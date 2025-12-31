@@ -1,4 +1,4 @@
-# 🏰 [PROJECT_NAME]
+# 🏰 Balairung | 3D Portfolio Hall
 
 > An immersive 3D portfolio experience — walk through a grand hall to explore my work.
 
@@ -10,7 +10,7 @@
 
 ## 📖 Overview
 
-[PROJECT_NAME] is an interactive portfolio website designed as a virtual museum hall. Visitors can explore projects displayed as paintings on walls and artifacts in display cases — either through first-person 3D navigation or a simplified 2D floor plan interface.
+Balairung | 3D Portfolio Hall is an interactive portfolio website designed as a virtual museum hall. Visitors can explore projects displayed as paintings on walls and artifacts in display cases — either through first-person 3D navigation or a simplified 2D floor plan interface.
 
 **Author:** Muhammad Hazimi Yusri  
 **Repository:** Public  
@@ -87,7 +87,7 @@ Theme choice affects:
 ### Directory Structure
 
 ```
-[project-name]/
+portfolio-hall/
 ├── public/
 │   ├── models/
 │   │   └── hall.glb              # Main hall 3D model
@@ -264,7 +264,7 @@ const shouldDefaultToFallback = (): boolean => {
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                                                         │
-│              Welcome to [PROJECT_NAME]                  │
+│              Welcome to Balairun                        │
 │                                                         │
 │   ┌─────────────────────────────────────────────────┐  │
 │   │                                                 │  │
@@ -411,8 +411,8 @@ Deployment is automated via GitHub Actions on push to `main`.
 
 ```bash
 # Clone repository
-git clone https://github.com/[username]/[project-name].git
-cd [project-name]
+git clone https://github.com/Muhammad-Hazimi-Yusri/portfolio-hall.git
+cd portfolio-hall
 
 # Install dependencies
 npm install
