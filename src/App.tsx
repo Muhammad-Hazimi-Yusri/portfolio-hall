@@ -1,14 +1,21 @@
 import { useState } from 'react'
+import { useDeviceCapability } from '@/hooks/useDeviceCapability'
 
 type AppMode = 'welcome' | '3d' | 'fallback'
 
 function App() {
   const [mode, setMode] = useState<AppMode>('welcome')
+  const { canUse3D, warnings, isChecking } = useDeviceCapability()
 
   return (
     <div className="w-full h-full flex items-center justify-center">
       {mode === 'welcome' && (
-        <WelcomeScreen onSelectMode={setMode} />
+        <WelcomeScreen 
+          onSelectMode={setMode}
+          canUse3D={canUse3D}
+          warnings={warnings}
+          isChecking={isChecking}
+        />
       )}
       {mode === 'fallback' && (
         <FallbackMode onSwitchMode={() => setMode('3d')} />
@@ -22,11 +29,18 @@ function App() {
 
 // Placeholder components - will be moved to separate files
 
-function WelcomeScreen({ onSelectMode }: { onSelectMode: (mode: AppMode) => void }) {
+type WelcomeScreenProps = {
+  onSelectMode: (mode: AppMode) => void
+  canUse3D: boolean
+  warnings: string[]
+  isChecking: boolean
+}
+
+function WelcomeScreen({ onSelectMode, canUse3D, warnings, isChecking }: WelcomeScreenProps) {
   return (
     <div className="text-center p-8 max-w-md">
       <h1 className="text-4xl font-bold mb-2 text-hall-text">
-        🏰 [PROJECT_NAME]
+        🏰 Balairung
       </h1>
       <p className="text-hall-muted mb-8">
         An immersive portfolio experience
@@ -42,17 +56,27 @@ function WelcomeScreen({ onSelectMode }: { onSelectMode: (mode: AppMode) => void
         
         <button
           onClick={() => onSelectMode('3d')}
-          className="w-full py-4 px-6 bg-hall-surface text-hall-text rounded-lg border border-hall-muted/30 hover:border-hall-accent transition-colors"
+          disabled={!canUse3D || isChecking}
+          className="w-full py-4 px-6 bg-hall-surface text-hall-text rounded-lg border border-hall-muted/30 hover:border-hall-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <span className="block font-semibold">Try Interactive 3D</span>
-          <span className="block text-sm text-hall-muted mt-1">
-            ⚠️ Requires WebGL • Best on desktop
+          <span className="block font-semibold">
+            {isChecking ? 'Checking device...' : 'Try Interactive 3D'}
           </span>
+          {!canUse3D && !isChecking && (
+            <span className="block text-sm text-red-400 mt-1">
+              ❌ WebGL not supported
+            </span>
+          )}
+          {canUse3D && warnings.length > 0 && (
+            <span className="block text-sm text-yellow-400 mt-1">
+              ⚠️ {warnings[0]}
+            </span>
+          )}
         </button>
       </div>
 
       <p className="text-hall-muted text-sm mt-8">
-        v0.1.0 — Scaffold
+        v0.2.0 — Welcome Gate
       </p>
     </div>
   )
