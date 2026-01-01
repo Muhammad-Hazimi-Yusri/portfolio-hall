@@ -3,7 +3,7 @@
 > An immersive 3D portfolio experience — walk through a grand hall to explore my work.
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
-[![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-0.3.0-blue.svg)]()
 [![Status](https://img.shields.io/badge/status-In%20Development-yellow.svg)]()
 
 ---
@@ -293,15 +293,15 @@ const shouldDefaultToFallback = (): boolean => {
 - [x] Mode selection logic with warnings
 - [x] Mode state management
 
-#### v0.3.0 — Fallback Mode
-- [ ] SVG floor plan component
-- [ ] Sidebar navigation
-- [ ] POI data loading from JSON
-- [ ] Click-to-select POI
-- [ ] Inspect modal component
-- [ ] Section filtering
-- [ ] Fully functional without 3D
-- [ ] Responsive layout
+#### v0.3.0 — Fallback Mode ✅
+- [x] SVG floor plan component
+- [x] Sidebar navigation
+- [x] POI data loading from JSON
+- [x] Click-to-select POI
+- [x] Inspect modal component
+- [x] Section filtering
+- [x] Fully functional without 3D
+- [x] Responsive layout
 
 ---
 

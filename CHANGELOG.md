@@ -15,18 +15,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [0.1.0] - 2025-12-30
+## [0.3.0] - 2025-01-01
 
 ### Added
-- Initial project scaffold
-- Vite + React + TypeScript setup
-- Tailwind CSS configuration
-- Babylon.js dependencies
-- Basic welcome screen with mode selection
-- POI type definitions
-- Placeholder POI data structure
-- GitHub Actions deployment workflow
-- Project documentation (README)
+- Fallback mode with full 2D experience
+- SVG floor plan with clickable POI markers
+- Sidebar navigation with section filtering
+- Inspect modal for POI details (description, tags, links)
+- `usePOIs` hook for data loading
+- `FloorPlan` component
+- Responsive layout (mobile-first)
+
 
 ## [0.2.0] - 2025-01-01
 
@@ -40,6 +39,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - WelcomeScreen now shows device-appropriate messaging
 - Updated project name to "Balairung" throughout
+
+
+## [0.1.0] - 2025-12-30
+
+### Added
+- Initial project scaffold
+- Vite + React + TypeScript setup
+- Tailwind CSS configuration
+- Babylon.js dependencies
+- Basic welcome screen with mode selection
+- POI type definitions
+- Placeholder POI data structure
+- GitHub Actions deployment workflow
+- Project documentation (README)
 
 ---
 
