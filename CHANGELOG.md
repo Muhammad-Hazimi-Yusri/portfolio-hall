@@ -10,7 +10,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- Welcome screen with device detection
 - 2D fallback mode (SVG floor plan)
 - 3D grand hall exploration
 
@@ -29,10 +28,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Actions deployment workflow
 - Project documentation (README)
 
+## [0.2.0] - 2025-01-01
+
+### Added
+- Device capability detection (`src/utils/detection.ts`)
+- `useDeviceCapability` React hook
+- WebGL hard blocker (disables 3D if unsupported)
+- Soft warnings for low RAM, slow connection, mobile, reduced motion
+- Dynamic 3D button state on welcome screen
+
+### Changed
+- WelcomeScreen now shows device-appropriate messaging
+- Updated project name to "Balairung" throughout
+
 ---
 
 <!-- 
-## [0.2.0] - YYYY-MM-DD
+## [X.X.X] - YYYY-MM-DD
 ### Added
 ### Changed
 ### Deprecated

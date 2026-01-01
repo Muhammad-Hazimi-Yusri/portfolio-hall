@@ -288,11 +288,10 @@ const shouldDefaultToFallback = (): boolean => {
 - [x] GitHub Pages deployment pipeline
 - [x] Basic welcome screen placeholder
 
-#### v0.2.0 — Welcome Gate
-- [ ] Device capability detection
-- [ ] Mode selection logic with warnings
-- [ ] Mode state management
-- [ ] Responsive layout
+#### v0.2.0 — Welcome Gate ✅
+- [x] Device capability detection
+- [x] Mode selection logic with warnings
+- [x] Mode state management
 
 #### v0.3.0 — Fallback Mode
 - [ ] SVG floor plan component
@@ -302,6 +301,7 @@ const shouldDefaultToFallback = (): boolean => {
 - [ ] Inspect modal component
 - [ ] Section filtering
 - [ ] Fully functional without 3D
+- [ ] Responsive layout
 
 ---
 
