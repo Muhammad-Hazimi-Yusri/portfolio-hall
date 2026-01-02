@@ -15,6 +15,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.0] - 2025-01-02
+
+### Added
+- Mobile joystick controls using nipplejs
+- Auto-detect mobile devices and show touch controls
+- Joystick movement with collision support
+
+
 ## [1.0.1] - [1.0.3] - 2025-01-02
 
 ### Changed

@@ -6,7 +6,11 @@ import { UniversalCamera } from '@babylonjs/core/Cameras/universalCamera'
 import '@babylonjs/core/Cameras/Inputs/freeCameraKeyboardMoveInput'
 import '@babylonjs/core/Cameras/Inputs/freeCameraMouseInput'
 
-export function createFirstPersonCamera(scene: Scene, canvas: HTMLCanvasElement) {
+export function createFirstPersonCamera(
+  scene: Scene,
+  canvas: HTMLCanvasElement,
+  joystickRef?: React.RefObject<{ x: number; y: number }>
+) {
   const camera = new UniversalCamera('fpCam', new Vector3(0, 1.6, 5), scene)
   
   camera.setTarget(new Vector3(0, 1.6, 0))
@@ -59,6 +63,20 @@ export function createFirstPersonCamera(scene: Scene, canvas: HTMLCanvasElement)
   let isGrounded = true
 
   scene.onBeforeRenderObservable.add(() => {
+    // Joystick movement (using cameraDirection for collision support)
+    if (joystickRef?.current) {
+      const { x, y } = joystickRef.current
+      if (x !== 0 || y !== 0) {
+        const moveSpeed = 0.06
+        camera.cameraDirection.addInPlace(
+          camera.getDirection(Vector3.Forward()).scale(y * moveSpeed)
+        )
+        camera.cameraDirection.addInPlace(
+          camera.getDirection(Vector3.Right()).scale(x * moveSpeed)
+        )
+      }
+    }
+
     velocityY += gravity
     camera.position.y += velocityY
 
