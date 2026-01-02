@@ -15,11 +15,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.0.1] - [1.0.2] - 2025-01-02
+## [1.0.1] - [1.0.3] - 2025-01-02
 
 ### Changed
 - v1.0.1: Lazy load Babylon.js only when user enters 3D mode
 - v1.0.2: Tree-shake Babylon.js with deep imports for smaller bundle
+- v1.0.2a: Fix camera/collision side-effect imports for tree-shaking
+- v1.0.3: Add loading screen with spinner while 3D loads
 
 ## [1.0.0] - 2025-01-02
 
