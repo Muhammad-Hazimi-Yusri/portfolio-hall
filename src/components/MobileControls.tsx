@@ -152,37 +152,38 @@ export function MobileControls({
       return { x, y }
     }
 
-    const updateFromTouches = (touches: TouchList) => {
-      if (!dpadRef.current) return
-      const rect = dpadRef.current.getBoundingClientRect()
-      
-      let totalX = 0, totalY = 0
-      
-      for (let i = 0; i < touches.length; i++) {
-        const t = touches[i]
-        // Only process touches within dpad bounds
-        if (t.clientX >= rect.left && t.clientX <= rect.right &&
-            t.clientY >= rect.top && t.clientY <= rect.bottom) {
-          const dir = calculateDirection(t.clientX, t.clientY)
-          totalX += dir.x
-          totalY += dir.y
+    useEffect(() => {
+
+      const updateFromTouches = (touches: TouchList) => {
+        if (!dpadRef.current) return
+        const rect = dpadRef.current.getBoundingClientRect()
+        
+        let totalX = 0, totalY = 0
+        
+        for (let i = 0; i < touches.length; i++) {
+          const t = touches[i]
+          // Only process touches within dpad bounds
+          if (t.clientX >= rect.left && t.clientX <= rect.right &&
+              t.clientY >= rect.top && t.clientY <= rect.bottom) {
+            const dir = calculateDirection(t.clientX, t.clientY)
+            totalX += dir.x
+            totalY += dir.y
+          }
+        }
+        
+        // Clamp
+        totalX = Math.max(-1, Math.min(1, totalX))
+        totalY = Math.max(-1, Math.min(1, totalY))
+        
+        setActiveDir({ x: totalX, y: totalY })
+        
+        if (totalX !== 0 || totalY !== 0) {
+          onMove(totalX, totalY)
+        } else {
+          onMoveEnd()
         }
       }
-      
-      // Clamp
-      totalX = Math.max(-1, Math.min(1, totalX))
-      totalY = Math.max(-1, Math.min(1, totalY))
-      
-      setActiveDir({ x: totalX, y: totalY })
-      
-      if (totalX !== 0 || totalY !== 0) {
-        onMove(totalX, totalY)
-      } else {
-        onMoveEnd()
-      }
-    }
 
-    useEffect(() => {
       const dpad = dpadRef.current
       if (!dpad) return
 
@@ -215,7 +216,7 @@ export function MobileControls({
         dpad.removeEventListener('touchend', onTouchEnd)
         dpad.removeEventListener('touchcancel', onTouchEnd)
       }
-    }, [onMove, onMoveEnd])
+    }, )
 
     const btnBase = "w-12 h-12 bg-[#2C2C2C] rounded-lg flex items-center justify-center text-2xl text-gray-300 select-none shadow-md transition-colors"
     const activeClass = "bg-[#1a1a1a] text-white"
