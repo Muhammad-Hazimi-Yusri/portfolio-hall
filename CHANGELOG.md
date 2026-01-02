@@ -15,6 +15,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.5] - 2025-01-02
+
+### Added
+- Game Boy-style control panel in portrait mode (gray shell, magenta buttons)
+- Toggle switches for P.Lock, Gyro, Run with engraved label styling
+- Multi-touch D-pad supporting diagonal movement (up+left, etc.)
+- Slide-between-buttons on D-pad (no lift required)
+- Configurable control panel height via CONTROL_PANEL_HEIGHT constant
+- Visual feedback on active D-pad directions
+
+### Changed
+- Portrait controls now occupy 45% of screen (adjustable)
+- D-pad uses touch event listeners for better responsiveness
+- A/B buttons styled magenta like classic Game Boy
+
 ## [1.1.4] - 2025-01-02
 
 ### Added

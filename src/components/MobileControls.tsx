@@ -7,10 +7,32 @@ type MobileControlsProps = {
   onLook: (deltaX: number, deltaY: number) => void
   onJump: () => void
   onInteract: () => void
-  canInteract: boolean  // show A button as active when near POI
+  canInteract: boolean
+  gyroEnabled: boolean
+  onGyroToggle: () => void
+  portraitLocked: boolean
+  onPortraitLockToggle: () => void
+  sprintEnabled: boolean
+  onSprintToggle: () => void
 }
 
-export function MobileControls({ onMove, onMoveEnd, onLook, onJump, onInteract, canInteract }: MobileControlsProps) {
+export function MobileControls({ 
+  onMove, 
+  onMoveEnd, 
+  onLook, 
+  onJump, 
+  onInteract, 
+  canInteract,
+  gyroEnabled,
+  onGyroToggle,
+  portraitLocked,
+  onPortraitLockToggle,
+  sprintEnabled,
+  onSprintToggle
+}: MobileControlsProps) {
+  // === EASY ADJUSTMENT: Change this value (0.4 = 40%, 0.5 = 50%, etc.) ===
+  const CONTROL_PANEL_HEIGHT = 0.30 // 45% of screen
+
   const joystickRef = useRef<HTMLDivElement>(null)
   const lookRef = useRef<HTMLDivElement>(null)
   const touchId = useRef<number | null>(null)
@@ -108,67 +130,145 @@ export function MobileControls({ onMove, onMoveEnd, onLook, onJump, onInteract, 
   }, [onLook, portrait])
 
   const DPad = () => {
-    const handleDirection = (x: number, y: number) => {
-      onMove(x, y)
+    const dpadRef = useRef<HTMLDivElement>(null)
+    const [activeDir, setActiveDir] = useState({ x: 0, y: 0 })
+
+    const calculateDirection = (touchX: number, touchY: number) => {
+      if (!dpadRef.current) return { x: 0, y: 0 }
+      
+      const rect = dpadRef.current.getBoundingClientRect()
+      const centerX = rect.left + rect.width / 2
+      const centerY = rect.top + rect.height / 2
+      
+      const dx = touchX - centerX
+      const dy = touchY - centerY
+      
+      const threshold = 15 // dead zone
+      let x = 0, y = 0
+      
+      if (Math.abs(dx) > threshold) x = dx > 0 ? 1 : -1
+      if (Math.abs(dy) > threshold) y = dy > 0 ? -1 : 1 // inverted for game coords
+      
+      return { x, y }
     }
 
-    const handleRelease = () => {
-      onMoveEnd()
+    const updateFromTouches = (touches: TouchList) => {
+      if (!dpadRef.current) return
+      const rect = dpadRef.current.getBoundingClientRect()
+      
+      let totalX = 0, totalY = 0
+      
+      for (let i = 0; i < touches.length; i++) {
+        const t = touches[i]
+        // Only process touches within dpad bounds
+        if (t.clientX >= rect.left && t.clientX <= rect.right &&
+            t.clientY >= rect.top && t.clientY <= rect.bottom) {
+          const dir = calculateDirection(t.clientX, t.clientY)
+          totalX += dir.x
+          totalY += dir.y
+        }
+      }
+      
+      // Clamp
+      totalX = Math.max(-1, Math.min(1, totalX))
+      totalY = Math.max(-1, Math.min(1, totalY))
+      
+      setActiveDir({ x: totalX, y: totalY })
+      
+      if (totalX !== 0 || totalY !== 0) {
+        onMove(totalX, totalY)
+      } else {
+        onMoveEnd()
+      }
     }
 
-    const btnClass = "w-12 h-12 bg-hall-surface/80 rounded-lg flex items-center justify-center text-2xl active:bg-hall-accent select-none"
+    useEffect(() => {
+      const dpad = dpadRef.current
+      if (!dpad) return
+
+      const onTouchStart = (e: TouchEvent) => {
+        e.preventDefault()
+        updateFromTouches(e.touches)
+      }
+      const onTouchMove = (e: TouchEvent) => {
+        e.preventDefault()
+        updateFromTouches(e.touches)
+      }
+      const onTouchEnd = (e: TouchEvent) => {
+        e.preventDefault()
+        if (e.touches.length === 0) {
+          setActiveDir({ x: 0, y: 0 })
+          onMoveEnd()
+        } else {
+          updateFromTouches(e.touches)
+        }
+      }
+
+      dpad.addEventListener('touchstart', onTouchStart, { passive: false })
+      dpad.addEventListener('touchmove', onTouchMove, { passive: false })
+      dpad.addEventListener('touchend', onTouchEnd, { passive: false })
+      dpad.addEventListener('touchcancel', onTouchEnd, { passive: false })
+
+      return () => {
+        dpad.removeEventListener('touchstart', onTouchStart)
+        dpad.removeEventListener('touchmove', onTouchMove)
+        dpad.removeEventListener('touchend', onTouchEnd)
+        dpad.removeEventListener('touchcancel', onTouchEnd)
+      }
+    }, [onMove, onMoveEnd])
+
+    const btnBase = "w-12 h-12 bg-[#2C2C2C] rounded-lg flex items-center justify-center text-2xl text-gray-300 select-none shadow-md transition-colors"
+    const activeClass = "bg-[#1a1a1a] text-white"
 
     return (
-      <div className="grid grid-cols-3 gap-1">
+      <div ref={dpadRef} className="grid grid-cols-3 gap-1 touch-none">
         <div />
-        <button
-          className={btnClass}
-          onTouchStart={() => handleDirection(0, 1)}
-          onTouchEnd={handleRelease}
-          onTouchCancel={handleRelease}
-        >
-          ▲
-        </button>
+        <div className={`${btnBase} ${activeDir.y > 0 ? activeClass : ''}`}>▲</div>
         <div />
-        <button
-          className={btnClass}
-          onTouchStart={() => handleDirection(-1, 0)}
-          onTouchEnd={handleRelease}
-          onTouchCancel={handleRelease}
-        >
-          ◀
-        </button>
+        <div className={`${btnBase} ${activeDir.x < 0 ? activeClass : ''}`}>◀</div>
         <div />
-        <button
-          className={btnClass}
-          onTouchStart={() => handleDirection(1, 0)}
-          onTouchEnd={handleRelease}
-          onTouchCancel={handleRelease}
-        >
-          ▶
-        </button>
+        <div className={`${btnBase} ${activeDir.x > 0 ? activeClass : ''}`}>▶</div>
         <div />
-        <button
-          className={btnClass}
-          onTouchStart={() => handleDirection(0, -1)}
-          onTouchEnd={handleRelease}
-          onTouchCancel={handleRelease}
-        >
-          ▼
-        </button>
+        <div className={`${btnBase} ${activeDir.y < 0 ? activeClass : ''}`}>▼</div>
         <div />
       </div>
     )
   }
 
-  const ActionButtons = () => {
-    const btnClass = "w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold select-none"
+  const ToggleButtons = () => {
+    const Toggle = ({ label, active, onToggle }: { label: string; active: boolean; onToggle: () => void }) => (
+      <button
+        onClick={onToggle}
+        className="flex flex-col items-center -rotate-[25deg]"
+      >
+        <div className={`w-12 h-6 rounded-full relative transition-colors shadow-inner ${active ? 'bg-hall-accent' : 'bg-gray-500'}`}>
+          <div className={`absolute top-1 w-4 h-4 rounded-full bg-gray-200 shadow transition-transform ${active ? 'translate-x-7' : 'translate-x-1'}`} />
+        </div>
+        <span className="text-[9px] text-gray-600 mt-1 uppercase tracking-wide font-medium"
+          style={{ textShadow: '1px 1px 0 rgba(255,255,255,0.3), -1px -1px 0 rgba(0,0,0,0.2)' }}
+        >
+          {label}
+        </span>
+      </button>
+    )
 
     return (
-      <div className="relative w-32 h-24">
+      <div className="flex gap-6">
+        <Toggle label="P.Lock" active={portraitLocked} onToggle={onPortraitLockToggle} />
+        <Toggle label="Gyro" active={gyroEnabled} onToggle={onGyroToggle} />
+        <Toggle label="Run" active={sprintEnabled} onToggle={onSprintToggle} />
+      </div>
+    )
+  }
+
+  const ActionButtons = () => {
+    const btnClass = "w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold select-none shadow-md"
+
+    return (
+      <div className="relative w-32 h-20">
         {/* A button - top right */}
         <button
-          className={`${btnClass} bg-hall-surface/80 active:bg-hall-accent ${canInteract ? 'ring-2 ring-hall-accent' : ''} absolute top-0 right-0`}
+          className={`${btnClass} bg-[#9B2257] text-white active:bg-[#7a1a45] ${canInteract ? 'ring-2 ring-white' : ''} absolute -top-4 right-0`}
           onClick={() => {
             if (canInteract) {
               onMoveEnd()
@@ -180,7 +280,7 @@ export function MobileControls({ onMove, onMoveEnd, onLook, onJump, onInteract, 
         </button>
         {/* B button - bottom left */}
         <button
-          className={`${btnClass} bg-hall-surface/80 active:bg-hall-accent absolute bottom-0 left-0`}
+          className={`${btnClass} bg-[#9B2257] text-white active:bg-[#7a1a45] absolute bottom-0 left-0`}
           onTouchStart={onJump}
         >
           B
@@ -195,12 +295,23 @@ export function MobileControls({ onMove, onMoveEnd, onLook, onJump, onInteract, 
         {/* Top area - touch drag for camera */}
         <div
           ref={lookRef}
-          className="flex-1 touch-none"
+          className="touch-none"
+          style={{ height: `${(1 - CONTROL_PANEL_HEIGHT) * 100}%` }}
         />
         {/* Bottom controls - GameBoy style */}
-        <div className="h-48 bg-hall-bg/50 flex items-center justify-between px-8 touch-none">
-          <DPad />
-          <ActionButtons />
+        <div 
+          className="bg-[#8B8B8B] flex flex-col justify-center touch-none rounded-t-3xl"
+          style={{ height: `${CONTROL_PANEL_HEIGHT * 100}%` }}
+        >
+          {/* Top row: D-pad + A/B buttons */}
+          <div className="flex items-center justify-center gap-8">
+            <DPad />
+            <ActionButtons />
+          </div>
+          {/* Bottom row: Toggles */}
+          <div className="flex justify-center mt-2">
+            <ToggleButtons />
+          </div>
         </div>
       </div>
     )

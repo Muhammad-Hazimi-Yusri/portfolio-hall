@@ -102,7 +102,7 @@ function WelcomeScreen({ onSelectMode, canUse3D, warnings, isChecking }: Welcome
       </div>
 
       <p className="text-hall-muted text-sm mt-8">
-        v1.1.4 — Cross-Platform Controls
+        v1.1.5 — Game Boy Controls
       </p>
     </div>
   )
