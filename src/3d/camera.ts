@@ -2,6 +2,10 @@ import { Scene } from '@babylonjs/core/scene'
 import { Vector3 } from '@babylonjs/core/Maths/math.vector'
 import { UniversalCamera } from '@babylonjs/core/Cameras/universalCamera'
 
+// Side-effect imports for camera inputs
+import '@babylonjs/core/Cameras/Inputs/freeCameraKeyboardMoveInput'
+import '@babylonjs/core/Cameras/Inputs/freeCameraMouseInput'
+
 export function createFirstPersonCamera(scene: Scene, canvas: HTMLCanvasElement) {
   const camera = new UniversalCamera('fpCam', new Vector3(0, 1.6, 5), scene)
   
