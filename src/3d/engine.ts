@@ -1,4 +1,5 @@
-import { Engine, Scene } from '@babylonjs/core'
+import { Engine } from '@babylonjs/core/Engines/engine'
+import { Scene } from '@babylonjs/core/scene'
 
 export function createEngine(canvas: HTMLCanvasElement): Engine {
   const engine = new Engine(canvas, true, {

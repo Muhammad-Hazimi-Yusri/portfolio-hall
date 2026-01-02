@@ -3,7 +3,7 @@
 > An immersive 3D portfolio experience — walk through a grand hall to explore my work.
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
-[![Version](https://img.shields.io/badge/version-1.0.1-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-1.0.2-blue.svg)]()
 [![Status](https://img.shields.io/badge/status-In%20Development-yellow.svg)]()
 
 ---
@@ -316,6 +316,10 @@ const shouldDefaultToFallback = (): boolean => {
 - [x] POI placeholder rendering
 - [x] Collision detection (walls + POIs)
 - [x] Basic interaction (approach + E key)
+
+#### v1.0.1 - v1.0.2 — Performance ✅
+- [x] Lazy load Babylon.js (only loads when entering 3D)
+- [x] Tree-shake with deep imports for smaller bundle
 
 #### v1.1.0 — 3D Polish
 - [ ] Mobile controls (virtual joystick)

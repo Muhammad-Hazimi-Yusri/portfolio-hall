@@ -1,4 +1,9 @@
-import { Scene, Vector3, MeshBuilder, StandardMaterial, Color3, Mesh } from '@babylonjs/core'
+import { Scene } from '@babylonjs/core/scene'
+import { Vector3 } from '@babylonjs/core/Maths/math.vector'
+import { Color3 } from '@babylonjs/core/Maths/math.color'
+import { MeshBuilder } from '@babylonjs/core/Meshes/meshBuilder'
+import { StandardMaterial } from '@babylonjs/core/Materials/standardMaterial'
+import { Mesh } from '@babylonjs/core/Meshes/mesh'
 import type { POI } from '@/types/poi'
 
 export function createPOIMeshes(scene: Scene, pois: POI[]) {

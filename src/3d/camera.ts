@@ -1,4 +1,6 @@
-import { Scene, Vector3, UniversalCamera } from '@babylonjs/core'
+import { Scene } from '@babylonjs/core/scene'
+import { Vector3 } from '@babylonjs/core/Maths/math.vector'
+import { UniversalCamera } from '@babylonjs/core/Cameras/universalCamera'
 
 export function createFirstPersonCamera(scene: Scene, canvas: HTMLCanvasElement) {
   const camera = new UniversalCamera('fpCam', new Vector3(0, 1.6, 5), scene)

@@ -1,4 +1,8 @@
-import { Scene, Vector3, Color3, MeshBuilder, StandardMaterial } from '@babylonjs/core'
+import { Scene } from '@babylonjs/core/scene'
+import { Vector3 } from '@babylonjs/core/Maths/math.vector'
+import { Color3 } from '@babylonjs/core/Maths/math.color'
+import { MeshBuilder } from '@babylonjs/core/Meshes/meshBuilder'
+import { StandardMaterial } from '@babylonjs/core/Materials/standardMaterial'
 
 export function createHall(scene: Scene) {
   scene.collisionsEnabled = true

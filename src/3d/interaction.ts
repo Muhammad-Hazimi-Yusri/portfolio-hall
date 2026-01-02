@@ -1,4 +1,6 @@
-import { Scene, Vector3, Mesh } from '@babylonjs/core'
+import { Scene } from '@babylonjs/core/scene'
+import { Vector3 } from '@babylonjs/core/Maths/math.vector'
+import { Mesh } from '@babylonjs/core/Meshes/mesh'
 import type { POI } from '@/types/poi'
 
 type POIMeshMap = Map<string, { mesh: Mesh; poi: POI }>

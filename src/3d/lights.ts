@@ -1,4 +1,8 @@
-import { Scene, Vector3, HemisphericLight, PointLight, Color3 } from '@babylonjs/core'
+import { Scene } from '@babylonjs/core/scene'
+import { Vector3 } from '@babylonjs/core/Maths/math.vector'
+import { Color3 } from '@babylonjs/core/Maths/math.color'
+import { HemisphericLight } from '@babylonjs/core/Lights/hemisphericLight'
+import { PointLight } from '@babylonjs/core/Lights/pointLight'
 
 export function createLights(scene: Scene) {
   // Ambient light
