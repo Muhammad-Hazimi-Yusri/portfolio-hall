@@ -9,7 +9,8 @@ import '@babylonjs/core/Cameras/Inputs/freeCameraMouseInput'
 export function createFirstPersonCamera(
   scene: Scene,
   canvas: HTMLCanvasElement,
-  joystickRef?: React.RefObject<{ x: number; y: number }>
+  joystickRef?: React.MutableRefObject<{ x: number; y: number }>,
+  lookRef?: React.MutableRefObject<{ x: number; y: number }>
 ) {
   const camera = new UniversalCamera('fpCam', new Vector3(0, 1.6, 5), scene)
   
@@ -74,6 +75,19 @@ export function createFirstPersonCamera(
         camera.cameraDirection.addInPlace(
           camera.getDirection(Vector3.Right()).scale(x * moveSpeed)
         )
+      }
+    }
+    // Touch look
+    if (lookRef?.current) {
+      const { x, y } = lookRef.current
+      if (x !== 0 || y !== 0) {
+        const sensitivity = 0.005
+        camera.rotation.y += x * sensitivity
+        camera.rotation.x += y * sensitivity
+        // Clamp vertical look
+        camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotation.x))
+        // Reset after applying
+        lookRef.current = { x: 0, y: 0 }
       }
     }
 

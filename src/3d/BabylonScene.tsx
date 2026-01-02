@@ -22,6 +22,12 @@ export function BabylonScene({ onInspect }: BabylonSceneProps) {
   const joystickRef = useRef({ x: 0, y: 0 })
   const showMobileControls = isMobile()
 
+  const lookRef = useRef({ x: 0, y: 0 })
+
+  const handleLook = useCallback((deltaX: number, deltaY: number) => {
+    lookRef.current = { x: deltaX, y: deltaY }
+  }, [])
+
   const handleMove = useCallback((x: number, y: number) => {
     joystickRef.current = { x, y }
   }, [])
@@ -39,7 +45,7 @@ export function BabylonScene({ onInspect }: BabylonSceneProps) {
 
     createHall(scene)
     createLights(scene)
-    const camera = createFirstPersonCamera(scene, canvas, joystickRef)
+    const camera = createFirstPersonCamera(scene, canvas, joystickRef, lookRef)
     const poiMeshes = createPOIMeshes(scene, poisData.pois as POI[])
 
     const cleanupPointerLock = setupPointerLock(canvas)
@@ -66,7 +72,11 @@ export function BabylonScene({ onInspect }: BabylonSceneProps) {
       <canvas ref={canvasRef} className="w-full h-full outline-none" />
       
       {showMobileControls && (
-        <MobileControls onMove={handleMove} onMoveEnd={handleMoveEnd} />
+        <MobileControls 
+          onMove={handleMove} 
+          onMoveEnd={handleMoveEnd}
+          onLook={handleLook}
+        />
       )}
       
       {nearbyPOI && (

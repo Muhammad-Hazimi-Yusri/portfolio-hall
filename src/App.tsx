@@ -82,7 +82,7 @@ function WelcomeScreen({ onSelectMode, canUse3D, warnings, isChecking }: Welcome
       </div>
 
       <p className="text-hall-muted text-sm mt-8">
-        v1.1.0 — Mobile Controls
+        v1.1.1 — Mobile Controls
       </p>
     </div>
   )

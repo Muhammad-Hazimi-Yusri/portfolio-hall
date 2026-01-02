@@ -3,7 +3,7 @@
 > An immersive 3D portfolio experience — walk through a grand hall to explore my work.
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
-[![Version](https://img.shields.io/badge/version-1.0.3-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-1.1.1-blue.svg)]()
 [![Status](https://img.shields.io/badge/status-In%20Development-yellow.svg)]()
 
 ---
