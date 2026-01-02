@@ -3,7 +3,7 @@
 > An immersive 3D portfolio experience — walk through a grand hall to explore my work.
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
-[![Version](https://img.shields.io/badge/version-0.3.0-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)]()
 [![Status](https://img.shields.io/badge/status-In%20Development-yellow.svg)]()
 
 ---
@@ -307,15 +307,15 @@ const shouldDefaultToFallback = (): boolean => {
 
 ### Version 1.x — 3D Experience
 
-#### v1.0.0 — 3D Core
-- [ ] Babylon.js engine setup
-- [ ] Hall model loading (.glb)
-- [ ] Basic lighting setup
-- [ ] First-person camera
-- [ ] Desktop controls (WASD + mouse)
-- [ ] POI placeholder rendering
-- [ ] Collision detection (walls)
-- [ ] Basic interaction (approach + keypress)
+#### v1.0.0 — 3D Core ✅
+- [x] Babylon.js engine setup
+- [x] Hall model loading (procedural)
+- [x] Basic lighting setup
+- [x] First-person camera
+- [x] Desktop controls (WASD + mouse + sprint + jump)
+- [x] POI placeholder rendering
+- [x] Collision detection (walls + POIs)
+- [x] Basic interaction (approach + E key)
 
 #### v1.1.0 — 3D Polish
 - [ ] Mobile controls (virtual joystick)

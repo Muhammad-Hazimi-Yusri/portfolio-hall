@@ -15,6 +15,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.0] - 2025-01-02
+
+### Added
+- Babylon.js engine setup (`src/3d/engine.ts`)
+- Procedural hall with ground and 4 walls (`src/3d/scene.ts`)
+- Basic lighting with ambient and point light (`src/3d/lights.ts`)
+- First-person camera with gravity and collisions (`src/3d/camera.ts`)
+- WASD movement, sprint (Shift), jump (Space)
+- Pointer lock for immersive controls (`src/3d/pointerLock.ts`)
+- POI placeholder meshes (paintings, display cases, pedestals)
+- Proximity-based interaction system (E key)
+- Inspect modal in 3D mode
+- BabylonScene React component
+
+
 ## [0.3.0] - 2025-01-01
 
 ### Added

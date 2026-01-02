@@ -1,7 +1,9 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useDeviceCapability } from '@/hooks/useDeviceCapability'
 import { usePOIs } from '@/hooks/usePOIs'
 import { FloorPlan } from '@/components/FloorPlan'
+import { BabylonScene } from '@/3d/BabylonScene'
+import type { POI } from '@/types/poi'
 
 type AppMode = 'welcome' | '3d' | 'fallback'
 
@@ -78,7 +80,7 @@ function WelcomeScreen({ onSelectMode, canUse3D, warnings, isChecking }: Welcome
       </div>
 
       <p className="text-hall-muted text-sm mt-8">
-        v0.2.0 — Welcome Gate
+        v1.0.0 — 3D Core
       </p>
     </div>
   )
@@ -202,16 +204,76 @@ function FallbackMode({ onSwitchMode }: { onSwitchMode: () => void }) {
 }
 
 function ThreeDMode({ onSwitchMode }: { onSwitchMode: () => void }) {
+  const [inspectedPOI, setInspectedPOI] = useState<POI | null>(null)
+
+  const handleInspect = useCallback((poi: POI) => {
+    setInspectedPOI(poi)
+    document.exitPointerLock()
+  }, [])
+
+  const closeModal = () => {
+    setInspectedPOI(null)
+    const canvas = document.querySelector('canvas')
+    if (canvas) {
+      canvas.focus()
+      canvas.requestPointerLock()
+    }
+  }
+
   return (
-    <div className="text-center p-8">
-      <h2 className="text-2xl font-bold mb-4">3D Mode</h2>
-      <p className="text-hall-muted mb-4">Babylon.js scene coming soon...</p>
+    <div className="w-full h-full relative">
+      <BabylonScene onInspect={handleInspect} />
       <button
         onClick={onSwitchMode}
-        className="text-hall-accent underline"
+        className="absolute top-4 right-4 px-3 py-1 bg-hall-surface/80 text-hall-accent rounded text-sm hover:bg-hall-surface"
       >
-        Switch to Simple Mode
+        Exit 3D
       </button>
+
+      {inspectedPOI && (
+        <div
+          className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50"
+          onClick={closeModal}
+        >
+          <div
+            className="bg-hall-surface rounded-lg max-w-lg w-full p-6 max-h-[80vh] overflow-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-2xl font-bold mb-2">{inspectedPOI.content.title}</h2>
+            <p className="text-hall-muted text-sm capitalize mb-4">
+              {inspectedPOI.type} · {inspectedPOI.section}
+            </p>
+            <p className="mb-4">{inspectedPOI.content.description}</p>
+
+            {inspectedPOI.content.tags && (
+              <div className="flex flex-wrap gap-2 mb-4">
+                {inspectedPOI.content.tags.map((tag) => (
+                  <span key={tag} className="px-2 py-1 bg-hall-muted/20 rounded text-sm">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {inspectedPOI.content.links && inspectedPOI.content.links.length > 0 && (
+              <div className="flex flex-wrap gap-3 mb-4">
+                {inspectedPOI.content.links.map((link) => (
+                  <a key={link.label} href={link.url} target="_blank" rel="noopener noreferrer" className="px-3 py-1 bg-hall-accent text-white rounded text-sm hover:opacity-90">
+                    {link.label}
+                  </a>
+                ))}
+              </div>
+            )}
+
+            <button
+              onClick={closeModal}
+              className="text-hall-accent underline"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
