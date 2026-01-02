@@ -15,6 +15,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.2] - 2025-01-02
+
+### Added
+- Portrait mode with Game Boy-style controls
+- D-pad for movement in portrait orientation
+- A button for interact, B button for jump
+- Touch-drag camera on upper screen area (portrait)
+- Orientation detection (auto-switch landscape/portrait controls)
+- Mobile-friendly interact button (replaces "Press E" prompt)
+
+### Fixed
+- Movement stuck bug when near POIs
+- Joystick cleanup on orientation change
+- Landscape prompt no longer shows in portrait mode
+
 ## [1.1.1] - 2025-01-02
 
 ### Added

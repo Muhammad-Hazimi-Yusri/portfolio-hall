@@ -10,7 +10,8 @@ export function createFirstPersonCamera(
   scene: Scene,
   canvas: HTMLCanvasElement,
   joystickRef?: React.MutableRefObject<{ x: number; y: number }>,
-  lookRef?: React.MutableRefObject<{ x: number; y: number }>
+  lookRef?: React.MutableRefObject<{ x: number; y: number }>,
+  jumpRef?: React.MutableRefObject<boolean>
 ) {
   const camera = new UniversalCamera('fpCam', new Vector3(0, 1.6, 5), scene)
   
@@ -89,6 +90,12 @@ export function createFirstPersonCamera(
         // Reset after applying
         lookRef.current = { x: 0, y: 0 }
       }
+    }
+    // Mobile jump
+    if (jumpRef?.current && isGrounded) {
+      velocityY = jumpForce
+      isGrounded = false
+      jumpRef.current = false
     }
 
     velocityY += gravity

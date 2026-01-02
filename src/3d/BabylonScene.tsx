@@ -18,11 +18,21 @@ type BabylonSceneProps = {
 export function BabylonScene({ onInspect }: BabylonSceneProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [nearbyPOI, setNearbyPOI] = useState<POI | null>(null)
-
   const joystickRef = useRef({ x: 0, y: 0 })
   const showMobileControls = isMobile()
-
   const lookRef = useRef({ x: 0, y: 0 })
+  const jumpRef = useRef(false)
+  const [isPortrait, setIsPortrait] = useState(window.innerHeight > window.innerWidth)
+
+  useEffect(() => {
+    const handleResize = () => setIsPortrait(window.innerHeight > window.innerWidth)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+  const handleJump = useCallback(() => {
+    jumpRef.current = true
+  }, [])
 
   const handleLook = useCallback((deltaX: number, deltaY: number) => {
     lookRef.current = { x: deltaX, y: deltaY }
@@ -45,7 +55,7 @@ export function BabylonScene({ onInspect }: BabylonSceneProps) {
 
     createHall(scene)
     createLights(scene)
-    const camera = createFirstPersonCamera(scene, canvas, joystickRef, lookRef)
+    const camera = createFirstPersonCamera(scene, canvas, joystickRef, lookRef, jumpRef)
     const poiMeshes = createPOIMeshes(scene, poisData.pois as POI[])
 
     const cleanupPointerLock = setupPointerLock(canvas)
@@ -76,13 +86,23 @@ export function BabylonScene({ onInspect }: BabylonSceneProps) {
           onMove={handleMove} 
           onMoveEnd={handleMoveEnd}
           onLook={handleLook}
+          onJump={handleJump}
+          onInteract={() => nearbyPOI && onInspect(nearbyPOI)}
+          canInteract={nearbyPOI !== null}
         />
       )}
-      
-      {nearbyPOI && (
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 bg-hall-surface/90 px-4 py-2 rounded">
-          Press <span className="text-hall-accent font-bold">E</span> to inspect {nearbyPOI.content.title}
-        </div>
+            
+      {nearbyPOI && !(showMobileControls && isPortrait) && (
+        <button
+          onClick={() => onInspect(nearbyPOI)}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 bg-hall-surface/90 px-4 py-2 rounded z-50"
+        >
+          {showMobileControls ? (
+            <span>Tap to inspect <span className="text-hall-accent font-bold">{nearbyPOI.content.title}</span></span>
+          ) : (
+            <span>Press <span className="text-hall-accent font-bold">E</span> to inspect {nearbyPOI.content.title}</span>
+          )}
+        </button>
       )}
     </div>
   )

@@ -1,20 +1,38 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import nipplejs from 'nipplejs'
 
 type MobileControlsProps = {
   onMove: (x: number, y: number) => void
   onMoveEnd: () => void
   onLook: (deltaX: number, deltaY: number) => void
+  onJump: () => void
+  onInteract: () => void
+  canInteract: boolean  // show A button as active when near POI
 }
 
-export function MobileControls({ onMove, onMoveEnd, onLook }: MobileControlsProps) {
+export function MobileControls({ onMove, onMoveEnd, onLook, onJump, onInteract, canInteract }: MobileControlsProps) {
   const joystickRef = useRef<HTMLDivElement>(null)
   const lookRef = useRef<HTMLDivElement>(null)
   const touchId = useRef<number | null>(null)
   const lastTouch = useRef<{ x: number; y: number } | null>(null)
+  const [portrait, setPortrait] = useState(window.innerHeight > window.innerWidth)
 
-  // Joystick setup
   useEffect(() => {
+    const handleResize = () => {
+      setPortrait(window.innerHeight > window.innerWidth)
+    }
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+  // Reset movement when interaction state changes
+  useEffect(() => {
+    onMoveEnd()
+  }, [canInteract, onMoveEnd])
+
+  // Joystick setup - only in landscape
+  useEffect(() => {
+    if (portrait) return  // Skip in portrait mode
     if (!joystickRef.current) return
 
     const manager = nipplejs.create({
@@ -36,8 +54,9 @@ export function MobileControls({ onMove, onMoveEnd, onLook }: MobileControlsProp
 
     return () => {
       manager.destroy()
+      onMoveEnd()  // Reset movement on cleanup
     }
-  }, [onMove, onMoveEnd])
+  }, [onMove, onMoveEnd, portrait])
 
   // Look touch setup
   useEffect(() => {
@@ -88,6 +107,104 @@ export function MobileControls({ onMove, onMoveEnd, onLook }: MobileControlsProp
     }
   }, [onLook])
 
+  const DPad = () => {
+    const handleDirection = (x: number, y: number) => {
+      onMove(x, y)
+    }
+
+    const handleRelease = () => {
+      onMoveEnd()
+    }
+
+    const btnClass = "w-12 h-12 bg-hall-surface/80 rounded-lg flex items-center justify-center text-2xl active:bg-hall-accent select-none"
+
+    return (
+      <div className="grid grid-cols-3 gap-1">
+        <div />
+        <button
+          className={btnClass}
+          onTouchStart={() => handleDirection(0, 1)}
+          onTouchEnd={handleRelease}
+          onTouchCancel={handleRelease}
+        >
+          ▲
+        </button>
+        <div />
+        <button
+          className={btnClass}
+          onTouchStart={() => handleDirection(-1, 0)}
+          onTouchEnd={handleRelease}
+          onTouchCancel={handleRelease}
+        >
+          ◀
+        </button>
+        <div />
+        <button
+          className={btnClass}
+          onTouchStart={() => handleDirection(1, 0)}
+          onTouchEnd={handleRelease}
+          onTouchCancel={handleRelease}
+        >
+          ▶
+        </button>
+        <div />
+        <button
+          className={btnClass}
+          onTouchStart={() => handleDirection(0, -1)}
+          onTouchEnd={handleRelease}
+          onTouchCancel={handleRelease}
+        >
+          ▼
+        </button>
+        <div />
+      </div>
+    )
+  }
+
+  const ActionButtons = () => {
+    const btnClass = "w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold select-none"
+
+    return (
+      <div className="flex flex-col items-end gap-2">
+        <button
+          className={`${btnClass} bg-hall-surface/80 active:bg-hall-accent ${canInteract ? 'ring-2 ring-hall-accent' : ''}`}
+          onClick={() => {
+            if (canInteract) {
+              onMoveEnd()
+              onInteract()
+            }
+          }}
+        >
+          A
+        </button>
+        <button
+          className={`${btnClass} bg-hall-surface/80 active:bg-hall-accent`}
+          onTouchStart={onJump}
+        >
+          B
+        </button>
+      </div>
+    )
+  }
+
+  if (portrait) {
+    return (
+      <div className="absolute inset-0 z-40 flex flex-col">
+        {/* Top area - touch drag for camera */}
+        <div
+          ref={lookRef}
+          className="flex-1 touch-none"
+        />
+        {/* Bottom controls - GameBoy style */}
+        <div className="h-48 bg-hall-bg/50 flex items-center justify-between px-8 touch-none">
+          <DPad />
+          <ActionButtons />
+        </div>
+      </div>
+    )
+  }
+
+  // Landscape mode (existing)
   return (
     <>
       <div
