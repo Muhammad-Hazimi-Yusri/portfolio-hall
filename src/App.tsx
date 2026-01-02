@@ -1,9 +1,10 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, lazy, Suspense } from 'react'
 import { useDeviceCapability } from '@/hooks/useDeviceCapability'
 import { usePOIs } from '@/hooks/usePOIs'
 import { FloorPlan } from '@/components/FloorPlan'
-import { BabylonScene } from '@/3d/BabylonScene'
 import type { POI } from '@/types/poi'
+
+const BabylonScene = lazy(() => import('@/3d/BabylonScene').then(m => ({ default: m.BabylonScene })))
 
 type AppMode = 'welcome' | '3d' | 'fallback'
 
@@ -222,7 +223,9 @@ function ThreeDMode({ onSwitchMode }: { onSwitchMode: () => void }) {
 
   return (
     <div className="w-full h-full relative">
-      <BabylonScene onInspect={handleInspect} />
+      <Suspense fallback={<div className="w-full h-full flex items-center justify-center text-hall-muted">Loading 3D...</div>}>
+        <BabylonScene onInspect={handleInspect} />
+      </Suspense>
       <button
         onClick={onSwitchMode}
         className="absolute top-4 right-4 px-3 py-1 bg-hall-surface/80 text-hall-accent rounded text-sm hover:bg-hall-surface"

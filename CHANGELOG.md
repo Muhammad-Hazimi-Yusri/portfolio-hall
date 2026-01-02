@@ -15,6 +15,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.1] - 2025-01-02
+
+### Changed
+- Lazy load Babylon.js only when user enters 3D mode
+- Fallback mode no longer downloads 3D engine code
+
 ## [1.0.0] - 2025-01-02
 
 ### Added
