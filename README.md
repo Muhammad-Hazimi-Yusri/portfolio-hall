@@ -1,10 +1,36 @@
 # 🏰 Balairung | 3D Portfolio Hall
 
-> An immersive 3D portfolio experience — walk through a grand hall to explore my work.
+> **Balairung** /bə-ˈlaɪ-ruŋ/ — *noun, Malay*
+> 
+> A grand royal hall or throne room; the ceremonial heart of a palace where audiences are received and important gatherings held.
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
 [![Version](https://img.shields.io/badge/version-1.1.2-blue.svg)]()
 [![Status](https://img.shields.io/badge/status-In%20Development-yellow.svg)]()
+
+<details>
+<summary>📑 Table of Contents</summary>
+
+- [Overview](#-overview)
+- [Live Demo](#-live-demo)
+- [Project Goals](#-project-goals)
+- [Theme](#-theme)
+- [Features](#-features)
+- [Tech Stack](#-tech-stack)
+- [Architecture](#-architecture)
+- [Data Structures](#-data-structures)
+- [Hall Layout](#-hall-layout--balairung)
+- [Controls](#-controls)
+- [Mode Detection & Fallback](#-mode-detection--fallback)
+- [Development Roadmap](#-development-roadmap)
+- [Testing Strategy](#-testing-strategy)
+- [Deployment](#-deployment)
+- [Getting Started](#-getting-started)
+- [License](#-license)
+- [Changelog](#-changelog)
+- [Contact](#-contact)
+
+</details>
 
 ---
 
@@ -15,6 +41,10 @@ Balairung | 3D Portfolio Hall is an interactive portfolio website designed as a 
 **Author:** Muhammad Hazimi Yusri  
 **Repository:** Public  
 **Hosting:** GitHub Pages (with Cloudflare domain)
+
+## 🌐 Live Demo
+
+**[View Live → muhammad-hazimi-yusri.github.io/portfolio-hall](https://muhammad-hazimi-yusri.github.io/portfolio-hall/)**
 
 ---
 

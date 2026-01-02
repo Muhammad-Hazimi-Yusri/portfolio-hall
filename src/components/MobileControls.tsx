@@ -165,9 +165,10 @@ export function MobileControls({ onMove, onMoveEnd, onLook, onJump, onInteract, 
     const btnClass = "w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold select-none"
 
     return (
-      <div className="flex flex-col items-end gap-2">
+      <div className="relative w-32 h-24">
+        {/* A button - top right */}
         <button
-          className={`${btnClass} bg-hall-surface/80 active:bg-hall-accent ${canInteract ? 'ring-2 ring-hall-accent' : ''}`}
+          className={`${btnClass} bg-hall-surface/80 active:bg-hall-accent ${canInteract ? 'ring-2 ring-hall-accent' : ''} absolute top-0 right-0`}
           onClick={() => {
             if (canInteract) {
               onMoveEnd()
@@ -177,8 +178,9 @@ export function MobileControls({ onMove, onMoveEnd, onLook, onJump, onInteract, 
         >
           A
         </button>
+        {/* B button - bottom left */}
         <button
-          className={`${btnClass} bg-hall-surface/80 active:bg-hall-accent`}
+          className={`${btnClass} bg-hall-surface/80 active:bg-hall-accent absolute bottom-0 left-0`}
           onTouchStart={onJump}
         >
           B

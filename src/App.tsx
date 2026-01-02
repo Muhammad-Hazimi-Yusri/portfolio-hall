@@ -1,4 +1,4 @@
-import { useState, useCallback, lazy, Suspense } from 'react'
+import { useState, useCallback, lazy, Suspense, useEffect } from 'react'
 import { useDeviceCapability } from '@/hooks/useDeviceCapability'
 import { usePOIs } from '@/hooks/usePOIs'
 import { FloorPlan } from '@/components/FloorPlan'
@@ -82,7 +82,7 @@ function WelcomeScreen({ onSelectMode, canUse3D, warnings, isChecking }: Welcome
       </div>
 
       <p className="text-hall-muted text-sm mt-8">
-        v1.1.2 — Portrait Controls
+        v1.1.3 — Fullscreen Support
       </p>
     </div>
   )
@@ -207,6 +207,42 @@ function FallbackMode({ onSwitchMode }: { onSwitchMode: () => void }) {
 
 function ThreeDMode({ onSwitchMode }: { onSwitchMode: () => void }) {
   const [inspectedPOI, setInspectedPOI] = useState<POI | null>(null)
+  const [isFullscreen, setIsFullscreen] = useState(!!document.fullscreenElement)
+  const [showFullscreenHint, setShowFullscreenHint] = useState(false)
+  const [isPortrait, setIsPortrait] = useState(window.innerHeight > window.innerWidth)
+  const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+
+  useEffect(() => {
+    const handleResize = () => setIsPortrait(window.innerHeight > window.innerWidth)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement)
+    }
+    document.addEventListener('fullscreenchange', handleFullscreenChange)
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange)
+  }, [])
+
+  // Show hint when entering landscape on mobile
+  useEffect(() => {
+    if (isMobileDevice && !isPortrait && !isFullscreen) {
+      setShowFullscreenHint(true)
+      const timer = setTimeout(() => setShowFullscreenHint(false), 3000)
+      return () => clearTimeout(timer)
+    }
+  }, [isMobileDevice, isPortrait, isFullscreen])
+
+  const requestFullscreen = () => {
+    const elem = document.documentElement
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen()
+    } else if ((elem as unknown as { webkitRequestFullscreen: () => void }).webkitRequestFullscreen) {
+      (elem as unknown as { webkitRequestFullscreen: () => void }).webkitRequestFullscreen()
+    }
+  }
 
   const handleInspect = useCallback((poi: POI) => {
     setInspectedPOI(poi)
@@ -229,10 +265,28 @@ function ThreeDMode({ onSwitchMode }: { onSwitchMode: () => void }) {
       </Suspense>
       <button
         onClick={onSwitchMode}
-        className="absolute top-4 right-4 px-3 py-1 bg-hall-surface/80 text-hall-accent rounded text-sm hover:bg-hall-surface"
+        className="absolute top-4 left-4 px-3 py-1 bg-hall-surface/80 text-hall-accent rounded text-sm hover:bg-hall-surface z-50"
       >
         Exit 3D
       </button>
+
+      {isMobileDevice && !isPortrait && !isFullscreen && (
+      <button
+        onClick={requestFullscreen}
+        className="absolute top-4 right-4 flex items-center gap-2 z-50"
+      >
+        <span 
+          className={`bg-hall-surface/90 px-3 py-1 rounded text-sm transition-all duration-300 ${
+            showFullscreenHint ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'
+          }`}
+        >
+          Tap for fullscreen
+        </span>
+        <span className="bg-hall-surface/90 p-2 rounded">
+          ⛶
+        </span>
+      </button>
+    )}
 
       {inspectedPOI && (
         <div

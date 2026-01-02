@@ -15,6 +15,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.3] - 2025-01-02
+
+### Added
+- Fullscreen button for landscape mobile (top-right)
+- Fullscreen hint that slides in when entering landscape, fades after 3s
+- Fullscreen state tracking
+
+### Changed
+- Exit 3D button moved to top-left
+- Exit 3D button z-index increased (z-50)
+
 ## [1.1.2] - 2025-01-02
 
 ### Added
