@@ -43,6 +43,9 @@ type WelcomeScreenProps = {
 }
 
 function WelcomeScreen({ onSelectMode, canUse3D, warnings, isChecking }: WelcomeScreenProps) {
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+  const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+
   return (
     <div className="text-center p-8 max-w-md">
       <h1 className="text-4xl font-bold mb-2 text-hall-text">
@@ -81,8 +84,25 @@ function WelcomeScreen({ onSelectMode, canUse3D, warnings, isChecking }: Welcome
         </button>
       </div>
 
+      <div className="text-hall-muted text-xs mt-6 max-w-xs space-y-2 text-center mx-auto">
+        <p className="text-hall-text text-sm font-semibold">🎮 Controls</p>
+        <p><strong>Desktop:</strong> WASD + mouse, sprint, jump</p>
+        <p><strong>Mobile landscape:</strong> Virtual joystick + touch-drag camera</p>
+        <p><strong>Mobile portrait:</strong> Game Boy-style D-pads control buttons</p>
+        {isMobileDevice && isIOS && (
+          <p className="text-yellow-400 mt-2">
+            📱 iOS: Add to Home Screen for best landscape experience
+          </p>
+        )}
+        {isMobileDevice && !isIOS && (
+          <p className="text-yellow-400 mt-2">
+            📱 Use fullscreen in landscape for immersive experience
+          </p>
+        )}
+      </div>
+
       <p className="text-hall-muted text-sm mt-8">
-        v1.1.3 — Fullscreen Support
+        v1.1.4 — Cross-Platform Controls
       </p>
     </div>
   )
@@ -211,6 +231,9 @@ function ThreeDMode({ onSwitchMode }: { onSwitchMode: () => void }) {
   const [showFullscreenHint, setShowFullscreenHint] = useState(false)
   const [isPortrait, setIsPortrait] = useState(window.innerHeight > window.innerWidth)
   const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+  const isPWA = window.matchMedia('(display-mode: standalone)').matches
+  const [iosLandscapeDismissed, setIosLandscapeDismissed] = useState(false)
 
   useEffect(() => {
     const handleResize = () => setIsPortrait(window.innerHeight > window.innerWidth)
@@ -270,7 +293,7 @@ function ThreeDMode({ onSwitchMode }: { onSwitchMode: () => void }) {
         Exit 3D
       </button>
 
-      {isMobileDevice && !isPortrait && !isFullscreen && (
+      {isMobileDevice && !isIOS && !isPortrait && !isFullscreen && (
       <button
         onClick={requestFullscreen}
         className="absolute top-4 right-4 flex items-center gap-2 z-50"
@@ -286,6 +309,27 @@ function ThreeDMode({ onSwitchMode }: { onSwitchMode: () => void }) {
           ⛶
         </span>
       </button>
+    )}
+
+    {isMobileDevice && isIOS && !isPortrait && !isPWA && !iosLandscapeDismissed && (
+      <div className="absolute inset-0 bg-black/90 z-50 flex flex-col items-center justify-center p-8 text-center">
+        <p className="text-2xl mb-4">📱</p>
+        <h2 className="text-xl font-bold mb-2">Add to Home Screen</h2>
+        <p className="text-hall-muted mb-6 max-w-xs">
+          For the best landscape experience on iOS, add this site to your home screen.
+        </p>
+        <ol className="text-left text-sm text-hall-muted space-y-2 mb-6">
+          <li>1. Tap the <span className="text-hall-text">Share</span> button (⬆️)</li>
+          <li>2. Scroll down, tap <span className="text-hall-text">Add to Home Screen</span></li>
+          <li>3. Open from your home screen</li>
+        </ol>
+        <button
+          onClick={() => setIosLandscapeDismissed(true)}
+          className="text-hall-accent underline text-sm"
+        >
+          Continue anyway
+        </button>
+      </div>
     )}
 
       {inspectedPOI && (

@@ -5,7 +5,7 @@
 > A grand royal hall or throne room; the ceremonial heart of a palace where audiences are received and important gatherings held.
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
-[![Version](https://img.shields.io/badge/version-1.1.2-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-1.1.4-blue.svg)]()
 [![Status](https://img.shields.io/badge/status-In%20Development-yellow.svg)]()
 
 <details>
@@ -256,9 +256,12 @@ WALL│  [Contact]                     [Skills]   │WALL
 | Platform | Movement | Camera | Interact |
 |----------|----------|--------|----------|
 | Desktop | WASD / Arrow keys | Mouse (pointer lock) | E key or Left click |
-| Mobile (landscape) | Left joystick | Right touch drag | Tap on POI |
-| Mobile (portrait) | Bottom joystick | Gyro (optional) + touch | Tap on POI |
+| Mobile (landscape) | Virtual joystick | Touch drag | Tap on POI |
+| Mobile (portrait) | D-pad | Touch drag or Gyro | A button |
 | VR (future) | Thumbstick / Teleport | Headset tracking | Controller trigger |
+
+### iOS Note
+iOS Safari doesn't support fullscreen API. For best landscape experience, add the site to your home screen (PWA mode).
 
 ### Teleportation
 - Click minimap location → fade out → fly to → fade in → face nearest POI

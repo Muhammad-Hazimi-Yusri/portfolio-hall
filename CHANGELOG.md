@@ -15,6 +15,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.4] - 2025-01-02
+
+### Added
+- Controls info on welcome screen (desktop, landscape, portrait)
+- iOS-specific PWA prompt when in landscape (dismissible overlay)
+- Mobile tips on welcome screen (iOS: Add to Home Screen, Android: fullscreen)
+
+### Fixed
+- Touch camera rotation breaking after orientation change
+- Hide fullscreen button on iOS (not supported by Safari)
+
 ## [1.1.3] - 2025-01-02
 
 ### Added

@@ -105,7 +105,7 @@ export function MobileControls({ onMove, onMoveEnd, onLook, onJump, onInteract, 
       lookZone.removeEventListener('touchmove', onTouchMove)
       lookZone.removeEventListener('touchend', onTouchEnd)
     }
-  }, [onLook])
+  }, [onLook, portrait])
 
   const DPad = () => {
     const handleDirection = (x: number, y: number) => {
