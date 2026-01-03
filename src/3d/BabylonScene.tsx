@@ -23,6 +23,10 @@ export function BabylonScene({ onInspect }: BabylonSceneProps) {
   const lookRef = useRef({ x: 0, y: 0 })
   const jumpRef = useRef(false)
   const [isPortrait, setIsPortrait] = useState(window.innerHeight > window.innerWidth)
+  const sprintRef = useRef(false)
+  const [sprintEnabled, setSprintEnabled] = useState(false)
+  const [gyroEnabled, setGyroEnabled] = useState(false)
+  const gyroRef = useRef(false)
 
   useEffect(() => {
     const handleResize = () => setIsPortrait(window.innerHeight > window.innerWidth)
@@ -55,7 +59,7 @@ export function BabylonScene({ onInspect }: BabylonSceneProps) {
 
     createHall(scene)
     createLights(scene)
-    const camera = createFirstPersonCamera(scene, canvas, joystickRef, lookRef, jumpRef)
+    const camera = createFirstPersonCamera(scene, canvas, joystickRef, lookRef, jumpRef, sprintRef, gyroRef)
     const poiMeshes = createPOIMeshes(scene, poisData.pois as POI[])
 
     const cleanupPointerLock = setupPointerLock(canvas)
@@ -89,13 +93,27 @@ export function BabylonScene({ onInspect }: BabylonSceneProps) {
           onJump={handleJump}
           onInteract={() => nearbyPOI && onInspect(nearbyPOI)}
           canInteract={nearbyPOI !== null}
-          // Temporary fix to pass npm run type-check
-          gyroEnabled={true}
-          onGyroToggle={handleJump}
-          portraitLocked={true}
-          onPortraitLockToggle={handleJump}
-          sprintEnabled={true}
-          onSprintToggle={handleJump}
+          gyroEnabled={gyroEnabled}
+          onGyroToggle={async () => {
+            if (!gyroEnabled) {
+              // Request permission on iOS
+              if (typeof (DeviceOrientationEvent as unknown as { requestPermission?: () => Promise<string> }).requestPermission === 'function') {
+                try {
+                  const permission = await (DeviceOrientationEvent as unknown as { requestPermission: () => Promise<string> }).requestPermission()
+                  if (permission !== 'granted') return
+                } catch {
+                  return
+                }
+              }
+            }
+            setGyroEnabled(prev => !prev)
+            gyroRef.current = !gyroRef.current
+          }}
+          sprintEnabled={sprintEnabled}
+          onSprintToggle={() => {
+            setSprintEnabled(prev => !prev)
+            sprintRef.current = !sprintRef.current
+          }}
         />
       )}
             

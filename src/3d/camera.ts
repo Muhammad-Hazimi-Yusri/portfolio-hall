@@ -11,7 +11,9 @@ export function createFirstPersonCamera(
   canvas: HTMLCanvasElement,
   joystickRef?: React.MutableRefObject<{ x: number; y: number }>,
   lookRef?: React.MutableRefObject<{ x: number; y: number }>,
-  jumpRef?: React.MutableRefObject<boolean>
+  jumpRef?: React.MutableRefObject<boolean>,
+  sprintRef?: React.MutableRefObject<boolean>,
+  gyroRef?: React.MutableRefObject<boolean>
 ) {
   const camera = new UniversalCamera('fpCam', new Vector3(0, 1.6, 5), scene)
   
@@ -55,8 +57,7 @@ export function createFirstPersonCamera(
   camera.ellipsoidOffset = new Vector3(0, 0.9, 0)
   camera.checkCollisions = true
 
-  // Gravity & Jump
-  camera.applyGravity = false // We'll handle it manually
+  camera.applyGravity = false
   
   let velocityY = 0
   const gravity = -0.015
@@ -64,12 +65,42 @@ export function createFirstPersonCamera(
   const groundY = 1.6
   let isGrounded = true
 
+  // Gyro state
+  let initialAlpha: number | null = null
+  let touchOffsetYaw = 0
+  let touchOffsetPitch = 0
+
+  const handleOrientation = (e: DeviceOrientationEvent) => {
+    if (!gyroRef?.current) return
+    if (e.alpha === null || e.beta === null) return
+
+    // Store initial heading on first read
+    if (initialAlpha === null) {
+      initialAlpha = e.alpha
+    }
+
+    // alpha: compass heading → yaw (horizontal look)
+    // beta: tilt forward/back → pitch (vertical look)
+    
+    let yaw = ((e.alpha - initialAlpha) * Math.PI) / 180
+    // Normalize to -PI to PI
+    while (yaw > Math.PI) yaw -= 2 * Math.PI
+    while (yaw < -Math.PI) yaw += 2 * Math.PI
+
+    const pitch = ((e.beta - 90) * Math.PI) / 180
+
+    camera.rotation.y = -yaw + touchOffsetYaw
+    camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, -pitch + touchOffsetPitch))
+  }
+
+  window.addEventListener('deviceorientation', handleOrientation)
+
   scene.onBeforeRenderObservable.add(() => {
-    // Joystick movement (using cameraDirection for collision support)
+    // Joystick movement
     if (joystickRef?.current) {
       const { x, y } = joystickRef.current
       if (x !== 0 || y !== 0) {
-        const moveSpeed = 0.06
+        const moveSpeed = sprintRef?.current ? 0.12 : 0.06
         camera.cameraDirection.addInPlace(
           camera.getDirection(Vector3.Forward()).scale(y * moveSpeed)
         )
@@ -78,19 +109,28 @@ export function createFirstPersonCamera(
         )
       }
     }
+
     // Touch look
     if (lookRef?.current) {
       const { x, y } = lookRef.current
       if (x !== 0 || y !== 0) {
-        const sensitivity = 0.005
-        camera.rotation.y += x * sensitivity
-        camera.rotation.x += y * sensitivity
-        // Clamp vertical look
-        camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotation.x))
-        // Reset after applying
+        if (gyroRef?.current) {
+          // Gyro ON: touch adds offset
+          const sensitivity = 0.003
+          touchOffsetYaw += x * sensitivity
+          touchOffsetPitch += y * sensitivity
+          touchOffsetPitch = Math.max(-Math.PI / 4, Math.min(Math.PI / 4, touchOffsetPitch))
+        } else {
+          // Gyro OFF: touch controls camera directly
+          const sensitivity = 0.005
+          camera.rotation.y += x * sensitivity
+          camera.rotation.x += y * sensitivity
+          camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotation.x))
+        }
         lookRef.current = { x: 0, y: 0 }
       }
     }
+
     // Mobile jump
     if (jumpRef?.current && isGrounded) {
       velocityY = jumpForce
@@ -98,6 +138,7 @@ export function createFirstPersonCamera(
       jumpRef.current = false
     }
 
+    // Gravity
     velocityY += gravity
     camera.position.y += velocityY
 

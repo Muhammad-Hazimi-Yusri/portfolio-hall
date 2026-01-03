@@ -10,8 +10,6 @@ type MobileControlsProps = {
   canInteract: boolean
   gyroEnabled: boolean
   onGyroToggle: () => void
-  portraitLocked: boolean
-  onPortraitLockToggle: () => void
   sprintEnabled: boolean
   onSprintToggle: () => void
 }
@@ -25,13 +23,10 @@ export function MobileControls({
   canInteract,
   gyroEnabled,
   onGyroToggle,
-  portraitLocked,
-  onPortraitLockToggle,
   sprintEnabled,
   onSprintToggle
 }: MobileControlsProps) {
-  // === EASY ADJUSTMENT: Change this value (0.4 = 40%, 0.5 = 50%, etc.) ===
-  const CONTROL_PANEL_HEIGHT = 0.30 // 45% of screen
+  const CONTROL_PANEL_HEIGHT = 0.30
 
   const joystickRef = useRef<HTMLDivElement>(null)
   const lookRef = useRef<HTMLDivElement>(null)
@@ -54,7 +49,7 @@ export function MobileControls({
 
   // Joystick setup - only in landscape
   useEffect(() => {
-    if (portrait) return  // Skip in portrait mode
+    if (portrait) return
     if (!joystickRef.current) return
 
     const manager = nipplejs.create({
@@ -76,7 +71,7 @@ export function MobileControls({
 
     return () => {
       manager.destroy()
-      onMoveEnd()  // Reset movement on cleanup
+      onMoveEnd()
     }
   }, [onMove, onMoveEnd, portrait])
 
@@ -86,7 +81,7 @@ export function MobileControls({
     if (!lookZone) return
 
     const onTouchStart = (e: TouchEvent) => {
-      if (touchId.current !== null) return // already tracking a touch
+      if (touchId.current !== null) return
       const touch = e.changedTouches[0]
       touchId.current = touch.identifier
       lastTouch.current = { x: touch.clientX, y: touch.clientY }
@@ -143,17 +138,16 @@ export function MobileControls({
       const dx = touchX - centerX
       const dy = touchY - centerY
       
-      const threshold = 15 // dead zone
+      const threshold = 15
       let x = 0, y = 0
       
       if (Math.abs(dx) > threshold) x = dx > 0 ? 1 : -1
-      if (Math.abs(dy) > threshold) y = dy > 0 ? -1 : 1 // inverted for game coords
+      if (Math.abs(dy) > threshold) y = dy > 0 ? -1 : 1
       
       return { x, y }
     }
 
     useEffect(() => {
-
       const updateFromTouches = (touches: TouchList) => {
         if (!dpadRef.current) return
         const rect = dpadRef.current.getBoundingClientRect()
@@ -216,7 +210,7 @@ export function MobileControls({
         dpad.removeEventListener('touchend', onTouchEnd)
         dpad.removeEventListener('touchcancel', onTouchEnd)
       }
-    }, )
+    })
 
     const btnBase = "w-12 h-12 bg-[#2C2C2C] rounded-lg flex items-center justify-center text-2xl text-gray-300 select-none shadow-md transition-colors"
     const activeClass = "bg-[#1a1a1a] text-white"
@@ -255,7 +249,6 @@ export function MobileControls({
 
     return (
       <div className="flex gap-6">
-        <Toggle label="P.Lock" active={portraitLocked} onToggle={onPortraitLockToggle} />
         <Toggle label="Gyro" active={gyroEnabled} onToggle={onGyroToggle} />
         <Toggle label="Run" active={sprintEnabled} onToggle={onSprintToggle} />
       </div>
@@ -318,7 +311,7 @@ export function MobileControls({
     )
   }
 
-  // Landscape mode (existing)
+  // Landscape mode
   return (
     <>
       <div
