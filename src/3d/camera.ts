@@ -77,6 +77,10 @@ export function createFirstPersonCamera(
     // Store initial heading on first read
     if (initialAlpha === null) {
       initialAlpha = e.alpha
+      // Capture current camera rotation so it doesn't jump
+      const currentPitch = ((e.beta - 90) * Math.PI) / 180
+      touchOffsetYaw = camera.rotation.y
+      touchOffsetPitch = camera.rotation.x + currentPitch
     }
 
     // alpha: compass heading → yaw (horizontal look)
