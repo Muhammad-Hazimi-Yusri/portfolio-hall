@@ -24,6 +24,14 @@ export function createFirstPersonCamera(
   camera.minZ = 0.1
   camera.maxZ = 100
 
+  // Adjust FOV based on orientation
+  const updateFOV = () => {
+    const isPortrait = window.innerHeight > window.innerWidth
+    camera.fov = isPortrait ? 1.2 : 0.8  // radians: ~69° portrait, ~46° landscape
+  }
+  updateFOV()
+  window.addEventListener('resize', updateFOV)
+
   // Camera sensitivity & inertia
   camera.angularSensibility = 1000
   camera.inertia = 0.2
@@ -112,8 +120,8 @@ export function createFirstPersonCamera(
 
     let pitch: number
     if (isLandscape) {
-      // Landscape: gamma controls pitch
-      pitch = (e.gamma * Math.PI) / 180
+      // gamma is limited to ±90°, so we scale it and rely more on touch offset
+      pitch = (e.gamma * Math.PI) / 180 * 0.5
       camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, pitch + touchOffsetPitch))
     } else {
       // Portrait: beta controls pitch

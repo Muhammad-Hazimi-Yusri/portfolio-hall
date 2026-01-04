@@ -232,7 +232,8 @@ function ThreeDMode({ onSwitchMode }: { onSwitchMode: () => void }) {
   const [isPortrait, setIsPortrait] = useState(window.innerHeight > window.innerWidth)
   const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
-  const isPWA = window.matchMedia('(display-mode: standalone)').matches
+  const isPWA = window.matchMedia('(display-mode: standalone)').matches || 
+              (window.navigator as Navigator & { standalone?: boolean }).standalone === true
   const [iosLandscapeDismissed, setIosLandscapeDismissed] = useState(false)
 
   useEffect(() => {
