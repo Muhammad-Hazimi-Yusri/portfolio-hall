@@ -69,32 +69,59 @@ export function createFirstPersonCamera(
   let initialAlpha: number | null = null
   let touchOffsetYaw = 0
   let touchOffsetPitch = 0
+  let lastOrientation: boolean | null = null
 
   const handleOrientation = (e: DeviceOrientationEvent) => {
     if (!gyroRef?.current) return
-    if (e.alpha === null || e.beta === null) return
+    if (e.alpha === null || e.beta === null || e.gamma === null) return
 
-    // Store initial heading on first read
+    const isLandscape = window.innerWidth > window.innerHeight
+
+    // Detect orientation change - recalibrate to maintain current view
+    if (lastOrientation !== null && lastOrientation !== isLandscape) {
+      initialAlpha = e.alpha
+      if (isLandscape) {
+        const gyroPitch = (e.gamma * Math.PI) / 180
+        touchOffsetPitch = camera.rotation.x - gyroPitch
+      } else {
+        const gyroPitch = ((e.beta - 90) * Math.PI) / 180
+        touchOffsetPitch = camera.rotation.x + gyroPitch
+      }
+    }
+    lastOrientation = isLandscape
+
+    // Initialize on first read
     if (initialAlpha === null) {
       initialAlpha = e.alpha
       // Capture current camera rotation so it doesn't jump
-      const currentPitch = ((e.beta - 90) * Math.PI) / 180
-      touchOffsetYaw = camera.rotation.y
-      touchOffsetPitch = camera.rotation.x + currentPitch
+      if (isLandscape) {
+        const gyroPitch = (e.gamma * Math.PI) / 180
+        touchOffsetYaw = camera.rotation.y
+        touchOffsetPitch = camera.rotation.x - gyroPitch
+      } else {
+        const gyroPitch = ((e.beta - 90) * Math.PI) / 180
+        touchOffsetYaw = camera.rotation.y
+        touchOffsetPitch = camera.rotation.x + gyroPitch
+      }
     }
 
-    // alpha: compass heading → yaw (horizontal look)
-    // beta: tilt forward/back → pitch (vertical look)
-    
     let yaw = ((e.alpha - initialAlpha) * Math.PI) / 180
     // Normalize to -PI to PI
     while (yaw > Math.PI) yaw -= 2 * Math.PI
     while (yaw < -Math.PI) yaw += 2 * Math.PI
 
-    const pitch = ((e.beta - 90) * Math.PI) / 180
+    let pitch: number
+    if (isLandscape) {
+      // Landscape: gamma controls pitch
+      pitch = (e.gamma * Math.PI) / 180
+      camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, pitch + touchOffsetPitch))
+    } else {
+      // Portrait: beta controls pitch
+      pitch = ((e.beta - 90) * Math.PI) / 180
+      camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, -pitch + touchOffsetPitch))
+    }
 
     camera.rotation.y = -yaw + touchOffsetYaw
-    camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, -pitch + touchOffsetPitch))
   }
 
   window.addEventListener('deviceorientation', handleOrientation)

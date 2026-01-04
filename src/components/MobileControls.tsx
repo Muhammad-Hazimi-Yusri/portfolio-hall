@@ -322,6 +322,21 @@ export function MobileControls({
         ref={lookRef}
         className="absolute inset-y-0 right-0 w-1/2 z-40 touch-none"
       />
+      {/* Landscape toggles */}
+      <div className="absolute bottom-4 right-4 flex gap-2 z-50">
+        <button
+          onClick={onGyroToggle}
+          className={`px-3 py-2 rounded text-sm font-medium ${gyroEnabled ? 'bg-hall-accent text-white' : 'bg-hall-surface/80 text-hall-text'}`}
+        >
+          Gyro
+        </button>
+        <button
+          onClick={onSprintToggle}
+          className={`px-3 py-2 rounded text-sm font-medium ${sprintEnabled ? 'bg-hall-accent text-white' : 'bg-hall-surface/80 text-hall-text'}`}
+        >
+          Run
+        </button>
+      </div>
     </>
   )
 }
