@@ -27,7 +27,7 @@ export function createFirstPersonCamera(
   // Adjust FOV based on orientation
   const updateFOV = () => {
     const isPortrait = window.innerHeight > window.innerWidth
-    camera.fov = isPortrait ? 1.2 : 0.8  // radians: ~69° portrait, ~46° landscape
+    camera.fov = isPortrait ? 2.0 : 0.8  // radians: ~115° portrait, ~46° landscape
   }
   updateFOV()
   window.addEventListener('resize', updateFOV)
@@ -78,58 +78,57 @@ export function createFirstPersonCamera(
   let touchOffsetYaw = 0
   let touchOffsetPitch = 0
   let lastOrientation: boolean | null = null
+  let orientationChangeTimeout: number | null = null
+
+  const getGyroPitch = (beta: number, gamma: number, isLandscape: boolean): number => {
+    if (isLandscape) {
+      // Landscape: use gamma, scale down to reduce jank
+      return (gamma * Math.PI) / 180 * 0.5
+    } else {
+      // Portrait: use beta
+      return ((beta - 90) * Math.PI) / 180 * -1
+    }
+  }
 
   const handleOrientation = (e: DeviceOrientationEvent) => {
     if (!gyroRef?.current) return
     if (e.alpha === null || e.beta === null || e.gamma === null) return
+    
+    // Skip during orientation change debounce
+    if (orientationChangeTimeout !== null) return
 
     const isLandscape = window.innerWidth > window.innerHeight
+    const gyroPitch = getGyroPitch(e.beta, e.gamma, isLandscape)
 
-    // Detect orientation change - recalibrate to maintain current view
+    // Detect orientation change
     if (lastOrientation !== null && lastOrientation !== isLandscape) {
-      initialAlpha = e.alpha
-      if (isLandscape) {
-        const gyroPitch = (e.gamma * Math.PI) / 180
-        touchOffsetPitch = camera.rotation.x - gyroPitch
-      } else {
-        const gyroPitch = ((e.beta - 90) * Math.PI) / 180
-        touchOffsetPitch = camera.rotation.x + gyroPitch
-      }
+      // Debounce: pause gyro briefly to let values stabilize
+      orientationChangeTimeout = window.setTimeout(() => {
+        // Recalibrate after stabilization
+        initialAlpha = null
+        orientationChangeTimeout = null
+      }, 300)
+      lastOrientation = isLandscape
+      return
     }
     lastOrientation = isLandscape
 
     // Initialize on first read
     if (initialAlpha === null) {
       initialAlpha = e.alpha
-      // Capture current camera rotation so it doesn't jump
-      if (isLandscape) {
-        const gyroPitch = (e.gamma * Math.PI) / 180
-        touchOffsetYaw = camera.rotation.y
-        touchOffsetPitch = camera.rotation.x - gyroPitch
-      } else {
-        const gyroPitch = ((e.beta - 90) * Math.PI) / 180
-        touchOffsetYaw = camera.rotation.y
-        touchOffsetPitch = camera.rotation.x + gyroPitch
-      }
+      touchOffsetYaw = camera.rotation.y
+      touchOffsetPitch = camera.rotation.x - gyroPitch
+      return
     }
 
+    // Yaw from alpha only (ignore roll/gamma for yaw)
     let yaw = ((e.alpha - initialAlpha) * Math.PI) / 180
     // Normalize to -PI to PI
     while (yaw > Math.PI) yaw -= 2 * Math.PI
     while (yaw < -Math.PI) yaw += 2 * Math.PI
 
-    let pitch: number
-    if (isLandscape) {
-      // gamma is limited to ±90°, so we scale it and rely more on touch offset
-      pitch = (e.gamma * Math.PI) / 180 * 0.5
-      camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, pitch + touchOffsetPitch))
-    } else {
-      // Portrait: beta controls pitch
-      pitch = ((e.beta - 90) * Math.PI) / 180
-      camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, -pitch + touchOffsetPitch))
-    }
-
     camera.rotation.y = -yaw + touchOffsetYaw
+    camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, gyroPitch + touchOffsetPitch))
   }
 
   window.addEventListener('deviceorientation', handleOrientation)
