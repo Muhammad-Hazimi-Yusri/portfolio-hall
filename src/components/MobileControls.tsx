@@ -43,11 +43,6 @@ export function MobileControls({
   const touchId = useRef<number | null>(null)
   const lastTouch = useRef<{ x: number; y: number } | null>(null)
 
-  // Reset movement when interaction state changes
-  useEffect(() => {
-    onMoveEnd()
-  }, [canInteract, onMoveEnd])
-
   // Joystick setup - only in landscape
   useEffect(() => {
     if (portrait) return

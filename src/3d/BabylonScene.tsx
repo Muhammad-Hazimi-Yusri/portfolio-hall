@@ -46,6 +46,22 @@ export function BabylonScene({ onInspect }: BabylonSceneProps) {
     }
   }, [showMobileControls])
 
+  // Lock portrait orientation when landscape mode is off
+  useEffect(() => {
+    if (!showMobileControls) return
+    const orient = screen.orientation as ScreenOrientation & { lock?: (o: string) => Promise<void> }
+    try {
+      if (landscapeMode) {
+        orient.unlock()
+      } else {
+        orient.lock?.('portrait')?.catch(() => {})
+      }
+    } catch { /* API not supported */ }
+    return () => {
+      try { orient.unlock() } catch { /* ignore */ }
+    }
+  }, [landscapeMode, showMobileControls])
+
   const handleJump = useCallback(() => {
     jumpRef.current = true
   }, [])

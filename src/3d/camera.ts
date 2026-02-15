@@ -79,6 +79,8 @@ export function createFirstPersonCamera(
   let touchOffsetYaw = 0
   let touchOffsetPitch = 0
   let lastLandscapeMode: boolean | null = null
+  let lastAlpha: number | null = null
+  const MAX_ALPHA_DELTA = 30 // degrees per event — reject sensor glitches
 
   const getGyroPitch = (beta: number, gamma: number, isLandscape: boolean): number => {
     if (isLandscape) {
@@ -103,6 +105,21 @@ export function createFirstPersonCamera(
 
     // Initialize on first read or after recalibration
     if (initialAlpha === null) {
+      initialAlpha = e.alpha
+      lastAlpha = e.alpha
+      touchOffsetYaw = camera.rotation.y
+      touchOffsetPitch = camera.rotation.x - gyroPitch
+      return
+    }
+
+    // Reject sudden alpha jumps (sensor glitch / gimbal lock)
+    let alphaDelta = e.alpha - (lastAlpha ?? e.alpha)
+    if (alphaDelta > 180) alphaDelta -= 360
+    if (alphaDelta < -180) alphaDelta += 360
+    lastAlpha = e.alpha
+
+    if (Math.abs(alphaDelta) > MAX_ALPHA_DELTA) {
+      // Recalibrate instead of snapping camera
       initialAlpha = e.alpha
       touchOffsetYaw = camera.rotation.y
       touchOffsetPitch = camera.rotation.x - gyroPitch
