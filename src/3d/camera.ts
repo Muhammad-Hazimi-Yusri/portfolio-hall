@@ -13,7 +13,8 @@ export function createFirstPersonCamera(
   lookRef?: React.MutableRefObject<{ x: number; y: number }>,
   jumpRef?: React.MutableRefObject<boolean>,
   sprintRef?: React.MutableRefObject<boolean>,
-  gyroRef?: React.MutableRefObject<boolean>
+  gyroRef?: React.MutableRefObject<boolean>,
+  landscapeModeRef?: React.MutableRefObject<boolean>
 ) {
   const camera = new UniversalCamera('fpCam', new Vector3(0, 1.6, 5), scene)
   
@@ -77,15 +78,12 @@ export function createFirstPersonCamera(
   let initialAlpha: number | null = null
   let touchOffsetYaw = 0
   let touchOffsetPitch = 0
-  let lastOrientation: boolean | null = null
-  let orientationChangeTimeout: number | null = null
+  let lastLandscapeMode: boolean | null = null
 
   const getGyroPitch = (beta: number, gamma: number, isLandscape: boolean): number => {
     if (isLandscape) {
-      // Landscape: use gamma, scale down to reduce jank
       return (gamma * Math.PI) / 180 * 0.5
     } else {
-      // Portrait: use beta
       return ((beta - 90) * Math.PI) / 180 * -1
     }
   }
@@ -93,27 +91,17 @@ export function createFirstPersonCamera(
   const handleOrientation = (e: DeviceOrientationEvent) => {
     if (!gyroRef?.current) return
     if (e.alpha === null || e.beta === null || e.gamma === null) return
-    
-    // Skip during orientation change debounce
-    if (orientationChangeTimeout !== null) return
 
-    const isLandscape = window.innerWidth > window.innerHeight
+    const isLandscape = landscapeModeRef?.current ?? false
     const gyroPitch = getGyroPitch(e.beta, e.gamma, isLandscape)
 
-    // Detect orientation change
-    if (lastOrientation !== null && lastOrientation !== isLandscape) {
-      // Debounce: pause gyro briefly to let values stabilize
-      orientationChangeTimeout = window.setTimeout(() => {
-        // Recalibrate after stabilization
-        initialAlpha = null
-        orientationChangeTimeout = null
-      }, 300)
-      lastOrientation = isLandscape
-      return
+    // Recalibrate when landscape mode changes
+    if (lastLandscapeMode !== null && lastLandscapeMode !== isLandscape) {
+      initialAlpha = null
     }
-    lastOrientation = isLandscape
+    lastLandscapeMode = isLandscape
 
-    // Initialize on first read
+    // Initialize on first read or after recalibration
     if (initialAlpha === null) {
       initialAlpha = e.alpha
       touchOffsetYaw = camera.rotation.y
@@ -121,9 +109,8 @@ export function createFirstPersonCamera(
       return
     }
 
-    // Yaw from alpha only (ignore roll/gamma for yaw)
+    // Yaw from alpha only — no roll influence
     let yaw = ((e.alpha - initialAlpha) * Math.PI) / 180
-    // Normalize to -PI to PI
     while (yaw > Math.PI) yaw -= 2 * Math.PI
     while (yaw < -Math.PI) yaw += 2 * Math.PI
 

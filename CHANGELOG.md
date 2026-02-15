@@ -15,6 +15,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.6] - 2025-02-15
+
+### Added
+- Manual "Landscape Mode" toggle in mobile controls (only visible when gyro is enabled)
+- Controls hint popup on first mobile load ("Drag screen to look around. Use D-pad to move.")
+- Landscape mode hint popup when toggling landscape on ("Rotate device to landscape...")
+- Hint popups auto-dismiss after 4 seconds or tap to dismiss
+- `landscapeModeRef` passed to camera for gyro axis mapping
+
+### Changed
+- Gyro axis mapping now driven by manual landscape toggle instead of auto-detecting from window dimensions
+- Mobile controls layout (portrait vs landscape) determined by landscape toggle prop, not window size
+- Gyro recalibrates automatically when landscape mode is toggled (resets `initialAlpha`)
+
+### Removed
+- Automatic orientation change detection in gyro handler (`lastOrientation`, `orientationChangeTimeout`)
+- Window resize listener for portrait/landscape detection in `MobileControls`
+
+### Fixed
+- Gyro camera wobble caused by device roll influencing yaw — yaw now derived from alpha only
+- Camera flicker and instability when rotating device between portrait and landscape during gyro use
+- Gyro axis mapping errors from unreliable auto-detection of device orientation
+
+---
+
 ## [1.1.5] - 2025-01-02
 
 ### Added

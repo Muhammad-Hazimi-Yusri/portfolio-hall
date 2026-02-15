@@ -12,35 +12,36 @@ type MobileControlsProps = {
   onGyroToggle: () => void
   sprintEnabled: boolean
   onSprintToggle: () => void
+  landscapeMode: boolean
+  onLandscapeModeToggle: () => void
+  showControlsHint: 'portrait' | 'landscape' | null
+  onDismissHint: () => void
 }
 
-export function MobileControls({ 
-  onMove, 
-  onMoveEnd, 
-  onLook, 
-  onJump, 
-  onInteract, 
+export function MobileControls({
+  onMove,
+  onMoveEnd,
+  onLook,
+  onJump,
+  onInteract,
   canInteract,
   gyroEnabled,
   onGyroToggle,
   sprintEnabled,
-  onSprintToggle
+  onSprintToggle,
+  landscapeMode,
+  onLandscapeModeToggle,
+  showControlsHint,
+  onDismissHint
 }: MobileControlsProps) {
   const CONTROL_PANEL_HEIGHT = 0.30
+
+  const portrait = !landscapeMode
 
   const joystickRef = useRef<HTMLDivElement>(null)
   const lookRef = useRef<HTMLDivElement>(null)
   const touchId = useRef<number | null>(null)
   const lastTouch = useRef<{ x: number; y: number } | null>(null)
-  const [portrait, setPortrait] = useState(window.innerHeight > window.innerWidth)
-
-  useEffect(() => {
-    const handleResize = () => {
-      setPortrait(window.innerHeight > window.innerWidth)
-    }
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
 
   // Reset movement when interaction state changes
   useEffect(() => {
@@ -250,6 +251,9 @@ export function MobileControls({
     return (
       <div className="flex gap-6">
         <Toggle label="Gyro" active={gyroEnabled} onToggle={onGyroToggle} />
+        {gyroEnabled && (
+          <Toggle label="Landscape" active={landscapeMode} onToggle={onLandscapeModeToggle} />
+        )}
         <Toggle label="Run" active={sprintEnabled} onToggle={onSprintToggle} />
       </div>
     )
@@ -283,9 +287,26 @@ export function MobileControls({
     )
   }
 
+  const hintMessage = showControlsHint === 'portrait'
+    ? 'Drag screen to look around. Use D-pad to move.'
+    : showControlsHint === 'landscape'
+    ? 'Rotate device to landscape. Left side: joystick to move. Right side: drag to look.'
+    : null
+
   if (portrait) {
     return (
       <div className="absolute inset-0 z-40 flex flex-col">
+        {/* Hint popup */}
+        {hintMessage && (
+          <div
+            className="absolute inset-0 z-[60] flex items-center justify-center"
+            onClick={onDismissHint}
+          >
+            <div className="bg-black/80 text-white text-center px-6 py-4 rounded-xl max-w-[80%] text-sm">
+              {hintMessage}
+            </div>
+          </div>
+        )}
         {/* Top area - touch drag for camera */}
         <div
           ref={lookRef}
@@ -293,7 +314,7 @@ export function MobileControls({
           style={{ height: `${(1 - CONTROL_PANEL_HEIGHT) * 100}%` }}
         />
         {/* Bottom controls - GameBoy style */}
-        <div 
+        <div
           className="bg-[#8B8B8B] flex flex-col justify-center touch-none rounded-t-3xl"
           style={{ height: `${CONTROL_PANEL_HEIGHT * 100}%` }}
         >
@@ -314,6 +335,17 @@ export function MobileControls({
   // Landscape mode
   return (
     <>
+      {/* Hint popup */}
+      {hintMessage && (
+        <div
+          className="absolute inset-0 z-[60] flex items-center justify-center"
+          onClick={onDismissHint}
+        >
+          <div className="bg-black/80 text-white text-center px-6 py-4 rounded-xl max-w-[80%] text-sm">
+            {hintMessage}
+          </div>
+        </div>
+      )}
       <div
         ref={joystickRef}
         className="absolute inset-y-0 left-0 w-1/2 z-40 touch-none"
@@ -330,6 +362,14 @@ export function MobileControls({
         >
           Gyro
         </button>
+        {gyroEnabled && (
+          <button
+            onClick={onLandscapeModeToggle}
+            className={`px-3 py-2 rounded text-sm font-medium ${landscapeMode ? 'bg-hall-accent text-white' : 'bg-hall-surface/80 text-hall-text'}`}
+          >
+            Landscape
+          </button>
+        )}
         <button
           onClick={onSprintToggle}
           className={`px-3 py-2 rounded text-sm font-medium ${sprintEnabled ? 'bg-hall-accent text-white' : 'bg-hall-surface/80 text-hall-text'}`}

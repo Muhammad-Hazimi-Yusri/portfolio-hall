@@ -5,7 +5,7 @@
 > A grand royal hall or throne room; the ceremonial heart of a palace where audiences are received and important gatherings held.
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
-[![Version](https://img.shields.io/badge/version-1.1.5-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-1.1.6-blue.svg)]()
 [![Status](https://img.shields.io/badge/status-In%20Development-yellow.svg)]()
 
 <details>
@@ -256,9 +256,12 @@ WALL│  [Contact]                     [Skills]   │WALL
 | Platform | Movement | Camera | Interact |
 |----------|----------|--------|----------|
 | Desktop | WASD / Arrow keys | Mouse (pointer lock) | E key or Left click |
-| Mobile (landscape) | Virtual joystick | Touch drag | Tap on POI |
 | Mobile (portrait) | D-pad | Touch drag or Gyro | A button |
+| Mobile (landscape) | Virtual joystick | Touch drag or Gyro | Tap on POI |
 | VR (future) | Thumbstick / Teleport | Headset tracking | Controller trigger |
+
+### Gyro & Landscape Mode
+When gyro is enabled, a **Landscape** toggle appears. This manually switches the control layout and gyro axis mapping — no auto-detection needed. Portrait uses beta/alpha; landscape uses gamma/alpha. Toggling recalibrates the gyro automatically.
 
 ### iOS Note
 iOS Safari doesn't support fullscreen API. For best landscape experience, add the site to your home screen (PWA mode).
@@ -356,8 +359,10 @@ const shouldDefaultToFallback = (): boolean => {
 - [x] Loading screen with spinner
 
 #### v1.1.0 — 3D Polish
-- [ ] Mobile controls (virtual joystick)
-- [ ] Gyroscope camera (optional)
+- [x] Mobile controls (virtual joystick)
+- [x] Gyroscope camera (optional)
+- [x] Manual landscape mode toggle (gyro axis mapping + layout switch)
+- [x] Controls hint popups (portrait first-load + landscape toggle)
 - [ ] Minimap component (SVG synced)
 - [ ] Player position sync to minimap
 - [ ] Click minimap to teleport

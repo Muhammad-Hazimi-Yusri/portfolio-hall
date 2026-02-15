@@ -27,12 +27,24 @@ export function BabylonScene({ onInspect }: BabylonSceneProps) {
   const [sprintEnabled, setSprintEnabled] = useState(false)
   const [gyroEnabled, setGyroEnabled] = useState(false)
   const gyroRef = useRef(false)
+  const [landscapeMode, setLandscapeMode] = useState(false)
+  const landscapeModeRef = useRef(false)
+  const [showControlsHint, setShowControlsHint] = useState<'portrait' | 'landscape' | null>(null)
 
   useEffect(() => {
     const handleResize = () => setIsPortrait(window.innerHeight > window.innerWidth)
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [])
+
+  // Show portrait hint on first mobile load
+  useEffect(() => {
+    if (showMobileControls) {
+      setShowControlsHint('portrait')
+      const timer = setTimeout(() => setShowControlsHint(null), 4000)
+      return () => clearTimeout(timer)
+    }
+  }, [showMobileControls])
 
   const handleJump = useCallback(() => {
     jumpRef.current = true
@@ -59,7 +71,7 @@ export function BabylonScene({ onInspect }: BabylonSceneProps) {
 
     createHall(scene)
     createLights(scene)
-    const camera = createFirstPersonCamera(scene, canvas, joystickRef, lookRef, jumpRef, sprintRef, gyroRef)
+    const camera = createFirstPersonCamera(scene, canvas, joystickRef, lookRef, jumpRef, sprintRef, gyroRef, landscapeModeRef)
     const poiMeshes = createPOIMeshes(scene, poisData.pois as POI[])
 
     const cleanupPointerLock = setupPointerLock(canvas)
@@ -114,6 +126,18 @@ export function BabylonScene({ onInspect }: BabylonSceneProps) {
             setSprintEnabled(prev => !prev)
             sprintRef.current = !sprintRef.current
           }}
+          landscapeMode={landscapeMode}
+          onLandscapeModeToggle={() => {
+            const newVal = !landscapeMode
+            setLandscapeMode(newVal)
+            landscapeModeRef.current = newVal
+            if (newVal) {
+              setShowControlsHint('landscape')
+              setTimeout(() => setShowControlsHint(null), 4000)
+            }
+          }}
+          showControlsHint={showControlsHint}
+          onDismissHint={() => setShowControlsHint(null)}
         />
       )}
             
