@@ -29,7 +29,7 @@ export function BabylonScene({ onInspect }: BabylonSceneProps) {
   const gyroRef = useRef(false)
   const [landscapeMode, setLandscapeMode] = useState(false)
   const landscapeModeRef = useRef(false)
-  const [showControlsHint, setShowControlsHint] = useState<'portrait' | 'landscape' | null>(null)
+  const [showControlsHint, setShowControlsHint] = useState<'portrait' | 'landscape-confirm' | null>(null)
 
   useEffect(() => {
     const handleResize = () => setIsPortrait(window.innerHeight > window.innerWidth)
@@ -52,7 +52,7 @@ export function BabylonScene({ onInspect }: BabylonSceneProps) {
     const orient = screen.orientation as ScreenOrientation & { lock?: (o: string) => Promise<void> }
     try {
       if (landscapeMode) {
-        orient.unlock()
+        orient.lock?.('landscape')?.catch(() => {})
       } else {
         orient.lock?.('portrait')?.catch(() => {})
       }
@@ -145,15 +145,23 @@ export function BabylonScene({ onInspect }: BabylonSceneProps) {
           landscapeMode={landscapeMode}
           onLandscapeModeToggle={() => {
             const newVal = !landscapeMode
+            // Disable gyro immediately before orientation change
+            setGyroEnabled(false)
+            gyroRef.current = false
             setLandscapeMode(newVal)
             landscapeModeRef.current = newVal
             if (newVal) {
-              setShowControlsHint('landscape')
-              setTimeout(() => setShowControlsHint(null), 4000)
+              // Show confirmation modal - user must tap Ready after rotating
+              setShowControlsHint('landscape-confirm')
             }
           }}
           showControlsHint={showControlsHint}
           onDismissHint={() => setShowControlsHint(null)}
+          onLandscapeConfirm={() => {
+            setShowControlsHint(null)
+            setGyroEnabled(true)
+            gyroRef.current = true
+          }}
         />
       )}
             
