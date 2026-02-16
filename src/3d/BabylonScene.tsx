@@ -109,8 +109,24 @@ export function BabylonScene({ onInspect }: BabylonSceneProps) {
     }
   }, [onInspect])
 
+  // Counter-rotate layout to stay portrait when device is physically in landscape
+  const needsRotation = showMobileControls && !landscapeMode && !isPortrait
+
   return (
-    <div className="w-full h-full relative">
+    <div
+      className="w-full h-full relative"
+      style={needsRotation ? {
+        transform: 'rotate(-90deg)',
+        transformOrigin: 'center center',
+        width: '100vh',
+        height: '100vw',
+        position: 'fixed',
+        top: '50%',
+        left: '50%',
+        marginTop: '-50vw',
+        marginLeft: '-50vh',
+      } : undefined}
+    >
       <canvas ref={canvasRef} className="w-full h-full outline-none" />
       
       {showMobileControls && (
