@@ -6,10 +6,17 @@ import { createFirstPersonCamera } from './camera'
 import { setupPointerLock } from './pointerLock'
 import { createPOIMeshes } from './pois'
 import { setupInteraction } from './interaction'
+import { createCameraRefDefault } from './cameraRef'
+import { flyTo, getApproachPosition } from './flyTo'
 import poisData from '@/data/pois.json'
 import type { POI } from '@/types/poi'
+import type { UniversalCamera } from '@babylonjs/core/Cameras/universalCamera'
+import type { Scene as BabylonScene_ } from '@babylonjs/core/scene'
 import { isMobile } from '@/utils/detection'
 import { MobileControls } from '@/components/MobileControls'
+import { Minimap } from '@/components/Minimap'
+import { ThreeDSidebar } from '@/components/ThreeDSidebar'
+import { FadeOverlay } from '@/components/FadeOverlay'
 
 type BabylonSceneProps = {
   onInspect: (poi: POI) => void
@@ -30,6 +37,13 @@ export function BabylonScene({ onInspect }: BabylonSceneProps) {
   const [landscapeMode, setLandscapeMode] = useState(false)
   const landscapeModeRef = useRef(false)
   const [showControlsHint, setShowControlsHint] = useState<'portrait' | 'landscape-confirm' | null>(null)
+
+  // Navigation state
+  const cameraRef = useRef(createCameraRefDefault())
+  const babylonCameraRef = useRef<UniversalCamera | null>(null)
+  const sceneRef = useRef<BabylonScene_ | null>(null)
+  const [fadeVisible, setFadeVisible] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   useEffect(() => {
     const handleResize = () => setIsPortrait(window.innerHeight > window.innerWidth)
@@ -78,6 +92,35 @@ export function BabylonScene({ onInspect }: BabylonSceneProps) {
     joystickRef.current = { x: 0, y: 0 }
   }, [])
 
+  const handleTeleport = useCallback((x: number, z: number, lookAtX?: number, lookAtZ?: number) => {
+    const camera = babylonCameraRef.current
+    const scene = sceneRef.current
+    if (!camera || !scene) return
+
+    setFadeVisible(true)
+    cameraRef.current.isFlyingTo = true
+
+    setTimeout(() => {
+      flyTo(
+        scene,
+        camera,
+        { x, z, lookAtX, lookAtZ },
+        () => { camera.checkCollisions = false },
+        () => {
+          camera.checkCollisions = true
+          cameraRef.current.isFlyingTo = false
+          setFadeVisible(false)
+        },
+        20
+      )
+    }, 300)
+  }, [])
+
+  const handleTeleportToPOI = useCallback((poi: POI) => {
+    const approach = getApproachPosition(poi)
+    handleTeleport(approach.x, approach.z, poi.position.x, poi.position.z)
+  }, [handleTeleport])
+
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
@@ -87,7 +130,9 @@ export function BabylonScene({ onInspect }: BabylonSceneProps) {
 
     createHall(scene)
     createLights(scene)
-    const camera = createFirstPersonCamera(scene, canvas, joystickRef, lookRef, jumpRef, sprintRef, gyroRef, landscapeModeRef)
+    const camera = createFirstPersonCamera(scene, canvas, joystickRef, lookRef, jumpRef, sprintRef, gyroRef, landscapeModeRef, cameraRef)
+    babylonCameraRef.current = camera
+    sceneRef.current = scene
     const poiMeshes = createPOIMeshes(scene, poisData.pois as POI[])
 
     const cleanupPointerLock = setupPointerLock(canvas)
@@ -102,6 +147,8 @@ export function BabylonScene({ onInspect }: BabylonSceneProps) {
     engine.runRenderLoop(() => scene.render())
 
     return () => {
+      babylonCameraRef.current = null
+      sceneRef.current = null
       cleanupPointerLock()
       cleanupInteraction()
       scene.dispose()
@@ -128,7 +175,24 @@ export function BabylonScene({ onInspect }: BabylonSceneProps) {
       } : undefined}
     >
       <canvas ref={canvasRef} className="w-full h-full outline-none" />
-      
+
+      <Minimap
+        pois={poisData.pois as POI[]}
+        cameraRef={cameraRef}
+        onTeleport={handleTeleport}
+        isPortrait={isPortrait}
+      />
+
+      <ThreeDSidebar
+        pois={poisData.pois as POI[]}
+        isOpen={sidebarOpen}
+        onToggle={() => setSidebarOpen(prev => !prev)}
+        onTeleportToPOI={handleTeleportToPOI}
+        isPortrait={isPortrait}
+      />
+
+      <FadeOverlay visible={fadeVisible} />
+
       {showMobileControls && (
         <MobileControls 
           onMove={handleMove} 

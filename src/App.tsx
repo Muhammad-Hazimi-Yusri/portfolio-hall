@@ -3,6 +3,7 @@ import { useDeviceCapability } from '@/hooks/useDeviceCapability'
 import { usePOIs } from '@/hooks/usePOIs'
 import { FloorPlan } from '@/components/FloorPlan'
 import { LoadingScreen } from '@/components/LoadingScreen'
+import { ModeToggle } from '@/components/ModeToggle'
 import type { POI } from '@/types/poi'
 
 const BabylonScene = lazy(() => import('@/3d/BabylonScene').then(m => ({ default: m.BabylonScene })))
@@ -102,7 +103,7 @@ function WelcomeScreen({ onSelectMode, canUse3D, warnings, isChecking }: Welcome
       </div>
 
       <p className="text-hall-muted text-sm mt-8">
-        v1.1.5 — Game Boy Controls
+        v1.2.0 — Navigation & UX
       </p>
     </div>
   )
@@ -142,12 +143,7 @@ function FallbackMode({ onSwitchMode }: { onSwitchMode: () => void }) {
             )
           })}
         </nav>
-        <button
-          onClick={onSwitchMode}
-          className="text-sm text-hall-accent underline"
-        >
-          Switch to 3D
-        </button>
+        <ModeToggle currentMode="fallback" onToggle={onSwitchMode} />
       </aside>
 
       {/* Main content */}
@@ -287,12 +283,9 @@ function ThreeDMode({ onSwitchMode }: { onSwitchMode: () => void }) {
       <Suspense fallback={<LoadingScreen />}>
         <BabylonScene onInspect={handleInspect} />
       </Suspense>
-      <button
-        onClick={onSwitchMode}
-        className="absolute top-4 left-4 px-3 py-1 bg-hall-surface/80 text-hall-accent rounded text-sm hover:bg-hall-surface z-50"
-      >
-        Exit 3D
-      </button>
+      <div className="absolute top-4 left-4 z-50">
+        <ModeToggle currentMode="3d" onToggle={onSwitchMode} />
+      </div>
 
       {isMobileDevice && !isIOS && !isPortrait && !isFullscreen && (
       <button

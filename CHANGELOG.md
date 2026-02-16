@@ -10,8 +10,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- 2D fallback mode (SVG floor plan)
-- 3D grand hall exploration
+- Visual polish (final hall model, lighting, textures)
+- Content population (real project data, thumbnails)
+
+---
+
+## [1.2.0] - 2026-02-16
+
+### Added
+- Minimap overlay component (`src/components/Minimap.tsx`) — SVG synced with 3D camera position in real-time
+- Player direction indicator (triangle) on minimap, updated at ~10fps via throttled rAF
+- Click-to-teleport on minimap with SVG coordinate conversion and hall bounds clamping
+- Fly-to camera animation system (`src/3d/flyTo.ts`) using Babylon.js native Animation with CubicEase
+- Fade overlay (`src/components/FadeOverlay.tsx`) for smooth teleport transitions (fade out → fly → fade in)
+- Collapsible 3D sidebar (`src/components/ThreeDSidebar.tsx`) with POIs grouped by section
+- Sidebar POI click triggers teleport to approach position facing the POI
+- Camera position bridge (`src/3d/cameraRef.ts`) — shared ref syncing Babylon.js camera to React
+- Mode toggle button (`src/components/ModeToggle.tsx`) — switch between 2D/3D from either mode
+- `getApproachPosition()` helper to calculate arrival position 2.5 units in front of a POI
+
+### Changed
+- `createFirstPersonCamera` now accepts `cameraRef` parameter and writes position/rotation each frame
+- Player movement (WASD, joystick, touch look, gravity) disabled during fly-to animation via `isFlyingTo` guard
+- Camera collisions temporarily disabled during fly-to to prevent wall clipping issues
+- "Exit 3D" button replaced with `ModeToggle` component in ThreeDMode
+- "Switch to 3D" link replaced with `ModeToggle` component in FallbackMode
+- Minimap and sidebar hidden in portrait mode on mobile to avoid overlapping controls
+- Version bumped to v1.2.0
 
 ---
 

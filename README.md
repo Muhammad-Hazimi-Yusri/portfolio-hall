@@ -5,7 +5,7 @@
 > A grand royal hall or throne room; the ceremonial heart of a palace where audiences are received and important gatherings held.
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
-[![Version](https://img.shields.io/badge/version-1.1.6-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)]()
 [![Status](https://img.shields.io/badge/status-In%20Development-yellow.svg)]()
 
 <details>
@@ -94,6 +94,15 @@ Balairung | 3D Portfolio Hall is an interactive portfolio website designed as a 
 - Controls hint popups (first load + landscape toggle)
 - Controls info on welcome screen per device type
 
+### Navigation & UX (v1.2)
+- Minimap overlay (SVG synced with 3D camera position)
+- Real-time player position and direction indicator on minimap
+- Click minimap to teleport anywhere in the hall
+- Fly-to camera animation with fade-in/fade-out transition
+- Collapsible sidebar with POI navigation grouped by section
+- Sidebar teleportation (click POI name → fly to it)
+- Mode toggle button (switch between 2D/3D anytime from either mode)
+
 ---
 
 ## 🛠 Tech Stack
@@ -127,25 +136,29 @@ portfolio-hall/
 │   │   └── pois.json             # All POI content data
 │   │
 │   ├── 3d/
-│   │   ├── engine.ts             # Babylon.js setup
-│   │   ├── scene.ts              # Hall scene loader
-│   │   ├── controls.ts           # Input handling (desktop/mobile)
-│   │   ├── fly-to.ts             # Teleport animation
-│   │   └── poi-renderer.ts       # Dynamic POI placement
+│   │   ├── engine.ts             # Babylon.js engine + scene factory
+│   │   ├── scene.ts              # Hall geometry (ground, walls)
+│   │   ├── camera.ts             # First-person camera (WASD, gyro, touch)
+│   │   ├── cameraRef.ts          # Shared camera position ref (3D → React)
+│   │   ├── flyTo.ts              # Fly-to teleport animation
+│   │   ├── lights.ts             # Ambient + point lighting
+│   │   ├── pois.ts               # POI mesh creation
+│   │   ├── interaction.ts        # Proximity detection + E key handler
+│   │   ├── pointerLock.ts        # Pointer lock management
+│   │   └── BabylonScene.tsx      # Main 3D React component
 │   │
-│   ├── ui/
-│   │   ├── WelcomeScreen.tsx     # Mode selection gate
-│   │   ├── Minimap.tsx           # SVG synced minimap
-│   │   ├── Sidebar.tsx           # Section navigation
-│   │   ├── InspectModal.tsx      # Content viewer
-│   │   └── ModeToggle.tsx        # Switch modes anytime
-│   │
-│   ├── fallback/
-│   │   └── SimpleMode.tsx        # Full 2D experience
+│   ├── components/
+│   │   ├── MobileControls.tsx    # Game Boy-style portrait + landscape controls
+│   │   ├── FloorPlan.tsx         # 2D SVG floor plan (fallback mode)
+│   │   ├── Minimap.tsx           # SVG minimap overlay (3D mode)
+│   │   ├── ThreeDSidebar.tsx     # Collapsible POI sidebar (3D mode)
+│   │   ├── FadeOverlay.tsx       # Fade transition for teleport
+│   │   ├── ModeToggle.tsx        # 2D/3D mode switch button
+│   │   └── LoadingScreen.tsx     # Loading spinner
 │   │
 │   ├── hooks/
 │   │   ├── useDeviceCapability.ts
-│   │   └── usePlayerPosition.ts
+│   │   └── usePOIs.ts
 │   │
 │   ├── types/
 │   │   └── poi.ts                # POI type definitions
@@ -153,7 +166,7 @@ portfolio-hall/
 │   ├── utils/
 │   │   └── detection.ts          # WebGL, RAM, motion pref checks
 │   │
-│   ├── App.tsx
+│   ├── App.tsx                   # Root (WelcomeScreen, FallbackMode, ThreeDMode)
 │   └── main.tsx
 │
 ├── index.html
@@ -322,7 +335,7 @@ const shouldDefaultToFallback = (): boolean => {
 ## 🚀 Development Roadmap
 
 <details>
-<summary>✅ Completed Versions (v0.1.0 – v1.1.6)</summary>
+<summary>✅ Completed Versions (v0.1.0 – v1.2.0)</summary>
 
 #### v0.1.0 — Scaffold
 Vite + React + TypeScript project setup, Tailwind CSS, Babylon.js deps, GitHub Pages CI/CD.
@@ -339,19 +352,12 @@ Babylon.js procedural hall, first-person camera, WASD + sprint + jump, POI place
 #### v1.1.0 – v1.1.6 — Mobile Controls + Gyroscope
 Virtual joystick, touch-drag camera, portrait D-pad + A/B buttons, landscape joystick layout, optional gyro camera, manual landscape toggle with axis remapping, fullscreen support, controls hints.
 
+#### v1.2.0 — Navigation & UX
+Minimap overlay with player tracking, click-to-teleport, fly-to camera animation with fade transitions, collapsible 3D sidebar with POI navigation, bidirectional 2D/3D mode toggle.
+
 </details>
 
 ### 🔧 In Progress
-
-#### v1.2.0 — Navigation & UX
-- [ ] Minimap component (SVG synced with 3D position)
-- [ ] Player position sync to minimap
-- [ ] Click minimap to teleport
-- [ ] Fly-to camera animation with fade transition
-- [ ] Sidebar teleportation (click POI name → fly to it)
-- [ ] Mode toggle (switch 2D/3D anytime)
-
-### 📋 Planned
 
 #### v1.3.0 — Visual Polish
 - [ ] Final hall model with castle theme

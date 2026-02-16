@@ -1,6 +1,7 @@
 import { Scene } from '@babylonjs/core/scene'
 import { Vector3 } from '@babylonjs/core/Maths/math.vector'
 import { UniversalCamera } from '@babylonjs/core/Cameras/universalCamera'
+import type { CameraRef } from './cameraRef'
 
 // Side-effect imports for camera inputs
 import '@babylonjs/core/Cameras/Inputs/freeCameraKeyboardMoveInput'
@@ -14,7 +15,8 @@ export function createFirstPersonCamera(
   jumpRef?: React.MutableRefObject<boolean>,
   sprintRef?: React.MutableRefObject<boolean>,
   gyroRef?: React.MutableRefObject<boolean>,
-  landscapeModeRef?: React.MutableRefObject<boolean>
+  landscapeModeRef?: React.MutableRefObject<boolean>,
+  cameraRef?: CameraRef
 ) {
   const camera = new UniversalCamera('fpCam', new Vector3(0, 1.6, 5), scene)
   
@@ -138,56 +140,66 @@ export function createFirstPersonCamera(
   window.addEventListener('deviceorientation', handleOrientation)
 
   scene.onBeforeRenderObservable.add(() => {
-    // Joystick movement
-    if (joystickRef?.current) {
-      const { x, y } = joystickRef.current
-      if (x !== 0 || y !== 0) {
-        const moveSpeed = sprintRef?.current ? 0.12 : 0.06
-        camera.cameraDirection.addInPlace(
-          camera.getDirection(Vector3.Forward()).scale(y * moveSpeed)
-        )
-        camera.cameraDirection.addInPlace(
-          camera.getDirection(Vector3.Right()).scale(x * moveSpeed)
-        )
-      }
-    }
-
-    // Touch look
-    if (lookRef?.current) {
-      const { x, y } = lookRef.current
-      if (x !== 0 || y !== 0) {
-        if (gyroRef?.current) {
-          // Gyro ON: touch adds offset
-          const sensitivity = 0.003
-          touchOffsetYaw += x * sensitivity
-          touchOffsetPitch += y * sensitivity
-          touchOffsetPitch = Math.max(-Math.PI / 4, Math.min(Math.PI / 4, touchOffsetPitch))
-        } else {
-          // Gyro OFF: touch controls camera directly
-          const sensitivity = 0.005
-          camera.rotation.y += x * sensitivity
-          camera.rotation.x += y * sensitivity
-          camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotation.x))
+    // Skip movement during fly-to animation
+    if (!cameraRef?.current.isFlyingTo) {
+      // Joystick movement
+      if (joystickRef?.current) {
+        const { x, y } = joystickRef.current
+        if (x !== 0 || y !== 0) {
+          const moveSpeed = sprintRef?.current ? 0.12 : 0.06
+          camera.cameraDirection.addInPlace(
+            camera.getDirection(Vector3.Forward()).scale(y * moveSpeed)
+          )
+          camera.cameraDirection.addInPlace(
+            camera.getDirection(Vector3.Right()).scale(x * moveSpeed)
+          )
         }
-        lookRef.current = { x: 0, y: 0 }
+      }
+
+      // Touch look
+      if (lookRef?.current) {
+        const { x, y } = lookRef.current
+        if (x !== 0 || y !== 0) {
+          if (gyroRef?.current) {
+            // Gyro ON: touch adds offset
+            const sensitivity = 0.003
+            touchOffsetYaw += x * sensitivity
+            touchOffsetPitch += y * sensitivity
+            touchOffsetPitch = Math.max(-Math.PI / 4, Math.min(Math.PI / 4, touchOffsetPitch))
+          } else {
+            // Gyro OFF: touch controls camera directly
+            const sensitivity = 0.005
+            camera.rotation.y += x * sensitivity
+            camera.rotation.x += y * sensitivity
+            camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotation.x))
+          }
+          lookRef.current = { x: 0, y: 0 }
+        }
+      }
+
+      // Mobile jump
+      if (jumpRef?.current && isGrounded) {
+        velocityY = jumpForce
+        isGrounded = false
+        jumpRef.current = false
+      }
+
+      // Gravity
+      velocityY += gravity
+      camera.position.y += velocityY
+
+      if (camera.position.y <= groundY) {
+        camera.position.y = groundY
+        velocityY = 0
+        isGrounded = true
       }
     }
 
-    // Mobile jump
-    if (jumpRef?.current && isGrounded) {
-      velocityY = jumpForce
-      isGrounded = false
-      jumpRef.current = false
-    }
-
-    // Gravity
-    velocityY += gravity
-    camera.position.y += velocityY
-
-    if (camera.position.y <= groundY) {
-      camera.position.y = groundY
-      velocityY = 0
-      isGrounded = true
+    // Write camera position to shared ref
+    if (cameraRef) {
+      cameraRef.current.position.x = camera.position.x
+      cameraRef.current.position.z = camera.position.z
+      cameraRef.current.rotationY = camera.rotation.y
     }
   })
 
