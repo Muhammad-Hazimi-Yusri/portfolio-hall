@@ -70,22 +70,29 @@ Balairung | 3D Portfolio Hall is an interactive portfolio website designed as a 
 
 ## ✨ Features
 
-### Core (v1.x)
-- [ ] Welcome gate with mode selection
-- [ ] 2D fallback mode (SVG floor plan + sidebar navigation)
-- [ ] 3D grand hall exploration
-- [ ] First-person controls (desktop + mobile)
-- [ ] Interactive POIs (paintings, display cases)
-- [ ] Inspect modal for content viewing
-- [ ] Synced minimap with click-to-teleport
-- [ ] Fly-to camera animation with fade transition
-- [ ] Section-based sidebar navigation
+### Foundation (v0.x)
+- Welcome gate with device capability detection and mode selection
+- 2D fallback mode — SVG floor plan, sidebar navigation, section filtering, inspect modal
+- Responsive mobile-first layout
 
-### Future (v2.x+)
-- [ ] WebXR/VR support
-- [ ] Custom meshes per project
-- [ ] AI-tailored experience for recruiters
-- [ ] Blog section (separate domain TBD)
+### 3D Experience (v1.0)
+- Babylon.js 3D hall with procedural geometry
+- First-person camera with WASD, sprint, jump, pointer lock
+- POI placeholder meshes (paintings, display cases, pedestals)
+- Collision detection (walls + POIs)
+- Proximity-based interaction (E key) with inspect modal
+- Lazy-loaded Babylon.js with tree-shaking and loading screen
+
+### Mobile Controls (v1.1)
+- Dynamic joystick (nipplejs) with multitouch support
+- Touch-drag camera rotation
+- Portrait mode with Game Boy-style D-pad and A/B buttons
+- Landscape mode with joystick + touch look
+- Optional gyroscope camera control
+- Manual landscape mode toggle with gyro axis remapping
+- Fullscreen support (Android) with iOS PWA prompt
+- Controls hint popups (first load + landscape toggle)
+- Controls info on welcome screen per device type
 
 ---
 
@@ -314,79 +321,49 @@ const shouldDefaultToFallback = (): boolean => {
 
 ## 🚀 Development Roadmap
 
-### Version 0.x — Foundation
+<details>
+<summary>✅ Completed Versions (v0.1.0 – v1.1.6)</summary>
 
-#### v0.1.0 — Scaffold ✅
-- [x] Initialize Vite + React + TypeScript
-- [x] Configure Tailwind CSS
-- [x] Setup Babylon.js dependencies
-- [x] Project structure created
-- [x] GitHub Pages deployment pipeline
-- [x] Basic welcome screen placeholder
+#### v0.1.0 — Scaffold
+Vite + React + TypeScript project setup, Tailwind CSS, Babylon.js deps, GitHub Pages CI/CD.
 
-#### v0.2.0 — Welcome Gate ✅
-- [x] Device capability detection
-- [x] Mode selection logic with warnings
-- [x] Mode state management
+#### v0.2.0 — Welcome Gate
+Device capability detection, mode selection with warnings, state management.
 
-#### v0.3.0 — Fallback Mode ✅
-- [x] SVG floor plan component
-- [x] Sidebar navigation
-- [x] POI data loading from JSON
-- [x] Click-to-select POI
-- [x] Inspect modal component
-- [x] Section filtering
-- [x] Fully functional without 3D
-- [x] Responsive layout
+#### v0.3.0 — Fallback Mode
+SVG floor plan, sidebar navigation, POI data loading, inspect modal, section filtering, responsive layout.
 
----
+#### v1.0.0 – v1.0.3 — 3D Core + Performance
+Babylon.js procedural hall, first-person camera, WASD + sprint + jump, POI placeholders, collision detection, interaction system, lazy loading with tree-shaking.
 
-### Version 1.x — 3D Experience
+#### v1.1.0 – v1.1.6 — Mobile Controls + Gyroscope
+Virtual joystick, touch-drag camera, portrait D-pad + A/B buttons, landscape joystick layout, optional gyro camera, manual landscape toggle with axis remapping, fullscreen support, controls hints.
 
-#### v1.0.0 — 3D Core ✅
-- [x] Babylon.js engine setup
-- [x] Hall model loading (procedural)
-- [x] Basic lighting setup
-- [x] First-person camera
-- [x] Desktop controls (WASD + mouse + sprint + jump)
-- [x] POI placeholder rendering
-- [x] Collision detection (walls + POIs)
-- [x] Basic interaction (approach + E key)
+</details>
 
-#### v1.0.1 - v1.0.3 — Performance ✅
-- [x] Lazy load Babylon.js (only loads when entering 3D)
-- [x] Tree-shake with deep imports for smaller bundle
-- [x] Loading screen with spinner
+### 🔧 In Progress
 
-#### v1.1.0 — 3D Polish
-- [x] Mobile controls (virtual joystick)
-- [x] Gyroscope camera (optional)
-- [x] Manual landscape mode toggle (gyro axis mapping + layout switch)
-- [x] Controls hint popups (portrait first-load + landscape toggle)
-- [ ] Minimap component (SVG synced)
+#### v1.2.0 — Navigation & UX
+- [ ] Minimap component (SVG synced with 3D position)
 - [ ] Player position sync to minimap
 - [ ] Click minimap to teleport
-- [ ] Fly-to animation with fade
-- [ ] Sidebar teleportation
-- [ ] Mode toggle (switch anytime)
+- [ ] Fly-to camera animation with fade transition
+- [ ] Sidebar teleportation (click POI name → fly to it)
+- [ ] Mode toggle (switch 2D/3D anytime)
 
-#### v1.2.0 — Visual Polish
-- [ ] Final hall model with theme
-- [ ] Painting frames rendered
-- [ ] Display case meshes
-- [ ] Pedestal meshes
-- [ ] Proper lighting
-- [ ] Loading screen with progress
+### 📋 Planned
 
-#### v1.3.0 — Content Population
-- [ ] Real project data
-- [ ] Thumbnails created
-- [ ] About/Skills/Contact content
-- [ ] SEO metadata
+#### v1.3.0 — Visual Polish
+- [ ] Final hall model with castle theme
+- [ ] Painting frames rendered from project thumbnails
+- [ ] Display case and pedestal meshes
+- [ ] Proper lighting (ambient, spot, shadows)
+- [ ] Loading screen with progress bar
 
----
-
-### Version 2.x — Extended Reality
+#### v1.4.0 — Content Population
+- [ ] Real project data and thumbnails
+- [ ] About / Skills / Contact content
+- [ ] SEO metadata and Open Graph tags
 
 #### v2.0.0 — VR Support
 - [ ] WebXR session handling
@@ -394,11 +371,7 @@ const shouldDefaultToFallback = (): boolean => {
 - [ ] Teleport locomotion
 - [ ] VR-specific UI panels
 
----
-
-### Version 3.x — Intelligence (Backlog)
-
-#### v3.0.0 — AI Integration
+#### v3.0.0 — AI Integration (Backlog)
 - [ ] Visitor type detection
 - [ ] LLM integration
 - [ ] Dynamic content prioritization
