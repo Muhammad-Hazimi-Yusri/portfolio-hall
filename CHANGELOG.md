@@ -15,6 +15,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.2.1] - 2026-02-18
+
+### Added
+- GTA-style cinematic fly-to animation: 3-phase rise → overhead pan → descend (`flyToCinematic`)
+- Simple direct fly-to for short distances < 3 units (`flyToSimple`)
+- Minimap POI click teleports to approach position (2.5 units in front), not directly onto POI
+- POI labels on minimap (both TopScreen minimap and standalone Minimap)
+- "Exit 3D" button in portrait TopScreen, desktop top-right, and landscape mobile top-right
+- Game Boy 3DS-style portrait layout: gray console frame, top screen with minimap + nav, look zone with inset shadows, controller panel with D-pad + A/B buttons + toggle switches
+- Scanline overlay and LCD green tint on portrait top screen
+- Minimap tap-to-teleport in portrait TopScreen (SVG click → coordinate transform → world position)
+- Sidebar auto-collapse on pointer lock (desktop) and auto-expand when pointer unlocked
+- Sidebar defaults to open
+- Minimap defaults to expanded on desktop, positioned top-left
+- Minimap expand/collapse buttons moved below the map
+
+### Changed
+- Fly-to animation replaced fade overlay with cinematic 3-phase camera movement
+- Removed `FadeOverlay` component (no longer needed with cinematic fly-to)
+- Jump physics: gravity reduced from `-0.015` to `-0.006`, jump force adjusted to `0.18` for floaty feel
+- Mobile joystick movement speed reduced from `0.06`/`0.12` to `0.02`/`0.04` (walk/sprint) for parity with desktop
+- Gravity state (velocityY) reset during fly-to animation to prevent jitter on landing
+- Desktop minimap moved from bottom-right to top-left
+- Landscape mobile minimap moved from bottom-right to top-left
+- Desktop mode toggle moved from top-left to top-right, renamed "Exit 3D"
+- Portrait TopScreen uses 60/40 split (minimap gets more space) with larger POI labels
+- Controller panel uses straight-line separator instead of rounded corners
+- POI highlight mesh now uses `Mesh.BILLBOARDMODE_ALL` for visibility from all angles
+
+### Fixed
+- Camera jitter during minimap teleportation (velocityY not reset during fly-to)
+- Mobile movement ~4x faster than desktop (joystick speed values too high)
+- Top screen bezel had rounded bottom corners creating visual gap (now `rounded-t-md`)
+- Fly-to rotation normalization for shortest angular path
+
+---
+
 ## [1.2.0] - 2026-02-16
 
 ### Added

@@ -11,13 +11,16 @@ export function createPOIMeshes(scene: Scene, pois: POI[]) {
 
   pois.forEach((poi) => {
     let mesh
+    const rad = (poi.rotation * Math.PI) / 180
 
     if (poi.type === 'painting') {
-      mesh = MeshBuilder.CreatePlane(poi.id, { width: 1.5, height: 1 }, scene)
+      mesh = MeshBuilder.CreatePlane(poi.id, { width: 1.5, height: 1, sideOrientation: Mesh.DOUBLESIDE }, scene)
       mesh.position = new Vector3(poi.position.x, 2, poi.position.z)
+      mesh.rotation.y = rad
     } else if (poi.type === 'display-case') {
       mesh = MeshBuilder.CreateBox(poi.id, { width: 1, height: 0.8, depth: 1 }, scene)
       mesh.position = new Vector3(poi.position.x, 0.4, poi.position.z)
+      mesh.rotation.y = rad
     } else {
       // pedestal / custom
       mesh = MeshBuilder.CreateCylinder(poi.id, { diameter: 0.6, height: 1 }, scene)

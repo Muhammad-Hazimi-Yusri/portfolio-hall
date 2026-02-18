@@ -71,8 +71,8 @@ export function createFirstPersonCamera(
   camera.applyGravity = false
   
   let velocityY = 0
-  const gravity = -0.015
-  const jumpForce = 0.2
+  const gravity = -0.006
+  const jumpForce = 0.18
   const groundY = 1.6
   let isGrounded = true
 
@@ -146,7 +146,7 @@ export function createFirstPersonCamera(
       if (joystickRef?.current) {
         const { x, y } = joystickRef.current
         if (x !== 0 || y !== 0) {
-          const moveSpeed = sprintRef?.current ? 0.12 : 0.06
+          const moveSpeed = sprintRef?.current ? 0.04 : 0.02
           camera.cameraDirection.addInPlace(
             camera.getDirection(Vector3.Forward()).scale(y * moveSpeed)
           )
@@ -193,6 +193,10 @@ export function createFirstPersonCamera(
         velocityY = 0
         isGrounded = true
       }
+    } else {
+      // Reset gravity state during fly-to so there's no jitter on landing
+      velocityY = 0
+      isGrounded = true
     }
 
     // Write camera position to shared ref

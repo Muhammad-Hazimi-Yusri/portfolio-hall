@@ -48,26 +48,26 @@ function WelcomeScreen({ onSelectMode, canUse3D, warnings, isChecking }: Welcome
   const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
 
   return (
-    <div className="text-center p-8 max-w-md">
-      <h1 className="text-4xl font-bold mb-2 text-hall-text">
+    <div className="text-center p-8 max-w-md md:max-w-lg">
+      <h1 className="text-4xl md:text-5xl font-bold mb-2 text-hall-text">
         🏰 Balairung
       </h1>
-      <p className="text-hall-muted mb-8">
+      <p className="text-hall-muted mb-8 md:text-lg">
         An immersive portfolio experience
       </p>
-      
+
       <div className="space-y-4">
         <button
           onClick={() => onSelectMode('fallback')}
-          className="w-full py-4 px-6 bg-hall-accent text-white rounded-lg font-semibold hover:opacity-90 transition-opacity"
+          className="w-full py-4 md:py-5 px-6 bg-hall-accent text-white rounded-lg font-semibold md:text-lg hover:opacity-90 transition-opacity"
         >
           Enter Simple Mode
         </button>
-        
+
         <button
           onClick={() => onSelectMode('3d')}
           disabled={!canUse3D || isChecking}
-          className="w-full py-4 px-6 bg-hall-surface text-hall-text rounded-lg border border-hall-muted/30 hover:border-hall-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full py-4 md:py-5 px-6 bg-hall-surface text-hall-text rounded-lg border border-hall-muted/30 hover:border-hall-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <span className="block font-semibold">
             {isChecking ? 'Checking device...' : 'Try Interactive 3D'}
@@ -85,8 +85,8 @@ function WelcomeScreen({ onSelectMode, canUse3D, warnings, isChecking }: Welcome
         </button>
       </div>
 
-      <div className="text-hall-muted text-xs mt-6 max-w-xs space-y-2 text-center mx-auto">
-        <p className="text-hall-text text-sm font-semibold">🎮 Controls</p>
+      <div className="text-hall-muted text-xs md:text-sm mt-6 max-w-xs md:max-w-sm space-y-2 text-center mx-auto">
+        <p className="text-hall-text text-sm md:text-base font-semibold">🎮 Controls</p>
         <p><strong>Desktop:</strong> WASD + mouse, sprint, jump</p>
         <p><strong>Mobile landscape:</strong> Virtual joystick + touch-drag camera</p>
         <p><strong>Mobile portrait:</strong> Game Boy-style D-pads control buttons</p>
@@ -103,7 +103,7 @@ function WelcomeScreen({ onSelectMode, canUse3D, warnings, isChecking }: Welcome
       </div>
 
       <p className="text-hall-muted text-sm mt-8">
-        v1.2.0 — Navigation & UX
+        v1.2.1 — Navigation & UX
       </p>
     </div>
   )
@@ -120,7 +120,12 @@ function FallbackMode({ onSwitchMode }: { onSwitchMode: () => void }) {
   }
 
   return (
-    <div className="w-full h-full flex flex-col md:flex-row">
+    <div className="w-full h-full flex flex-col md:flex-row relative">
+      {/* Mode toggle - fixed position matching 3D mode */}
+      <div className="absolute top-4 right-4 z-50">
+        <ModeToggle currentMode="fallback" onToggle={onSwitchMode} />
+      </div>
+
       {/* Sidebar */}
       <aside className="w-full md:w-64 bg-hall-surface border-b md:border-b-0 md:border-r border-hall-muted/20 p-4 flex flex-col">
         <h2 className="text-xl font-bold mb-4">Balairung</h2>
@@ -143,7 +148,6 @@ function FallbackMode({ onSwitchMode }: { onSwitchMode: () => void }) {
             )
           })}
         </nav>
-        <ModeToggle currentMode="fallback" onToggle={onSwitchMode} />
       </aside>
 
       {/* Main content */}
@@ -281,10 +285,15 @@ function ThreeDMode({ onSwitchMode }: { onSwitchMode: () => void }) {
   return (
     <div className="w-full h-full relative">
       <Suspense fallback={<LoadingScreen />}>
-        <BabylonScene onInspect={handleInspect} />
+        <BabylonScene onInspect={handleInspect} onSwitchMode={onSwitchMode} />
       </Suspense>
-      <div className="absolute top-4 left-4 z-50">
-        <ModeToggle currentMode="3d" onToggle={onSwitchMode} />
+      <div className="absolute top-4 right-4 z-50 hidden md:block">
+        <button
+          onClick={onSwitchMode}
+          className="px-4 py-2 bg-hall-accent text-white rounded text-sm font-medium hover:opacity-90 transition-opacity shadow-lg"
+        >
+          Exit 3D
+        </button>
       </div>
 
       {isMobileDevice && !isIOS && !isPortrait && !isFullscreen && (

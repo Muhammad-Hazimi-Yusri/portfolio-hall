@@ -21,20 +21,20 @@ export function ThreeDSidebar({ pois, isOpen, onToggle, onTeleportToPOI, isPortr
 
   return (
     <>
-      {/* Toggle tab */}
+      {/* Toggle tab — right side */}
       <button
         onClick={onToggle}
-        className={`absolute top-1/2 -translate-y-1/2 z-30 bg-hall-bg/80 backdrop-blur-sm py-3 px-1 rounded-r border border-l-0 border-hall-muted/30 text-hall-muted hover:text-hall-text transition-all duration-200 ${
-          isOpen ? 'left-56' : 'left-0'
+        className={`absolute top-1/2 -translate-y-1/2 z-30 bg-hall-bg/80 backdrop-blur-sm py-3 px-1.5 rounded-l border border-r-0 border-hall-muted/30 text-hall-muted hover:text-hall-text transition-all duration-200 ${
+          isOpen ? 'right-56' : 'right-0'
         }`}
       >
-        {isOpen ? '\u25C0' : '\u25B6'}
+        {isOpen ? '\u25B6' : '\u25C0'}
       </button>
 
-      {/* Sidebar panel */}
+      {/* Sidebar panel — right side */}
       <div
-        className={`absolute top-0 left-0 h-full w-56 z-30 bg-hall-bg/90 backdrop-blur-sm border-r border-hall-muted/30 transition-transform duration-200 overflow-y-auto ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
+        className={`absolute top-0 right-0 h-full w-56 z-30 bg-hall-bg/90 backdrop-blur-sm border-l border-hall-muted/30 transition-transform duration-200 overflow-y-auto ${
+          isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
         <div className="p-4">

@@ -1,5 +1,8 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import nipplejs from 'nipplejs'
+import type { POI } from '@/types/poi'
+import type { CameraRef } from '@/3d/cameraRef'
+
 
 type DPadProps = {
   onMove: (x: number, y: number) => void
@@ -108,19 +111,24 @@ function DPad({ onMove, onMoveEnd }: DPadProps) {
     }
   }, [onMove, onMoveEnd])
 
-  const btnBase = "w-12 h-12 bg-[#2C2C2C] rounded-lg flex items-center justify-center text-2xl text-gray-300 select-none shadow-md transition-colors"
+  const btnBase = "w-12 h-12 bg-[#2a2a2a] rounded-lg flex items-center justify-center text-2xl text-gray-300 select-none transition-colors"
   const activeClass = "bg-[#1a1a1a] text-white"
 
   return (
-    <div ref={dpadRef} className="grid grid-cols-3 gap-1 touch-none">
+    <div ref={dpadRef} className="relative grid grid-cols-3 gap-0.5 touch-none"
+      style={{ filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.4))' }}
+    >
       <div />
-      <div className={`${btnBase} ${activeDir.y > 0 ? activeClass : ''}`}>▲</div>
+      <div className={`${btnBase} rounded-b-none ${activeDir.y > 0 ? activeClass : ''}`}>▲</div>
       <div />
-      <div className={`${btnBase} ${activeDir.x < 0 ? activeClass : ''}`}>◀</div>
+      <div className={`${btnBase} rounded-r-none ${activeDir.x < 0 ? activeClass : ''}`}>◀</div>
+      {/* Center connector piece */}
+      <div className="w-12 h-12 bg-[#252525] flex items-center justify-center">
+        <div className="w-3 h-3 rounded-full bg-[#1e1e1e]" />
+      </div>
+      <div className={`${btnBase} rounded-l-none ${activeDir.x > 0 ? activeClass : ''}`}>▶</div>
       <div />
-      <div className={`${btnBase} ${activeDir.x > 0 ? activeClass : ''}`}>▶</div>
-      <div />
-      <div className={`${btnBase} ${activeDir.y < 0 ? activeClass : ''}`}>▼</div>
+      <div className={`${btnBase} rounded-t-none ${activeDir.y < 0 ? activeClass : ''}`}>▼</div>
       <div />
     </div>
   )
@@ -180,6 +188,127 @@ function ActionButtons({ canInteract, onInteract, onMoveEnd, onJump }: ActionBut
   )
 }
 
+const SECTIONS = ['projects', 'about', 'skills', 'contact'] as const
+
+type TopScreenProps = {
+  pois: POI[]
+  playerPos: { x: number; z: number }
+  playerRot: number
+  onTeleportToPOI: (poi: POI) => void
+  onTeleport: (x: number, z: number) => void
+  onSwitchMode?: () => void
+}
+
+function TopScreen({ pois, playerPos, playerRot, onTeleportToPOI, onTeleport, onSwitchMode }: TopScreenProps) {
+  const svgRef = useRef<SVGSVGElement>(null)
+  const rotDeg = -180 + (playerRot * 180) / Math.PI
+  const mapX = -playerPos.x
+
+  const handleMapClick = useCallback((e: React.MouseEvent<SVGSVGElement>) => {
+    const svg = svgRef.current
+    if (!svg) return
+    const pt = svg.createSVGPoint()
+    pt.x = e.clientX
+    pt.y = e.clientY
+    const ctm = svg.getScreenCTM()
+    if (!ctm) return
+    const svgPt = pt.matrixTransform(ctm.inverse())
+    // Negate X back to world coords (SVG X is negated for left-handed correction)
+    const clampedX = Math.max(-7, Math.min(7, -svgPt.x))
+    const clampedZ = Math.max(-6.5, Math.min(6.5, svgPt.y))
+    onTeleport(clampedX, clampedZ)
+  }, [onTeleport])
+
+  return (
+    <div className="relative" style={{ height: '20%', background: '#8a8a8a' }}>
+      {/* Screen content — inset bezel */}
+      <div className="relative h-full flex mx-2 my-1 rounded-t-md border-2 border-[#444] overflow-hidden"
+        style={{
+          boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.15)',
+          background: '#080c08',
+        }}
+      >
+        {/* Scanline overlay */}
+        <div className="absolute inset-0 pointer-events-none z-20 opacity-[0.04]"
+          style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(255,255,255,0.1) 1px, rgba(255,255,255,0.1) 2px)' }}
+        />
+        {/* Minimap — left half */}
+        <div className="w-3/5 p-1 border-r border-[#1a1a1a] cursor-crosshair">
+          <svg
+            ref={svgRef}
+            viewBox="-10 -9 20 18"
+            className="w-full h-full"
+            onClick={handleMapClick}
+          >
+            {/* Hall outline */}
+            <rect x="-8" y="-7" width="16" height="14" fill="none" stroke="#3a5a3a" strokeWidth="0.3" />
+            {/* Door */}
+            <rect x="-1" y="6.9" width="2" height="0.3" fill="#e94560" opacity="0.4" />
+            {/* POI markers with labels — click goes to approach position */}
+            {pois.map((poi) => (
+              <g key={poi.id} onClick={(e) => { e.stopPropagation(); onTeleportToPOI(poi) }} className="cursor-pointer">
+                <circle
+                  cx={-poi.position.x}
+                  cy={poi.position.z}
+                  r="0.4"
+                  fill="#6a8a6a"
+                  opacity="0.8"
+                />
+                <text
+                  x={-poi.position.x}
+                  y={poi.position.z + 1.0}
+                  textAnchor="middle"
+                  fill="#5a7a5a"
+                  fontSize="0.7"
+                  className="pointer-events-none"
+                >
+                  {poi.content.title}
+                </text>
+              </g>
+            ))}
+            {/* Player indicator */}
+            <g transform={`translate(${mapX}, ${playerPos.z}) rotate(${rotDeg})`}>
+              <polygon points="0,-0.7 -0.5,0.5 0.5,0.5" fill="#e94560" />
+            </g>
+          </svg>
+        </div>
+        {/* Nav sections — right half */}
+        <div className="w-2/5 p-1.5 pt-1 flex flex-col gap-0.5 overflow-y-auto">
+          {SECTIONS.map((section) => {
+            const sectionPois = pois.filter((p) => p.section === section)
+            if (sectionPois.length === 0) return null
+            return (
+              <div key={section}>
+                <div className="text-[8px] text-[#5a7a5a] uppercase tracking-wider font-bold px-1">
+                  {section}
+                </div>
+                {sectionPois.map((poi) => (
+                  <button
+                    key={poi.id}
+                    onClick={() => onTeleportToPOI(poi)}
+                    className="block w-full text-left text-[10px] text-[#8ab88a] px-1 py-0.5 rounded active:bg-white/10 truncate"
+                  >
+                    {poi.content.title}
+                  </button>
+                ))}
+              </div>
+            )
+          })}
+        </div>
+        {/* Exit 3D button — subtle, matching UI */}
+        {onSwitchMode && (
+          <button
+            onClick={onSwitchMode}
+            className="absolute top-1 right-1 px-2 py-0.5 bg-[#555] border border-[#777] rounded text-[8px] text-gray-300 uppercase tracking-wider active:bg-[#666] z-30"
+          >
+            Exit 3D
+          </button>
+        )}
+      </div>
+    </div>
+  )
+}
+
 type MobileControlsProps = {
   onMove: (x: number, y: number) => void
   onMoveEnd: () => void
@@ -187,6 +316,11 @@ type MobileControlsProps = {
   onJump: () => void
   onInteract: () => void
   canInteract: boolean
+  pois: POI[]
+  cameraRef: CameraRef
+  onTeleportToPOI: (poi: POI) => void
+  onTeleport: (x: number, z: number) => void
+  onSwitchMode?: () => void
   gyroEnabled: boolean
   onGyroToggle: () => void
   sprintEnabled: boolean
@@ -205,6 +339,11 @@ export function MobileControls({
   onJump,
   onInteract,
   canInteract,
+  pois,
+  cameraRef,
+  onTeleportToPOI,
+  onTeleport,
+  onSwitchMode,
   gyroEnabled,
   onGyroToggle,
   sprintEnabled,
@@ -216,6 +355,7 @@ export function MobileControls({
   onLandscapeConfirm
 }: MobileControlsProps) {
   const CONTROL_PANEL_HEIGHT = 0.30
+  const TOP_SCREEN_HEIGHT = 0.20
 
   const portrait = !landscapeMode
 
@@ -223,6 +363,27 @@ export function MobileControls({
   const lookRef = useRef<HTMLDivElement>(null)
   const touchId = useRef<number | null>(null)
   const lastTouch = useRef<{ x: number; y: number } | null>(null)
+
+  // Track player position for top screen minimap
+  const [playerPos, setPlayerPos] = useState({ x: 0, z: 5 })
+  const [playerRot, setPlayerRot] = useState(0)
+
+  useEffect(() => {
+    if (!portrait) return
+    let frameCount = 0
+    let rafId: number
+    const update = () => {
+      frameCount++
+      if (frameCount % 6 === 0) {
+        const { position, rotationY } = cameraRef.current
+        setPlayerPos({ x: position.x, z: position.z })
+        setPlayerRot(rotationY)
+      }
+      rafId = requestAnimationFrame(update)
+    }
+    rafId = requestAnimationFrame(update)
+    return () => cancelAnimationFrame(rafId)
+  }, [cameraRef, portrait])
 
   // Joystick setup - only in landscape
   useEffect(() => {
@@ -307,6 +468,8 @@ export function MobileControls({
     : null
 
   if (portrait) {
+    const lookHeight = (1 - CONTROL_PANEL_HEIGHT - TOP_SCREEN_HEIGHT) * 100
+
     return (
       <div className="absolute inset-0 z-40 flex flex-col">
         {/* Hint popup */}
@@ -334,16 +497,32 @@ export function MobileControls({
             </div>
           </div>
         )}
-        {/* Top area - touch drag for camera */}
+
+        {/* 3DS Top Screen — minimap + nav */}
+        <TopScreen
+          pois={pois}
+          playerPos={playerPos}
+          playerRot={playerRot}
+          onTeleportToPOI={onTeleportToPOI}
+          onTeleport={onTeleport}
+          onSwitchMode={onSwitchMode}
+        />
+
+        {/* Middle area - main viewport (transparent so canvas shows through) */}
         <div
           ref={lookRef}
-          className="touch-none"
-          style={{ height: `${(1 - CONTROL_PANEL_HEIGHT) * 100}%` }}
+          className="touch-none border-x-[8px] border-[#8a8a8a]"
+          style={{ height: `${lookHeight}%`, boxShadow: 'inset 0 4px 12px rgba(0,0,0,0.6), inset 0 -4px 12px rgba(0,0,0,0.4), inset 4px 0 12px rgba(0,0,0,0.4), inset -4px 0 12px rgba(0,0,0,0.4)' }}
         />
+
         {/* Bottom controls - GameBoy style */}
         <div
-          className="bg-[#8B8B8B] flex flex-col justify-center touch-none rounded-t-3xl"
-          style={{ height: `${CONTROL_PANEL_HEIGHT * 100}%` }}
+          className="flex flex-col justify-center touch-none border-t-2 border-[#999]"
+          style={{
+            height: `${CONTROL_PANEL_HEIGHT * 100}%`,
+            background: 'linear-gradient(to bottom, #9a9a9a, #8a8a8a 30%, #7e7e7e)',
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.2)',
+          }}
         >
           {/* Top row: D-pad + A/B buttons */}
           <div className="flex items-center justify-center gap-8">
@@ -351,7 +530,7 @@ export function MobileControls({
             <ActionButtons canInteract={canInteract} onInteract={onInteract} onMoveEnd={onMoveEnd} onJump={onJump} />
           </div>
           {/* Bottom row: Toggles */}
-          <div className="flex justify-center mt-2">
+          <div className="flex justify-center mt-1">
             <ToggleButtons
               gyroEnabled={gyroEnabled}
               onGyroToggle={onGyroToggle}
@@ -391,6 +570,15 @@ export function MobileControls({
         ref={lookRef}
         className="absolute inset-y-0 right-0 w-1/2 z-40 touch-none"
       />
+      {/* Exit 3D button — landscape */}
+      {onSwitchMode && (
+        <button
+          onClick={onSwitchMode}
+          className="absolute top-2 right-2 z-50 px-3 py-1 bg-hall-surface/80 text-hall-text rounded text-sm"
+        >
+          Exit 3D
+        </button>
+      )}
       {/* Landscape toggles */}
       <div className="absolute bottom-4 right-4 flex gap-2 z-50">
         <button

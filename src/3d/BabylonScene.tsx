@@ -7,7 +7,7 @@ import { setupPointerLock } from './pointerLock'
 import { createPOIMeshes } from './pois'
 import { setupInteraction } from './interaction'
 import { createCameraRefDefault } from './cameraRef'
-import { flyTo, getApproachPosition } from './flyTo'
+import { flyToCinematic, getApproachPosition } from './flyTo'
 import poisData from '@/data/pois.json'
 import type { POI } from '@/types/poi'
 import type { UniversalCamera } from '@babylonjs/core/Cameras/universalCamera'
@@ -16,13 +16,13 @@ import { isMobile } from '@/utils/detection'
 import { MobileControls } from '@/components/MobileControls'
 import { Minimap } from '@/components/Minimap'
 import { ThreeDSidebar } from '@/components/ThreeDSidebar'
-import { FadeOverlay } from '@/components/FadeOverlay'
 
 type BabylonSceneProps = {
   onInspect: (poi: POI) => void
+  onSwitchMode?: () => void
 }
 
-export function BabylonScene({ onInspect }: BabylonSceneProps) {
+export function BabylonScene({ onInspect, onSwitchMode }: BabylonSceneProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [nearbyPOI, setNearbyPOI] = useState<POI | null>(null)
   const joystickRef = useRef({ x: 0, y: 0 })
@@ -42,14 +42,23 @@ export function BabylonScene({ onInspect }: BabylonSceneProps) {
   const cameraRef = useRef(createCameraRefDefault())
   const babylonCameraRef = useRef<UniversalCamera | null>(null)
   const sceneRef = useRef<BabylonScene_ | null>(null)
-  const [fadeVisible, setFadeVisible] = useState(false)
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(true)
 
   useEffect(() => {
     const handleResize = () => setIsPortrait(window.innerHeight > window.innerWidth)
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [])
+
+  // Auto-collapse sidebar on pointer lock (desktop only)
+  useEffect(() => {
+    if (showMobileControls) return
+    const onLockChange = () => {
+      setSidebarOpen(!document.pointerLockElement)
+    }
+    document.addEventListener('pointerlockchange', onLockChange)
+    return () => document.removeEventListener('pointerlockchange', onLockChange)
+  }, [showMobileControls])
 
   // Show portrait hint on first mobile load
   useEffect(() => {
@@ -97,23 +106,18 @@ export function BabylonScene({ onInspect }: BabylonSceneProps) {
     const scene = sceneRef.current
     if (!camera || !scene) return
 
-    setFadeVisible(true)
     cameraRef.current.isFlyingTo = true
 
-    setTimeout(() => {
-      flyTo(
-        scene,
-        camera,
-        { x, z, lookAtX, lookAtZ },
-        () => { camera.checkCollisions = false },
-        () => {
-          camera.checkCollisions = true
-          cameraRef.current.isFlyingTo = false
-          setFadeVisible(false)
-        },
-        20
-      )
-    }, 300)
+    flyToCinematic(
+      scene,
+      camera,
+      { x, z, lookAtX, lookAtZ },
+      () => { camera.checkCollisions = false },
+      () => {
+        camera.checkCollisions = true
+        cameraRef.current.isFlyingTo = false
+      },
+    )
   }, [])
 
   const handleTeleportToPOI = useCallback((poi: POI) => {
@@ -180,6 +184,7 @@ export function BabylonScene({ onInspect }: BabylonSceneProps) {
         pois={poisData.pois as POI[]}
         cameraRef={cameraRef}
         onTeleport={handleTeleport}
+        onTeleportToPOI={handleTeleportToPOI}
         isPortrait={isPortrait}
       />
 
@@ -191,16 +196,19 @@ export function BabylonScene({ onInspect }: BabylonSceneProps) {
         isPortrait={isPortrait}
       />
 
-      <FadeOverlay visible={fadeVisible} />
-
       {showMobileControls && (
-        <MobileControls 
-          onMove={handleMove} 
+        <MobileControls
+          onMove={handleMove}
           onMoveEnd={handleMoveEnd}
           onLook={handleLook}
           onJump={handleJump}
           onInteract={() => nearbyPOI && onInspect(nearbyPOI)}
           canInteract={nearbyPOI !== null}
+          pois={poisData.pois as POI[]}
+          cameraRef={cameraRef}
+          onTeleportToPOI={handleTeleportToPOI}
+          onTeleport={handleTeleport}
+          onSwitchMode={onSwitchMode}
           gyroEnabled={gyroEnabled}
           onGyroToggle={async () => {
             if (!gyroEnabled) {
