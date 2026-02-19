@@ -10,8 +10,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- Visual polish (final hall model, lighting, textures)
 - Content population (real project data, thumbnails)
+
+---
+
+## [1.3.0] - 2026-02-19
+
+### Added
+- Javanese/Malay royal hall "Teak & Gold" color palette (8 semantic tokens in tailwind.config.js)
+- Cinzel serif font for headings and titles via Google Fonts
+- Inter font explicitly loaded via Google Fonts (weights 400–700)
+- CSS `.wood-texture` class with layered gradient wood grain effect
+- CSS `.gold-trim` class for reusable gold border styling
+- Theme section in README documenting design system
+
+### Changed
+- Welcome screen: gold Cinzel title (larger), gold primary button with dark text, gold-outlined secondary button, decorative gold separator
+- Game Boy portrait console frame: gray shell → carved teak wood (`wood-texture`) with gold trim border
+- D-pad buttons: dark gray → dark wood tones, gold arrows on press, gold center dot
+- A button: magenta (#9B2257) → batik red (`hall-accent-warm`), B button → lighter teak wood (`hall-frame-light`)
+- Toggle switches: inactive gray → wood tones, active gold; label text uses parchment shadows
+- TopScreen: gray background → wood-texture, green-tinted screen → warm dark, all SVG colors updated to gold/wood palette
+- Fallback mode sidebar: solid background → wood-texture, gold "Balairung" heading
+- Fallback POI cards: muted border → gold-trim class
+- Fallback inspect modal: added gold-trim, tags use `hall-frame` background
+- 3D sidebar: solid background → wood-texture panel with gold accent border
+- Nipplejs joystick color: magenta → gold
+- All `text-white` on gold buttons → `text-hall-bg` for consistent dark-on-gold contrast
+- All hardcoded gray/blue values replaced with semantic `hall-*` tokens
+
+### Removed
+- Generic dark blue (#1a1a2e) and red (#e94560) placeholder theme colors
+- Gray Game Boy shell colors (#8a8a8a, #9a9a9a, #7e7e7e)
+- Hardcoded magenta button color (#9B2257)
+- Green-tinted minimap colors (#3a5a3a, #6a8a6a, #5a7a5a, #8ab88a)
 
 ---
 

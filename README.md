@@ -5,7 +5,7 @@
 > A grand royal hall or throne room; the ceremonial heart of a palace where audiences are received and important gatherings held.
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
-[![Version](https://img.shields.io/badge/version-1.2.1-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)]()
 [![Status](https://img.shields.io/badge/status-In%20Development-yellow.svg)]()
 
 <details>
@@ -59,12 +59,12 @@ Balairung | 3D Portfolio Hall is an interactive portfolio website designed as a 
 
 ## 🎨 Theme
 
-**Balairung** — Royal castle hall aesthetic
+Balairung uses a **Javanese/Malay royal hall** aesthetic inspired by traditional Southeast Asian palace architecture:
 
-- Ornate architectural details
-- Warm lighting with rich textures
-- Deep jewel-tone color palette
-- Classic, elegant typography
+- **Color palette**: "Teak & Gold" — deep wood tones, royal gold accents, batik red highlights, parchment text
+- **Typography**: Cinzel (serif) for headings and titles, Inter (sans-serif) for body text
+- **UI texture**: CSS wood-grain patterns on console frames and panels, gold trim borders
+- **Mobile controls**: Portrait Game Boy-style frame reimagined as a carved teak console with gold gilding
 
 ---
 
@@ -102,9 +102,20 @@ Balairung | 3D Portfolio Hall is an interactive portfolio website designed as a 
 - Collapsible sidebar with POI navigation grouped by section (auto-collapses on pointer lock)
 - Sidebar teleportation (click POI name → fly to approach position facing the POI)
 - "Exit 3D" button consistently placed top-right across desktop, landscape, and portrait modes
-- Game Boy 3DS-style portrait layout: gray console frame, top screen (minimap + nav), look zone with inset shadows, D-pad + A/B controller panel
+- Game Boy 3DS-style portrait layout: teak & gold console frame, top screen (minimap + nav), look zone with inset shadows, D-pad + A/B controller panel
 - Floaty jump physics with satisfying hang time
 - Mobile movement speed tuned to match desktop parity
+
+### Visual Polish (v1.3)
+- Javanese/Malay royal hall "Teak & Gold" theme with 8 semantic color tokens
+- Cinzel serif font for headings via Google Fonts, Inter for body text
+- CSS `.wood-texture` class with layered gradient wood grain effect
+- CSS `.gold-trim` class for reusable gold border styling
+- Welcome screen: gold Cinzel title, gold primary/outline buttons, decorative separator
+- Game Boy console frame: carved teak wood with gold trim, batik red A button, wood B button
+- Fallback sidebar and POI cards: wood-textured background, gold-trimmed cards
+- 3D sidebar: wood-textured panel with gold accent border
+- Minimap SVG: warm wood/gold color palette replacing green/magenta
 
 ---
 
@@ -338,7 +349,7 @@ const shouldDefaultToFallback = (): boolean => {
 ## 🚀 Development Roadmap
 
 <details>
-<summary>✅ Completed Versions (v0.1.0 – v1.2.0)</summary>
+<summary>✅ Completed Versions (v0.1.0 – v1.3.0)</summary>
 
 #### v0.1.0 — Scaffold
 Vite + React + TypeScript project setup, Tailwind CSS, Babylon.js deps, GitHub Pages CI/CD.
@@ -358,16 +369,12 @@ Virtual joystick, touch-drag camera, portrait D-pad + A/B buttons, landscape joy
 #### v1.2.0 – v1.2.1 — Navigation & UX
 Minimap overlay with player tracking and POI labels, click-to-teleport (approach position for POIs), cinematic fly-to camera animation (rise → pan → descend), collapsible 3D sidebar with auto-collapse on pointer lock, "Exit 3D" button across all modes, Game Boy 3DS-style portrait controls, floaty jump physics, mobile speed parity.
 
+#### v1.3.0 — Visual Polish (Theme)
+Javanese/Malay royal hall "Teak & Gold" theme: color palette, Cinzel typography, CSS wood-grain textures, gold trim borders, themed welcome screen, themed Game Boy console frame, themed sidebar and fallback mode.
+
 </details>
 
 ### 🔧 In Progress
-
-#### v1.3.0 — Visual Polish
-- [ ] Final hall model with castle theme
-- [ ] Painting frames rendered from project thumbnails
-- [ ] Display case and pedestal meshes
-- [ ] Proper lighting (ambient, spot, shadows)
-- [ ] Loading screen with progress bar
 
 #### v1.4.0 — Content Population
 - [ ] Real project data and thumbnails

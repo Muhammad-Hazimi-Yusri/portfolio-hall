@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
+import React, { useEffect, useRef, useState, useCallback } from 'react'
 import nipplejs from 'nipplejs'
 import type { POI } from '@/types/poi'
 import type { CameraRef } from '@/3d/cameraRef'
@@ -111,8 +111,8 @@ function DPad({ onMove, onMoveEnd }: DPadProps) {
     }
   }, [onMove, onMoveEnd])
 
-  const btnBase = "w-12 h-12 bg-[#2a2a2a] rounded-lg flex items-center justify-center text-2xl text-gray-300 select-none transition-colors"
-  const activeClass = "bg-[#1a1a1a] text-white"
+  const btnBase = "w-12 h-12 bg-hall-bg rounded-lg flex items-center justify-center text-2xl text-hall-muted select-none transition-colors"
+  const activeClass = "bg-[#0F0A07] text-hall-accent"
 
   return (
     <div ref={dpadRef} className="relative grid grid-cols-3 gap-0.5 touch-none"
@@ -123,8 +123,8 @@ function DPad({ onMove, onMoveEnd }: DPadProps) {
       <div />
       <div className={`${btnBase} rounded-r-none ${activeDir.x < 0 ? activeClass : ''}`}>◀</div>
       {/* Center connector piece */}
-      <div className="w-12 h-12 bg-[#252525] flex items-center justify-center">
-        <div className="w-3 h-3 rounded-full bg-[#1e1e1e]" />
+      <div className="w-12 h-12 bg-hall-bg flex items-center justify-center">
+        <div className="w-3 h-3 rounded-full bg-hall-accent" />
       </div>
       <div className={`${btnBase} rounded-l-none ${activeDir.x > 0 ? activeClass : ''}`}>▶</div>
       <div />
@@ -141,11 +141,11 @@ function ToggleButtons({ gyroEnabled, onGyroToggle, landscapeMode, onLandscapeMo
       onClick={onToggle}
       className="flex flex-col items-center -rotate-[25deg]"
     >
-      <div className={`w-12 h-6 rounded-full relative transition-colors shadow-inner ${active ? 'bg-hall-accent' : 'bg-gray-500'}`}>
+      <div className={`w-12 h-6 rounded-full relative transition-colors shadow-inner ${active ? 'bg-hall-accent' : 'bg-hall-frame-light'}`}>
         <div className={`absolute top-1 w-4 h-4 rounded-full bg-gray-200 shadow transition-transform ${active ? 'translate-x-7' : 'translate-x-1'}`} />
       </div>
-      <span className="text-[9px] text-gray-600 mt-1 uppercase tracking-wide font-medium"
-        style={{ textShadow: '1px 1px 0 rgba(255,255,255,0.3), -1px -1px 0 rgba(0,0,0,0.2)' }}
+      <span className="text-[9px] text-hall-muted mt-1 uppercase tracking-wide font-medium"
+        style={{ textShadow: '1px 1px 0 rgba(232,223,208,0.3), -1px -1px 0 rgba(28,20,16,0.4)' }}
       >
         {label}
       </span>
@@ -169,7 +169,7 @@ function ActionButtons({ canInteract, onInteract, onMoveEnd, onJump }: ActionBut
   return (
     <div className="relative w-32 h-20">
       <button
-        className={`${btnClass} bg-[#9B2257] text-white active:bg-[#7a1a45] ${canInteract ? 'ring-2 ring-white' : ''} absolute -top-4 right-0`}
+        className={`${btnClass} bg-hall-accent-warm text-hall-text active:bg-[#8C3425] ${canInteract ? 'ring-2 ring-hall-accent' : ''} absolute -top-4 right-0`}
         onTouchEnd={(e) => {
           e.preventDefault()
           if (canInteract) { onMoveEnd(); onInteract() }
@@ -184,7 +184,7 @@ function ActionButtons({ canInteract, onInteract, onMoveEnd, onJump }: ActionBut
         A
       </button>
       <button
-        className={`${btnClass} bg-[#9B2257] text-white active:bg-[#7a1a45] absolute bottom-0 left-0`}
+        className={`${btnClass} bg-hall-frame-light text-hall-text active:bg-hall-frame absolute bottom-0 left-0`}
         onTouchStart={onJump}
       >
         B
@@ -235,12 +235,12 @@ function TopScreen({ pois, playerPos, playerRot, onTeleportToPOI, onTeleport, on
   }, [teleportFromPoint])
 
   return (
-    <div className="relative" style={{ height: '20%', background: '#8a8a8a' }}>
+    <div className="relative wood-texture" style={{ height: '20%', '--wood-base': '#3D2B1E' } as React.CSSProperties}>
       {/* Screen content — inset bezel */}
-      <div className="relative h-full flex mx-2 my-1 rounded-t-md border-2 border-[#444] overflow-hidden"
+      <div className="relative h-full flex mx-2 my-1 rounded-t-md border-2 border-hall-accent/50 overflow-hidden"
         style={{
-          boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.15)',
-          background: '#080c08',
+          boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.8), 0 1px 0 rgba(201,168,76,0.15)',
+          background: '#0A0806',
         }}
       >
         {/* Scanline overlay */}
@@ -248,7 +248,7 @@ function TopScreen({ pois, playerPos, playerRot, onTeleportToPOI, onTeleport, on
           style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(255,255,255,0.1) 1px, rgba(255,255,255,0.1) 2px)' }}
         />
         {/* Minimap — left half */}
-        <div className="w-3/5 p-1 border-r border-[#1a1a1a] cursor-crosshair">
+        <div className="w-3/5 p-1 border-r border-hall-bg cursor-crosshair">
           <svg
             ref={svgRef}
             viewBox="-10 -9 20 18"
@@ -257,9 +257,9 @@ function TopScreen({ pois, playerPos, playerRot, onTeleportToPOI, onTeleport, on
             onClick={handleMapClick}
           >
             {/* Hall outline */}
-            <rect x="-8" y="-7" width="16" height="14" fill="none" stroke="#3a5a3a" strokeWidth="0.3" />
+            <rect x="-8" y="-7" width="16" height="14" fill="none" stroke="#5C4033" strokeWidth="0.3" />
             {/* Door */}
-            <rect x="-1" y="6.9" width="2" height="0.3" fill="#e94560" opacity="0.4" />
+            <rect x="-1" y="6.9" width="2" height="0.3" fill="#C9A84C" opacity="0.4" />
             {/* POI markers with labels — click goes to approach position */}
             {pois.map((poi) => (
               <g key={poi.id} onTouchEnd={(e) => { e.preventDefault(); e.stopPropagation(); onTeleportToPOI(poi) }} onClick={(e) => { e.stopPropagation(); onTeleportToPOI(poi) }} className="cursor-pointer">
@@ -267,14 +267,14 @@ function TopScreen({ pois, playerPos, playerRot, onTeleportToPOI, onTeleport, on
                   cx={-poi.position.x}
                   cy={poi.position.z}
                   r="0.4"
-                  fill="#6a8a6a"
+                  fill="#9C8B7A"
                   opacity="0.8"
                 />
                 <text
                   x={-poi.position.x}
                   y={poi.position.z + 1.0}
                   textAnchor="middle"
-                  fill="#5a7a5a"
+                  fill="#9C8B7A"
                   fontSize="0.7"
                   className="pointer-events-none"
                 >
@@ -284,7 +284,7 @@ function TopScreen({ pois, playerPos, playerRot, onTeleportToPOI, onTeleport, on
             ))}
             {/* Player indicator */}
             <g transform={`translate(${mapX}, ${playerPos.z}) rotate(${rotDeg})`}>
-              <polygon points="0,-0.7 -0.5,0.5 0.5,0.5" fill="#e94560" />
+              <polygon points="0,-0.7 -0.5,0.5 0.5,0.5" fill="#C9A84C" />
             </g>
           </svg>
         </div>
@@ -295,7 +295,7 @@ function TopScreen({ pois, playerPos, playerRot, onTeleportToPOI, onTeleport, on
             if (sectionPois.length === 0) return null
             return (
               <div key={section}>
-                <div className="text-[8px] text-[#5a7a5a] uppercase tracking-wider font-bold px-1">
+                <div className="text-[8px] text-hall-muted uppercase tracking-wider font-bold px-1">
                   {section}
                 </div>
                 {sectionPois.map((poi) => (
@@ -303,7 +303,7 @@ function TopScreen({ pois, playerPos, playerRot, onTeleportToPOI, onTeleport, on
                     key={poi.id}
                     onTouchEnd={(e) => { e.preventDefault(); onTeleportToPOI(poi) }}
                     onClick={() => onTeleportToPOI(poi)}
-                    className="block w-full text-left text-[10px] text-[#8ab88a] px-1 py-0.5 rounded active:bg-white/10 truncate"
+                    className="block w-full text-left text-[10px] text-hall-muted px-1 py-0.5 rounded active:bg-hall-accent/10 active:text-hall-accent truncate"
                   >
                     {poi.content.title}
                   </button>
@@ -317,7 +317,7 @@ function TopScreen({ pois, playerPos, playerRot, onTeleportToPOI, onTeleport, on
           <button
             onTouchEnd={(e) => { e.preventDefault(); onSwitchMode() }}
             onClick={onSwitchMode}
-            className="absolute top-1 right-1 px-2 py-0.5 bg-[#555] border border-[#777] rounded text-[8px] text-gray-300 uppercase tracking-wider active:bg-[#666] z-30"
+            className="absolute top-1 right-1 px-2 py-0.5 bg-hall-frame border border-hall-accent/30 rounded text-[8px] text-hall-muted uppercase tracking-wider active:bg-hall-frame-light z-30"
           >
             Exit 3D
           </button>
@@ -411,7 +411,7 @@ export function MobileControls({
     const manager = nipplejs.create({
       zone: joystickRef.current,
       mode: 'dynamic',
-      color: '#e94560',
+      color: '#C9A84C',
       size: 120,
     })
 
@@ -508,7 +508,7 @@ export function MobileControls({
               <p className="text-sm mb-4">Rotate your device to landscape orientation</p>
               <button
                 onClick={onLandscapeConfirm}
-                className="bg-hall-accent text-white px-6 py-2 rounded-lg text-sm font-medium"
+                className="bg-hall-accent text-hall-bg px-6 py-2 rounded-lg text-sm font-medium"
               >
                 Ready
               </button>
@@ -529,17 +529,17 @@ export function MobileControls({
         {/* Middle area - main viewport (transparent so canvas shows through) */}
         <div
           ref={lookRef}
-          className="touch-none border-x-[8px] border-[#8a8a8a]"
-          style={{ height: `${lookHeight}%`, boxShadow: 'inset 0 4px 12px rgba(0,0,0,0.6), inset 0 -4px 12px rgba(0,0,0,0.4), inset 4px 0 12px rgba(0,0,0,0.4), inset -4px 0 12px rgba(0,0,0,0.4)' }}
+          className="touch-none border-x-[8px] border-hall-frame"
+          style={{ height: `${lookHeight}%`, boxShadow: 'inset 0 4px 12px rgba(20,10,5,0.6), inset 0 -4px 12px rgba(20,10,5,0.4), inset 4px 0 12px rgba(20,10,5,0.4), inset -4px 0 12px rgba(20,10,5,0.4)' }}
         />
 
         {/* Bottom controls - GameBoy style */}
         <div
-          className="flex flex-col justify-center touch-none border-t-2 border-[#999]"
+          className="flex flex-col justify-center touch-none border-t-2 border-hall-accent"
           style={{
             height: `${CONTROL_PANEL_HEIGHT * 100}%`,
-            background: 'linear-gradient(to bottom, #9a9a9a, #8a8a8a 30%, #7e7e7e)',
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.2)',
+            background: 'linear-gradient(to bottom, #4A3628, #3D2B1E 30%, #352418)',
+            boxShadow: 'inset 0 1px 0 rgba(201,168,76,0.15)',
           }}
         >
           {/* Top row: D-pad + A/B buttons */}
@@ -573,7 +573,7 @@ export function MobileControls({
             <p className="text-sm mb-4">Rotate your device to landscape orientation</p>
             <button
               onClick={onLandscapeConfirm}
-              className="bg-hall-accent text-white px-6 py-2 rounded-lg text-sm font-medium"
+              className="bg-hall-accent text-hall-bg px-6 py-2 rounded-lg text-sm font-medium"
             >
               Ready
             </button>
@@ -603,7 +603,7 @@ export function MobileControls({
         <button
           onTouchEnd={(e) => { e.preventDefault(); onGyroToggle() }}
           onClick={onGyroToggle}
-          className={`px-3 py-2 rounded text-sm font-medium ${gyroEnabled ? 'bg-hall-accent text-white' : 'bg-hall-surface/80 text-hall-text'}`}
+          className={`px-3 py-2 rounded text-sm font-medium ${gyroEnabled ? 'bg-hall-accent text-hall-bg' : 'bg-hall-surface/80 text-hall-text'}`}
         >
           Gyro
         </button>
@@ -611,7 +611,7 @@ export function MobileControls({
           <button
             onTouchEnd={(e) => { e.preventDefault(); onLandscapeModeToggle() }}
             onClick={onLandscapeModeToggle}
-            className={`px-3 py-2 rounded text-sm font-medium ${landscapeMode ? 'bg-hall-accent text-white' : 'bg-hall-surface/80 text-hall-text'}`}
+            className={`px-3 py-2 rounded text-sm font-medium ${landscapeMode ? 'bg-hall-accent text-hall-bg' : 'bg-hall-surface/80 text-hall-text'}`}
           >
             Landscape
           </button>
@@ -619,7 +619,7 @@ export function MobileControls({
         <button
           onTouchEnd={(e) => { e.preventDefault(); onSprintToggle() }}
           onClick={onSprintToggle}
-          className={`px-3 py-2 rounded text-sm font-medium ${sprintEnabled ? 'bg-hall-accent text-white' : 'bg-hall-surface/80 text-hall-text'}`}
+          className={`px-3 py-2 rounded text-sm font-medium ${sprintEnabled ? 'bg-hall-accent text-hall-bg' : 'bg-hall-surface/80 text-hall-text'}`}
         >
           Run
         </button>

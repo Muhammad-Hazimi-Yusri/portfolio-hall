@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import type { POI } from '@/types/poi'
 import { isMobile } from '@/utils/detection'
 
@@ -24,7 +24,7 @@ export function ThreeDSidebar({ pois, isOpen, onToggle, onTeleportToPOI, isPortr
       {/* Toggle tab — right side */}
       <button
         onClick={onToggle}
-        className={`absolute top-1/2 -translate-y-1/2 z-30 bg-hall-bg/80 backdrop-blur-sm py-3 px-1.5 rounded-l border border-r-0 border-hall-muted/30 text-hall-muted hover:text-hall-text transition-all duration-200 ${
+        className={`absolute top-1/2 -translate-y-1/2 z-30 bg-hall-frame/80 backdrop-blur-sm py-3 px-1.5 rounded-l border border-r-0 border-hall-accent/30 text-hall-muted hover:text-hall-text transition-all duration-200 ${
           isOpen ? 'right-56' : 'right-0'
         }`}
       >
@@ -33,12 +33,13 @@ export function ThreeDSidebar({ pois, isOpen, onToggle, onTeleportToPOI, isPortr
 
       {/* Sidebar panel — right side */}
       <div
-        className={`absolute top-0 right-0 h-full w-56 z-30 bg-hall-bg/90 backdrop-blur-sm border-l border-hall-muted/30 transition-transform duration-200 overflow-y-auto ${
+        className={`absolute top-0 right-0 h-full w-56 z-30 wood-texture backdrop-blur-sm border-l border-hall-accent/30 transition-transform duration-200 overflow-y-auto ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
+        style={{ '--wood-base': '#2A1F18' } as React.CSSProperties}
       >
         <div className="p-4">
-          <h3 className="text-sm font-bold text-hall-text mb-3 uppercase tracking-wider">
+          <h3 className="text-sm font-bold text-hall-muted mb-3 uppercase tracking-wider">
             Navigate
           </h3>
 
