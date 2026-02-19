@@ -114,7 +114,7 @@ function FallbackMode({ onSwitchMode }: { onSwitchMode: () => void }) {
   const [selectedSection, setSelectedSection] = useState<string | null>(null)
   const [inspectingId, setInspectingId] = useState<string | null>(null)
   const inspectedPOI = pois.find((p) => p.id === inspectingId) ?? null
-  
+
   if (isLoading) {
     return <div className="text-hall-muted">Loading...</div>
   }
@@ -273,14 +273,14 @@ function ThreeDMode({ onSwitchMode }: { onSwitchMode: () => void }) {
     document.exitPointerLock()
   }, [])
 
-  const closeModal = () => {
+  const closeModal = useCallback(() => {
     setInspectedPOI(null)
     const canvas = document.querySelector('canvas')
     if (canvas) {
       canvas.focus()
       canvas.requestPointerLock()
     }
-  }
+  }, [])
 
   return (
     <div className="w-full h-full relative">

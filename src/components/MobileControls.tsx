@@ -137,6 +137,7 @@ function DPad({ onMove, onMoveEnd }: DPadProps) {
 function ToggleButtons({ gyroEnabled, onGyroToggle, landscapeMode, onLandscapeModeToggle, sprintEnabled, onSprintToggle }: ToggleButtonsProps) {
   const Toggle = ({ label, active, onToggle }: { label: string; active: boolean; onToggle: () => void }) => (
     <button
+      onTouchEnd={(e) => { e.preventDefault(); onToggle() }}
       onClick={onToggle}
       className="flex flex-col items-center -rotate-[25deg]"
     >
@@ -169,6 +170,10 @@ function ActionButtons({ canInteract, onInteract, onMoveEnd, onJump }: ActionBut
     <div className="relative w-32 h-20">
       <button
         className={`${btnClass} bg-[#9B2257] text-white active:bg-[#7a1a45] ${canInteract ? 'ring-2 ring-white' : ''} absolute -top-4 right-0`}
+        onTouchEnd={(e) => {
+          e.preventDefault()
+          if (canInteract) { onMoveEnd(); onInteract() }
+        }}
         onClick={() => {
           if (canInteract) {
             onMoveEnd()
@@ -204,12 +209,12 @@ function TopScreen({ pois, playerPos, playerRot, onTeleportToPOI, onTeleport, on
   const rotDeg = -180 + (playerRot * 180) / Math.PI
   const mapX = -playerPos.x
 
-  const handleMapClick = useCallback((e: React.MouseEvent<SVGSVGElement>) => {
+  const teleportFromPoint = useCallback((clientX: number, clientY: number) => {
     const svg = svgRef.current
     if (!svg) return
     const pt = svg.createSVGPoint()
-    pt.x = e.clientX
-    pt.y = e.clientY
+    pt.x = clientX
+    pt.y = clientY
     const ctm = svg.getScreenCTM()
     if (!ctm) return
     const svgPt = pt.matrixTransform(ctm.inverse())
@@ -218,6 +223,16 @@ function TopScreen({ pois, playerPos, playerRot, onTeleportToPOI, onTeleport, on
     const clampedZ = Math.max(-6.5, Math.min(6.5, svgPt.y))
     onTeleport(clampedX, clampedZ)
   }, [onTeleport])
+
+  const handleMapClick = useCallback((e: React.MouseEvent<SVGSVGElement>) => {
+    teleportFromPoint(e.clientX, e.clientY)
+  }, [teleportFromPoint])
+
+  const handleMapTouch = useCallback((e: React.TouchEvent<SVGSVGElement>) => {
+    e.preventDefault()
+    const touch = e.changedTouches[0]
+    if (touch) teleportFromPoint(touch.clientX, touch.clientY)
+  }, [teleportFromPoint])
 
   return (
     <div className="relative" style={{ height: '20%', background: '#8a8a8a' }}>
@@ -238,6 +253,7 @@ function TopScreen({ pois, playerPos, playerRot, onTeleportToPOI, onTeleport, on
             ref={svgRef}
             viewBox="-10 -9 20 18"
             className="w-full h-full"
+            onTouchEnd={handleMapTouch}
             onClick={handleMapClick}
           >
             {/* Hall outline */}
@@ -246,7 +262,7 @@ function TopScreen({ pois, playerPos, playerRot, onTeleportToPOI, onTeleport, on
             <rect x="-1" y="6.9" width="2" height="0.3" fill="#e94560" opacity="0.4" />
             {/* POI markers with labels — click goes to approach position */}
             {pois.map((poi) => (
-              <g key={poi.id} onClick={(e) => { e.stopPropagation(); onTeleportToPOI(poi) }} className="cursor-pointer">
+              <g key={poi.id} onTouchEnd={(e) => { e.preventDefault(); e.stopPropagation(); onTeleportToPOI(poi) }} onClick={(e) => { e.stopPropagation(); onTeleportToPOI(poi) }} className="cursor-pointer">
                 <circle
                   cx={-poi.position.x}
                   cy={poi.position.z}
@@ -285,6 +301,7 @@ function TopScreen({ pois, playerPos, playerRot, onTeleportToPOI, onTeleport, on
                 {sectionPois.map((poi) => (
                   <button
                     key={poi.id}
+                    onTouchEnd={(e) => { e.preventDefault(); onTeleportToPOI(poi) }}
                     onClick={() => onTeleportToPOI(poi)}
                     className="block w-full text-left text-[10px] text-[#8ab88a] px-1 py-0.5 rounded active:bg-white/10 truncate"
                   >
@@ -298,6 +315,7 @@ function TopScreen({ pois, playerPos, playerRot, onTeleportToPOI, onTeleport, on
         {/* Exit 3D button — subtle, matching UI */}
         {onSwitchMode && (
           <button
+            onTouchEnd={(e) => { e.preventDefault(); onSwitchMode() }}
             onClick={onSwitchMode}
             className="absolute top-1 right-1 px-2 py-0.5 bg-[#555] border border-[#777] rounded text-[8px] text-gray-300 uppercase tracking-wider active:bg-[#666] z-30"
           >
@@ -573,6 +591,7 @@ export function MobileControls({
       {/* Exit 3D button — landscape */}
       {onSwitchMode && (
         <button
+          onTouchEnd={(e) => { e.preventDefault(); onSwitchMode() }}
           onClick={onSwitchMode}
           className="absolute top-2 right-2 z-50 px-3 py-1 bg-hall-surface/80 text-hall-text rounded text-sm"
         >
@@ -582,6 +601,7 @@ export function MobileControls({
       {/* Landscape toggles */}
       <div className="absolute bottom-4 right-4 flex gap-2 z-50">
         <button
+          onTouchEnd={(e) => { e.preventDefault(); onGyroToggle() }}
           onClick={onGyroToggle}
           className={`px-3 py-2 rounded text-sm font-medium ${gyroEnabled ? 'bg-hall-accent text-white' : 'bg-hall-surface/80 text-hall-text'}`}
         >
@@ -589,6 +609,7 @@ export function MobileControls({
         </button>
         {gyroEnabled && (
           <button
+            onTouchEnd={(e) => { e.preventDefault(); onLandscapeModeToggle() }}
             onClick={onLandscapeModeToggle}
             className={`px-3 py-2 rounded text-sm font-medium ${landscapeMode ? 'bg-hall-accent text-white' : 'bg-hall-surface/80 text-hall-text'}`}
           >
@@ -596,6 +617,7 @@ export function MobileControls({
           </button>
         )}
         <button
+          onTouchEnd={(e) => { e.preventDefault(); onSprintToggle() }}
           onClick={onSprintToggle}
           className={`px-3 py-2 rounded text-sm font-medium ${sprintEnabled ? 'bg-hall-accent text-white' : 'bg-hall-surface/80 text-hall-text'}`}
         >

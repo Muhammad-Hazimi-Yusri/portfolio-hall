@@ -38,13 +38,13 @@ export function Minimap({ pois, cameraRef, onTeleport, onTeleportToPOI, isPortra
     return () => cancelAnimationFrame(rafId)
   }, [cameraRef])
 
-  const handleClick = (e: React.MouseEvent<SVGSVGElement>) => {
+  const teleportFromPoint = (clientX: number, clientY: number) => {
     const svg = svgRef.current
     if (!svg) return
 
     const pt = svg.createSVGPoint()
-    pt.x = e.clientX
-    pt.y = e.clientY
+    pt.x = clientX
+    pt.y = clientY
     const ctm = svg.getScreenCTM()
     if (!ctm) return
     const svgPt = pt.matrixTransform(ctm.inverse())
@@ -53,6 +53,16 @@ export function Minimap({ pois, cameraRef, onTeleport, onTeleportToPOI, isPortra
     const clampedX = Math.max(-7, Math.min(7, -svgPt.x))
     const clampedZ = Math.max(-6.5, Math.min(6.5, svgPt.y))
     onTeleport(clampedX, clampedZ)
+  }
+
+  const handleClick = (e: React.MouseEvent<SVGSVGElement>) => {
+    teleportFromPoint(e.clientX, e.clientY)
+  }
+
+  const handleTouch = (e: React.TouchEvent<SVGSVGElement>) => {
+    e.preventDefault()
+    const touch = e.changedTouches[0]
+    if (touch) teleportFromPoint(touch.clientX, touch.clientY)
   }
 
   // Player direction indicator rotation
@@ -117,6 +127,7 @@ export function Minimap({ pois, cameraRef, onTeleport, onTeleportToPOI, isPortra
             ref={svgRef}
             viewBox={viewBox}
             className="w-full h-full"
+            onTouchEnd={handleTouch}
             onClick={handleClick}
           >
             {/* Hall outline (symmetric, no X change needed) */}
@@ -133,7 +144,7 @@ export function Minimap({ pois, cameraRef, onTeleport, onTeleportToPOI, isPortra
 
             {/* POI markers (negate X for left-handed correction) — click goes to approach position */}
             {pois.map((poi) => (
-              <g key={poi.id} onClick={(e) => { e.stopPropagation(); onTeleportToPOI(poi) }} className="cursor-pointer">
+              <g key={poi.id} onTouchEnd={(e) => { e.preventDefault(); e.stopPropagation(); onTeleportToPOI(poi) }} onClick={(e) => { e.stopPropagation(); onTeleportToPOI(poi) }} className="cursor-pointer">
                 <circle
                   cx={-poi.position.x}
                   cy={poi.position.z}
@@ -166,6 +177,7 @@ export function Minimap({ pois, cameraRef, onTeleport, onTeleportToPOI, isPortra
       <div className="flex gap-1 mt-1">
         {!collapsed && (
           <button
+            onTouchEnd={(e) => { e.preventDefault(); setExpanded(!expanded) }}
             onClick={() => setExpanded(!expanded)}
             className="text-xs bg-hall-bg/80 px-2 py-0.5 rounded-b text-hall-muted hover:text-hall-text"
           >
@@ -173,6 +185,7 @@ export function Minimap({ pois, cameraRef, onTeleport, onTeleportToPOI, isPortra
           </button>
         )}
         <button
+          onTouchEnd={(e) => { e.preventDefault(); setCollapsed(!collapsed) }}
           onClick={() => setCollapsed(!collapsed)}
           className="text-xs bg-hall-bg/80 px-2 py-0.5 rounded-b text-hall-muted hover:text-hall-text"
         >
