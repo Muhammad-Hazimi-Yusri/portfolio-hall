@@ -104,7 +104,7 @@ function WelcomeScreen({ onSelectMode, canUse3D, warnings, isChecking }: Welcome
       </div>
 
       <p className="text-hall-muted text-sm mt-8">
-        v1.3.0 — Visual Polish
+        v1.3.1 — Visual Polish
       </p>
     </div>
   )
@@ -231,6 +231,9 @@ function ThreeDMode({ onSwitchMode }: { onSwitchMode: () => void }) {
   const [isFullscreen, setIsFullscreen] = useState(!!document.fullscreenElement)
   const [showFullscreenHint, setShowFullscreenHint] = useState(false)
   const [isPortrait, setIsPortrait] = useState(window.innerHeight > window.innerWidth)
+  const [loadProgress, setLoadProgress] = useState(0)
+  const [loadStage, setLoadStage] = useState('engine')
+  const [isLoaded, setIsLoaded] = useState(false)
   const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
   const isPWA = window.matchMedia('(display-mode: standalone)').matches || 
@@ -269,6 +272,14 @@ function ThreeDMode({ onSwitchMode }: { onSwitchMode: () => void }) {
     }
   }
 
+  const handleLoadProgress = useCallback((progress: number, stage: string) => {
+    setLoadProgress(progress)
+    setLoadStage(stage)
+    if (progress >= 100) {
+      setTimeout(() => setIsLoaded(true), 400)
+    }
+  }, [])
+
   const handleInspect = useCallback((poi: POI) => {
     setInspectedPOI(poi)
     document.exitPointerLock()
@@ -285,8 +296,13 @@ function ThreeDMode({ onSwitchMode }: { onSwitchMode: () => void }) {
 
   return (
     <div className="w-full h-full relative">
+      {!isLoaded && (
+        <div className={`absolute inset-0 z-50 transition-opacity duration-300 ${loadProgress >= 100 ? 'opacity-0' : 'opacity-100'}`}>
+          <LoadingScreen progress={loadProgress} stage={loadStage} />
+        </div>
+      )}
       <Suspense fallback={<LoadingScreen />}>
-        <BabylonScene onInspect={handleInspect} onSwitchMode={onSwitchMode} />
+        <BabylonScene onInspect={handleInspect} onSwitchMode={onSwitchMode} onLoadProgress={handleLoadProgress} />
       </Suspense>
       <div className="absolute top-4 right-4 z-50 hidden md:block">
         <button

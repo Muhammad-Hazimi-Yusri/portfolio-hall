@@ -20,9 +20,10 @@ import { ThreeDSidebar } from '@/components/ThreeDSidebar'
 type BabylonSceneProps = {
   onInspect: (poi: POI) => void
   onSwitchMode?: () => void
+  onLoadProgress?: (progress: number, stage: string) => void
 }
 
-export function BabylonScene({ onInspect, onSwitchMode }: BabylonSceneProps) {
+export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress }: BabylonSceneProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [nearbyPOI, setNearbyPOI] = useState<POI | null>(null)
   const joystickRef = useRef({ x: 0, y: 0 })
@@ -129,15 +130,24 @@ export function BabylonScene({ onInspect, onSwitchMode }: BabylonSceneProps) {
     const canvas = canvasRef.current
     if (!canvas) return
 
+    onLoadProgress?.(0, 'engine')
     const engine = createEngine(canvas)
     const scene = createScene(engine)
+    onLoadProgress?.(20, 'scene')
 
-    createHall(scene)
-    createLights(scene)
+    const { ground } = createHall(scene)
+    onLoadProgress?.(40, 'scene')
+
     const camera = createFirstPersonCamera(scene, canvas, joystickRef, lookRef, jumpRef, sprintRef, gyroRef, landscapeModeRef, cameraRef)
     babylonCameraRef.current = camera
     sceneRef.current = scene
+
+    onLoadProgress?.(50, 'textures')
     const poiMeshes = createPOIMeshes(scene, poisData.pois as POI[])
+    onLoadProgress?.(70, 'textures')
+
+    createLights(scene, ground, poiMeshes)
+    onLoadProgress?.(90, 'textures')
 
     const cleanupPointerLock = setupPointerLock(canvas)
     const cleanupInteraction = setupInteraction(
@@ -148,6 +158,7 @@ export function BabylonScene({ onInspect, onSwitchMode }: BabylonSceneProps) {
       setNearbyPOI
     )
 
+    onLoadProgress?.(100, 'ready')
     engine.runRenderLoop(() => scene.render())
 
     return () => {
@@ -158,7 +169,7 @@ export function BabylonScene({ onInspect, onSwitchMode }: BabylonSceneProps) {
       scene.dispose()
       engine.dispose()
     }
-  }, [onInspect])
+  }, [onInspect, onLoadProgress])
 
   // Counter-rotate layout to stay portrait when device is physically in landscape
   const needsRotation = showMobileControls && !landscapeMode && !isPortrait

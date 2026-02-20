@@ -5,7 +5,7 @@
 > A grand royal hall or throne room; the ceremonial heart of a palace where audiences are received and important gatherings held.
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
-[![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-1.3.1-blue.svg)]()
 [![Status](https://img.shields.io/badge/status-In%20Development-yellow.svg)]()
 
 <details>
@@ -116,6 +116,13 @@ Balairung uses a **Javanese/Malay royal hall** aesthetic inspired by traditional
 - Fallback sidebar and POI cards: wood-textured background, gold-trimmed cards
 - 3D sidebar: wood-textured panel with gold accent border
 - Minimap SVG: warm wood/gold color palette replacing green/magenta
+- 3D hall: ceiling, doorway, baseboards, gold crown molding, corner pillars
+- Floor with procedural wood grain bump texture
+- Painting frames with gold beveled geometry and thumbnail textures
+- Display cases with glass transparency and teak base
+- Pedestals with 3-tier structure and gold top platform
+- Gallery lighting: directional light with shadows, per-painting spotlights, gold accent lights
+- Loading screen with progress bar and stage labels
 
 ---
 
@@ -349,7 +356,7 @@ const shouldDefaultToFallback = (): boolean => {
 ## 🚀 Development Roadmap
 
 <details>
-<summary>✅ Completed Versions (v0.1.0 – v1.3.0)</summary>
+<summary>✅ Completed Versions (v0.1.0 – v1.3.1)</summary>
 
 #### v0.1.0 — Scaffold
 Vite + React + TypeScript project setup, Tailwind CSS, Babylon.js deps, GitHub Pages CI/CD.
@@ -371,6 +378,9 @@ Minimap overlay with player tracking and POI labels, click-to-teleport (approach
 
 #### v1.3.0 — Visual Polish (Theme)
 Javanese/Malay royal hall "Teak & Gold" theme: color palette, Cinzel typography, CSS wood-grain textures, gold trim borders, themed welcome screen, themed Game Boy console frame, themed sidebar and fallback mode.
+
+#### v1.3.1 — Visual Polish (3D)
+Enhanced 3D hall with ceiling, doorway, baseboards, gold crown molding, corner pillars, procedural wood grain floor. Gold painting frames with thumbnail textures, glass display cases, 3-tier pedestals. Gallery lighting with directional shadows, per-painting spotlights, gold accent lights. Loading screen with progress bar.
 
 </details>
 

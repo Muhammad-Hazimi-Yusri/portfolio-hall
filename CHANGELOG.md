@@ -14,6 +14,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.3.1] - 2026-02-20
+
+### Added
+- Ceiling mesh closing the hall from above
+- Doorway gap in south wall (2-unit opening)
+- Baseboards along all walls using `hall-frame-light` color
+- Gold crown molding along all walls using `hall-accent` color
+- 4 decorative corner pillars (3-part: base, shaft, gold capital)
+- Procedural wood grain bump texture on floor via `DynamicTexture`
+- Gold painting frames (4-bar beveled geometry) around each painting POI
+- Thumbnail textures loaded onto painting canvases from POI data
+- Fallback `DynamicTexture` with title text when thumbnail is missing/fails
+- Display case mesh: teak base platform + gold trim ring + transparent glass box (alpha 0.25)
+- Pedestal mesh: 3-tier cylinder (wide base, column, gold top platform)
+- Shared material system for POI meshes (frame, teak, teakLight, glass)
+- `DirectionalLight` with `ShadowGenerator` (1024, blur exponential) replacing `PointLight`
+- Per-painting `SpotLight` positioned above and angled down for gallery illumination
+- Gold-tinted `PointLight` accents near display cases and pedestals (range-limited)
+- Ground receives shadows from POI meshes
+- Loading screen progress bar with `hall-accent` fill and stage labels
+- Loading progress milestones reported from `BabylonScene` (engine → scene → textures → ready)
+- Fade-out transition overlay when loading completes
+
+### Changed
+- Floor material updated from flat dark brown to `hall-surface` with specular sheen and bump map
+- Wall material updated from purple-gray to `hall-frame` (dark teak) with subtle specular
+- POI placeholder pink/red materials replaced with themed gold, teak, and glass materials
+- Hemispheric ambient light intensity reduced from 0.4 to 0.3, warm diffuse, `hall-surface` ground color
+- Main light changed from `PointLight` to `DirectionalLight` for shadow support
+- `createLights` signature updated to accept ground mesh and POI mesh map
+- `createHall` now returns `{ ground, walls, ceiling }` for shadow receiver setup
+- Loading screen upgraded from simple spinner to spinner + progress bar + stage text
+- Version bumped to v1.3.1
+
+### Removed
+- Single pink/red `StandardMaterial` applied to all POI types (replaced with per-type materials)
+- Simple `PointLight` ceiling light (replaced with `DirectionalLight` + spotlights)
+
+---
+
 ## [1.3.0] - 2026-02-19
 
 ### Added
