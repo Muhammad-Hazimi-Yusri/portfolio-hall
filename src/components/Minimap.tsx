@@ -50,8 +50,8 @@ export function Minimap({ pois, cameraRef, onTeleport, onTeleportToPOI, isPortra
     const svgPt = pt.matrixTransform(ctm.inverse())
 
     // Negate X back to world coords (SVG X is negated for left-handed correction)
-    const clampedX = Math.max(-7, Math.min(7, -svgPt.x))
-    const clampedZ = Math.max(-6.5, Math.min(6.5, svgPt.y))
+    const clampedX = Math.max(-20, Math.min(8, -svgPt.x))
+    const clampedZ = Math.max(-22, Math.min(18, svgPt.y))
     onTeleport(clampedX, clampedZ)
   }
 
@@ -106,10 +106,10 @@ export function Minimap({ pois, cameraRef, onTeleport, onTeleportToPOI, isPortra
     return `${cx - halfW} ${cz - halfH} ${halfW * 2} ${halfH * 2}`
   }, [playerPos.x, playerPos.z, pois])
 
-  const viewBox = expanded ? '-10 -9 20 18' : smallViewBox
+  const viewBox = expanded ? '-22 -24 44 44' : smallViewBox
 
   const containerSize = expanded
-    ? (showMobile ? 'w-56 h-48' : 'w-80 h-64')
+    ? (showMobile ? 'w-56 h-56' : 'w-80 h-80')
     : (showMobile ? 'w-36 h-32' : 'w-40 h-36')
 
   // Hide in portrait on mobile (after all hooks)
@@ -130,17 +130,24 @@ export function Minimap({ pois, cameraRef, onTeleport, onTeleportToPOI, isPortra
             onTouchEnd={handleTouch}
             onClick={handleClick}
           >
-            {/* Hall outline (symmetric, no X change needed) */}
-            <rect
-              x="-8" y="-7" width="16" height="14"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="0.2"
-              className="text-hall-muted/50"
-            />
+            {/* Zone outlines (negated X for SVG) */}
+            {/* Courtyard (center, open air) */}
+            <rect x="-8" y="-8" width="16" height="16"
+              fill="rgba(60,80,50,0.15)" stroke="currentColor" strokeWidth="0.2" className="text-hall-muted/50" />
+            {/* Reception (south wing) */}
+            <rect x="-5" y="8" width="10" height="10"
+              fill="rgba(90,65,45,0.15)" stroke="currentColor" strokeWidth="0.2" className="text-hall-muted/50" />
+            {/* Main Hall (north wing) */}
+            <rect x="-8" y="-22" width="16" height="14"
+              fill="rgba(40,30,22,0.2)" stroke="currentColor" strokeWidth="0.2" className="text-hall-muted/50" />
+            {/* Garden (west wing) */}
+            <rect x="8" y="-6" width="12" height="12"
+              fill="rgba(50,80,45,0.15)" stroke="currentColor" strokeWidth="0.2" className="text-hall-muted/50" />
 
-            {/* Door (symmetric around x=0) */}
-            <rect x="-1" y="6.9" width="2" height="0.3" className="fill-hall-accent/50" />
+            {/* Doorway connectors (gold lines) */}
+            <line x1="-1.5" y1="18" x2="1.5" y2="18" stroke="#C9A84C" strokeWidth="0.3" />
+            <line x1="-1.5" y1="-8" x2="1.5" y2="-8" stroke="#C9A84C" strokeWidth="0.3" />
+            <line x1="8" y1="-1.5" x2="8" y2="1.5" stroke="#C9A84C" strokeWidth="0.3" />
 
             {/* POI markers (negate X for left-handed correction) — click goes to approach position */}
             {pois.map((poi) => (

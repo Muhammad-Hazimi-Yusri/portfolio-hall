@@ -104,7 +104,7 @@ function WelcomeScreen({ onSelectMode, canUse3D, warnings, isChecking }: Welcome
       </div>
 
       <p className="text-hall-muted text-sm mt-8">
-        v1.3.1 — Visual Polish
+        v1.4.0 — Multi-Zone Castle
       </p>
     </div>
   )
@@ -131,7 +131,7 @@ function FallbackMode({ onSwitchMode }: { onSwitchMode: () => void }) {
       <aside className="w-full md:w-64 wood-texture border-b md:border-b-0 md:border-r border-hall-muted/20 p-4 flex flex-col" style={{ '--wood-base': '#2A1F18' } as React.CSSProperties}>
         <h2 className="text-xl font-bold mb-4 text-hall-accent">Balairung</h2>
         <nav className="flex-1 flex flex-row md:flex-col gap-2 md:gap-0 md:space-y-4 overflow-x-auto md:overflow-visible">
-          {(['projects', 'about', 'skills', 'contact'] as const).map((section) => {
+          {(['projects', 'about', 'skills', 'contact', 'experience', 'hackathons'] as const).map((section) => {
             const count = pois.filter((p) => p.section === section).length
             return (
               <button

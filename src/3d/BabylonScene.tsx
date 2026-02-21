@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { createEngine, createScene } from './engine'
-import { createHall } from './scene'
+import { createCastle } from './scene'
 import { createLights } from './lights'
 import { createFirstPersonCamera } from './camera'
 import { setupPointerLock } from './pointerLock'
@@ -133,9 +133,9 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress }: Babylo
     onLoadProgress?.(0, 'engine')
     const engine = createEngine(canvas)
     const scene = createScene(engine)
-    onLoadProgress?.(20, 'scene')
+    onLoadProgress?.(15, 'scene')
 
-    const { ground } = createHall(scene)
+    const castle = createCastle(scene)
     onLoadProgress?.(40, 'scene')
 
     const camera = createFirstPersonCamera(scene, canvas, joystickRef, lookRef, jumpRef, sprintRef, gyroRef, landscapeModeRef, cameraRef)
@@ -146,7 +146,7 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress }: Babylo
     const poiMeshes = createPOIMeshes(scene, poisData.pois as POI[])
     onLoadProgress?.(70, 'textures')
 
-    createLights(scene, ground, poiMeshes)
+    createLights(scene, castle, poiMeshes)
     onLoadProgress?.(90, 'textures')
 
     const cleanupPointerLock = setupPointerLock(canvas)

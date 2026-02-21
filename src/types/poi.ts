@@ -1,6 +1,8 @@
 export type POIType = 'painting' | 'display-case' | 'pedestal' | 'custom'
 
-export type POISection = 'projects' | 'about' | 'skills' | 'contact'
+export type POISection = 'projects' | 'about' | 'skills' | 'contact' | 'experience' | 'hackathons'
+
+export type Zone = 'reception' | 'main-hall' | 'courtyard' | 'garden'
 
 export type POILink = {
   label: string
@@ -25,6 +27,7 @@ export type POI = {
   id: string
   type: POIType
   section: POISection
+  zone: Zone
   position: { x: number; z: number }
   rotation: number
   content: POIContent

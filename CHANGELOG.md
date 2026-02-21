@@ -10,7 +10,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- Content population (real project data, thumbnails)
+- Real project thumbnails (screenshots / generated images)
+
+---
+
+## [1.4.0] - 2026-02-20
+
+### Added
+- Multi-zone castle layout: Reception (entrance foyer), Courtyard (open-air hub), Main Hall (project gallery), Garden (greenhouse for skills/hackathons)
+- 20 real POIs populated from CV data (projects, experience, skills, hackathons, about, contact)
+- `Zone` type system (`reception`, `main-hall`, `courtyard`, `garden`) with `zone` field on each POI
+- `POISection` extended with `experience` and `hackathons` categories
+- Castle zone geometry: stone courtyard with fountain, glass-walled garden, teak main hall with molding, pillared reception
+- Gold doorway frames at all zone transitions
+- Procedural skybox with gradient sky (deep blue → warm gold) and cloud wisps
+- `DirectionalLight` sun (intensity 0.8, warm golden) with 2048px shadow generator
+- Zone-aware indoor lighting for Reception and Main Hall
+- Scene ambient color set to warm gold tint
+- Unique placeholder thumbnails per painting: title-hashed background colors (gold, teak, batik red, forest green, slate blue, burgundy) with large serif initials
+- Multi-zone minimap showing all 4 zones as colored rects with gold doorway connectors
+- Multi-zone floor plan (2D fallback) with zone labels and expanded viewBox
+- Sidebar navigation grouped by zone (Reception, Courtyard, Main Hall, Garden) instead of section
+- SEO meta tags: description, author, theme-color, Open Graph (title, description, type, url, image), Twitter Card
+- Fallback mode sidebar includes `experience` and `hackathons` section filters
+
+### Changed
+- `createHall()` replaced with `createCastle()` returning `{ grounds, allWalls }` for multi-zone geometry
+- `createLights()` signature updated to accept `CastleGeometry` instead of single ground mesh; all zone grounds receive shadows
+- Camera spawn moved from `(0, 1.6, 5)` to `(0, 1.6, 16)` inside Reception, facing north toward Courtyard
+- Minimap viewBox expanded from `'-10 -9 20 18'` to `'-22 -24 44 44'`; teleport bounds expanded for full castle
+- Minimap container height increased for square aspect ratio in expanded mode
+- FloorPlan viewBox expanded to match new castle layout with zone labels
+- Crown molding material now has subtle emissive glow
+- Version bumped to v1.4.0
+
+### Removed
+- 5 placeholder POIs with dummy content (replaced with 20 real POIs)
+- Single-room hall geometry (replaced with 4-zone castle)
+- Section-based sidebar grouping (replaced with zone-based grouping)
+
+### Fixed
+- Lighting too dark — ambient intensity increased from 0.15 to 0.30, scene ambient color brightened, indoor light intensity increased from 0.5 to 0.7, ceiling materials brightened
+- 4 Main Hall paintings floating near south entrance (z=-9.8) — moved to north wall (z=-21.8) and reorganized all 10 paintings across north/west/east walls
+- Minimap teleport clamp bounds not covering full castle extent — expanded to match zone boundaries
 
 ---
 

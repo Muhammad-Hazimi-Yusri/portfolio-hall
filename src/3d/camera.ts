@@ -18,9 +18,9 @@ export function createFirstPersonCamera(
   landscapeModeRef?: React.MutableRefObject<boolean>,
   cameraRef?: CameraRef
 ) {
-  const camera = new UniversalCamera('fpCam', new Vector3(0, 1.6, 5), scene)
-  
-  camera.setTarget(new Vector3(0, 1.6, 0))
+  const camera = new UniversalCamera('fpCam', new Vector3(0, 1.6, 16), scene)
+
+  camera.setTarget(new Vector3(0, 1.6, 8))
   camera.attachControl(canvas, true)
 
   // Clipping planes

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import type { POI } from '@/types/poi'
+import type { POI, Zone } from '@/types/poi'
 import { isMobile } from '@/utils/detection'
 
 type ThreeDSidebarProps = {
@@ -10,10 +10,15 @@ type ThreeDSidebarProps = {
   isPortrait: boolean
 }
 
-const SECTIONS = ['projects', 'about', 'skills', 'contact'] as const
+const ZONES: { key: Zone; label: string }[] = [
+  { key: 'reception', label: 'Reception' },
+  { key: 'courtyard', label: 'Courtyard' },
+  { key: 'main-hall', label: 'Main Hall' },
+  { key: 'garden', label: 'Garden' },
+]
 
 export function ThreeDSidebar({ pois, isOpen, onToggle, onTeleportToPOI, isPortrait }: ThreeDSidebarProps) {
-  const [expandedSection, setExpandedSection] = useState<string | null>(null)
+  const [expandedZone, setExpandedZone] = useState<string | null>(null)
   const showMobile = isMobile()
 
   // Hide in portrait on mobile
@@ -43,24 +48,24 @@ export function ThreeDSidebar({ pois, isOpen, onToggle, onTeleportToPOI, isPortr
             Navigate
           </h3>
 
-          {SECTIONS.map((section) => {
-            const sectionPois = pois.filter((p) => p.section === section)
-            if (sectionPois.length === 0) return null
-            const isExpanded = expandedSection === section
+          {ZONES.map(({ key, label }) => {
+            const zonePois = pois.filter((p) => p.zone === key)
+            if (zonePois.length === 0) return null
+            const isExpanded = expandedZone === key
 
             return (
-              <div key={section} className="mb-2">
+              <div key={key} className="mb-2">
                 <button
-                  onClick={() => setExpandedSection(isExpanded ? null : section)}
-                  className="w-full text-left px-2 py-1.5 rounded text-sm font-semibold capitalize text-hall-muted hover:text-hall-text hover:bg-hall-muted/10 transition-colors flex items-center justify-between"
+                  onClick={() => setExpandedZone(isExpanded ? null : key)}
+                  className="w-full text-left px-2 py-1.5 rounded text-sm font-semibold text-hall-muted hover:text-hall-text hover:bg-hall-muted/10 transition-colors flex items-center justify-between"
                 >
-                  <span>{section}</span>
+                  <span>{label}</span>
                   <span className="text-xs">{isExpanded ? '\u25B2' : '\u25BC'}</span>
                 </button>
 
                 {isExpanded && (
                   <div className="ml-2 mt-1 space-y-0.5">
-                    {sectionPois.map((poi) => (
+                    {zonePois.map((poi) => (
                       <button
                         key={poi.id}
                         onClick={() => {

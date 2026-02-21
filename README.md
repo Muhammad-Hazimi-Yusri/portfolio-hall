@@ -5,7 +5,7 @@
 > A grand royal hall or throne room; the ceremonial heart of a palace where audiences are received and important gatherings held.
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
-[![Version](https://img.shields.io/badge/version-1.3.1-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-1.4.0-blue.svg)]()
 [![Status](https://img.shields.io/badge/status-In%20Development-yellow.svg)]()
 
 <details>
@@ -267,27 +267,32 @@ type AppState = {
 
 ---
 
-## 🗺 Hall Layout — Balairung
+## 🗺 Castle Layout — Balairung
 
 ```
-                    NORTH WALL (back)
-    ┌───────────────────────────────────────────┐
-    │                                           │
-    │     [P1]      [P2]      [P3]      [P4]    │   ← Projects(paintings)
-    │                                           │
-    │                                           │
-WEST│                                           │EAST
-WALL│  [Contact]                     [Skills]   │WALL
-    │  (pedestal)                   (display)   │
-    │                                           │
-    │                 [About]                   │
-    │               (pedestal)                  │
-    │                                           │
-    │                   ☻                      │   ← Spawn point
-    │                                           │
-    └─────────────────┤     ├───────────────────┘
-                      │DOOR │
-                    SOUTH (entrance)
+                    ┌──────────────────┐
+                    │    MAIN HALL     │
+                    │  (project gallery │
+                    │   10 paintings)  │
+                    │   z: -22 to -8  │
+                    └───────┤  ├──────┘
+                            │  │
+    ┌────────────┐  ┌───────┘  └──────┐
+    │   GARDEN   │──│   COURTYARD     │
+    │ (greenhouse│  │   (open-air     │
+    │  skills +  │  │   hub with      │
+    │  hackathons│  │   fountain)     │
+    │  x:-20→-8) │  │   x:-8→+8      │
+    └────────────┘  └───────┤  ├──────┘
+                            │  │
+                    ┌───────┘  └──────┐
+                    │   RECEPTION     │
+                    │   (entrance     │
+                    │   foyer with    │
+                    │   about/contact)│
+                    │   ☻ spawn      │
+                    └───────┤  ├──────┘
+                            DOOR
 ```
 
 ---
@@ -382,14 +387,19 @@ Javanese/Malay royal hall "Teak & Gold" theme: color palette, Cinzel typography,
 #### v1.3.1 — Visual Polish (3D)
 Enhanced 3D hall with ceiling, doorway, baseboards, gold crown molding, corner pillars, procedural wood grain floor. Gold painting frames with thumbnail textures, glass display cases, 3-tier pedestals. Gallery lighting with directional shadows, per-painting spotlights, gold accent lights. Loading screen with progress bar.
 
+#### v1.4.0 — Multi-Zone Castle & Content Population
+Multi-zone castle layout (Reception, Courtyard, Main Hall, Garden). 20 real POIs from CV data. Procedural skybox, sun lighting, gold doorway frames, glass-walled garden. Zone-based sidebar, expanded minimap/floorplan. SEO meta tags. Unique placeholder thumbnails.
+
 </details>
+
+#### v1.4.0 — Multi-Zone Castle & Content Population
+Multi-zone castle layout (Reception, Courtyard, Main Hall, Garden). 20 real POIs from CV data. Procedural skybox, sun lighting, gold doorway frames, glass-walled garden. Zone-based sidebar, expanded minimap/floorplan. SEO meta tags. Unique placeholder thumbnails. Hotfixed lighting, painting placement, and minimap bounds.
 
 ### 🔧 In Progress
 
-#### v1.4.0 — Content Population
-- [ ] Real project data and thumbnails
-- [ ] About / Skills / Contact content
-- [ ] SEO metadata and Open Graph tags
+#### v1.5.0 — 3D Modelling & Thumbnails
+- [ ] Real project thumbnails (screenshots / generated images)
+- [ ] OG image for social media previews
 
 #### v2.0.0 — VR Support
 - [ ] WebXR session handling

@@ -1,74 +1,309 @@
 {
   "pois": [
     {
-      "id": "project-1",
-      "type": "painting",
-      "section": "projects",
-      "position": { "x": -3, "z": -6.8 },
-      "rotation": 0,
-      "content": {
-        "title": "Project One",
-        "thumbnail": "/thumbnails/placeholder.png",
-        "description": "A placeholder project description.",
-        "links": [
-          { "label": "GitHub", "url": "#" },
-          { "label": "Live Demo", "url": "#" }
-        ],
-        "tags": ["React", "TypeScript"]
-      }
-    },
-    {
-      "id": "project-2",
-      "type": "painting",
-      "section": "projects",
-      "position": { "x": 0, "z": -6.8 },
-      "rotation": 0,
-      "content": {
-        "title": "Project Two",
-        "thumbnail": "/thumbnails/placeholder.png",
-        "description": "Another placeholder project.",
-        "tags": ["Babylon.js", "WebXR"]
-      }
-    },
-    {
       "id": "about",
       "type": "pedestal",
       "section": "about",
-      "position": { "x": 0, "z": 0 },
-      "rotation": 180,
+      "zone": "reception",
+      "position": { "x": -3, "z": 13 },
+      "rotation": 0,
       "content": {
         "title": "About Me",
         "thumbnail": "/thumbnails/placeholder.png",
-        "description": "Hello! I'm a developer who loves building immersive experiences."
-      }
-    },
-    {
-      "id": "skills",
-      "type": "display-case",
-      "section": "skills",
-      "position": { "x": 6, "z": -4 },
-      "rotation": 270,
-      "content": {
-        "title": "Skills & Tech",
-        "thumbnail": "/thumbnails/placeholder.png",
-        "description": "Technologies I work with.",
-        "tags": ["TypeScript", "React", "Babylon.js", "Node.js"]
+        "description": "MEng Electrical & Electronic Engineering from the University of Southampton (First Class Honours). UK-based with graduate visa until October 2027 — no sponsorship needed, willing to relocate. I build immersive experiences, from VR apps to full-stack web platforms.",
+        "tags": ["MEng EEE", "First Class", "UK Graduate Visa", "Full-Stack"]
       }
     },
     {
       "id": "contact",
       "type": "pedestal",
       "section": "contact",
-      "position": { "x": -6, "z": -4 },
-      "rotation": 90,
+      "zone": "reception",
+      "position": { "x": 3, "z": 13 },
+      "rotation": 0,
       "content": {
         "title": "Contact",
         "thumbnail": "/thumbnails/placeholder.png",
-        "description": "Get in touch!",
+        "description": "Get in touch — I'm open to opportunities in software engineering, XR development, and creative tech.",
         "links": [
-          { "label": "Email", "url": "mailto:placeholder@example.com" },
-          { "label": "GitHub", "url": "#" }
+          { "label": "Email", "url": "mailto:muhammadhazimiyusri@gmail.com" },
+          { "label": "LinkedIn", "url": "https://linkedin.com/in/muhammadhazimiyusri" },
+          { "label": "GitHub", "url": "https://github.com/Muhammad-Hazimi-Yusri" },
+          { "label": "GitLab", "url": "https://git.soton.ac.uk/mhby1g21" },
+          { "label": "Website", "url": "https://muhammadhazimiyusri.uk" }
         ]
+      }
+    },
+    {
+      "id": "audioscenic",
+      "type": "pedestal",
+      "section": "experience",
+      "zone": "courtyard",
+      "position": { "x": 3, "z": 0 },
+      "rotation": 270,
+      "content": {
+        "title": "Audioscenic — Intern",
+        "thumbnail": "/thumbnails/placeholder.png",
+        "description": "Developed Python tool for multi-channel audio analysis interfacing with embedded devices. Increased test coverage from ~30% to 85% using PyTest with TDD/BDD practices. Applied WebSocket for real-time communication and multiprocessing for concurrent audio stream handling.",
+        "tags": ["Python", "PyTest", "WebSocket", "PySerial", "GitLab"],
+        "links": [
+          { "label": "Audioscenic", "url": "https://audioscenic.com" }
+        ]
+      }
+    },
+    {
+      "id": "southampton-research",
+      "type": "pedestal",
+      "section": "experience",
+      "zone": "courtyard",
+      "position": { "x": -3, "z": 0 },
+      "rotation": 90,
+      "content": {
+        "title": "Southampton — Research Asst.",
+        "thumbnail": "/thumbnails/placeholder.png",
+        "description": "Refined ML pipeline for VR scene reconstruction (EdgeNet360). Adapted ML models for 360° image processing and implemented VR scene rendering in Unity with Steam Audio. Created custom audio recording system for room impulse response and developed acoustic evaluation methods in MATLAB.",
+        "tags": ["Unity", "Python", "MATLAB", "Steam Audio", "EdgeNet360"]
+      }
+    },
+    {
+      "id": "eee-roadmap",
+      "type": "painting",
+      "section": "projects",
+      "zone": "main-hall",
+      "position": { "x": -6, "z": -21.8 },
+      "rotation": 180,
+      "content": {
+        "title": "EEE Roadmap",
+        "thumbnail": "/thumbnails/placeholder.png",
+        "description": "Open-source learning platform for EEE students with progress tracking across 50+ topics. Built with Astro and interactive graph visualisation (Cytoscape.js) showing topic connections. Features cross-device sync with Google OAuth via Supabase, 43+ unit tests and E2E tests.",
+        "tags": ["Astro", "TypeScript", "TailwindCSS", "Supabase", "Cytoscape.js", "Vitest"],
+        "links": [
+          { "label": "GitHub", "url": "https://github.com/Muhammad-Hazimi-Yusri/eee-roadmap" },
+          { "label": "Live", "url": "https://eee-roadmap.muhammadhazimiyusri.uk" }
+        ]
+      }
+    },
+    {
+      "id": "food-wars",
+      "type": "painting",
+      "section": "projects",
+      "zone": "main-hall",
+      "position": { "x": -3, "z": -21.8 },
+      "rotation": 180,
+      "content": {
+        "title": "Food Wars (食戟)",
+        "thumbnail": "/thumbnails/placeholder.png",
+        "description": "Cloud-first kitchen inventory app — modern alternative to Grocy. Designed Grocy-compatible PostgreSQL schema (40+ fields) with Supabase RLS. Features dual auth, drag-and-drop tables, product image uploads, and a Japanese diner aesthetic.",
+        "tags": ["Next.js 14", "TypeScript", "Tailwind CSS 4", "Supabase", "shadcn/ui", "Vercel"],
+        "links": [
+          { "label": "GitHub", "url": "https://github.com/Muhammad-Hazimi-Yusri/food-wars" },
+          { "label": "Live", "url": "https://food-wars.muhammadhazimiyusri.uk" }
+        ]
+      }
+    },
+    {
+      "id": "portfolio-hall",
+      "type": "painting",
+      "section": "projects",
+      "zone": "main-hall",
+      "position": { "x": 0, "z": -21.8 },
+      "rotation": 180,
+      "content": {
+        "title": "Portfolio Hall (This!)",
+        "thumbnail": "/thumbnails/placeholder.png",
+        "description": "Immersive 3D portfolio website — the very castle you're exploring right now! Built interactive 3D museum with Babylon.js, procedural hall generation, collision detection, and three cross-platform control schemes. Features gyroscope camera, minimap, cinematic fly-to, and 2D fallback.",
+        "tags": ["React", "Babylon.js", "TypeScript", "Vite", "Tailwind CSS"],
+        "links": [
+          { "label": "GitHub", "url": "https://github.com/Muhammad-Hazimi-Yusri/portfolio-hall" },
+          { "label": "Live", "url": "https://muhammad-hazimi-yusri.github.io/portfolio-hall" }
+        ]
+      }
+    },
+    {
+      "id": "claude-refresher-orb",
+      "type": "painting",
+      "section": "projects",
+      "zone": "main-hall",
+      "position": { "x": 3, "z": -21.8 },
+      "rotation": 180,
+      "content": {
+        "title": "Claude Refresher Orb",
+        "thumbnail": "/thumbnails/placeholder.png",
+        "description": "Cross-platform mobile app to track Claude AI usage limits with proactive alarm notifications when the 5-hour rolling window resets. Designed notification system with reset alarms, daily kickstart, and manual countdown timer.",
+        "tags": ["Flutter", "Dart", "Swift", "Local Notifications"],
+        "links": [
+          { "label": "GitHub", "url": "https://github.com/Muhammad-Hazimi-Yusri/claude-refresher-orb" }
+        ]
+      }
+    },
+    {
+      "id": "home-server",
+      "type": "painting",
+      "section": "projects",
+      "zone": "main-hall",
+      "position": { "x": -7.8, "z": -13 },
+      "rotation": 90,
+      "content": {
+        "title": "Home Server",
+        "thumbnail": "/thumbnails/placeholder.png",
+        "description": "Personal media and photo management serving a household of 4 with 20TB storage. Deployed containerised apps (Plex, Immich, JellyFin) on Linux with DLNA streaming to VR headsets and various devices.",
+        "tags": ["Docker", "Linux", "Plex", "Immich", "DLNA", "Networking"]
+      }
+    },
+    {
+      "id": "petbot",
+      "type": "painting",
+      "section": "projects",
+      "zone": "main-hall",
+      "position": { "x": -7.8, "z": -17 },
+      "rotation": 90,
+      "content": {
+        "title": "PetBot",
+        "thumbnail": "/thumbnails/placeholder.png",
+        "description": "Social companion robot with local LLM for privacy-focused users. Integrated Ollama LLM on Raspberry Pi 5, developed Flask server with Socket.IO for real-time communication. Created 3D chassis design and programmed servo/DC motor control. Integrated TTS (Piper) and STT (Vosk).",
+        "tags": ["Raspberry Pi 5", "Python", "Flask", "Ollama", "Socket.IO", "3D Printing"],
+        "links": [
+          { "label": "Demo", "url": "https://youtu.be/3umn0yt_FcE" }
+        ]
+      }
+    },
+    {
+      "id": "avvr",
+      "type": "painting",
+      "section": "projects",
+      "zone": "main-hall",
+      "position": { "x": 7.8, "z": -13 },
+      "rotation": 270,
+      "content": {
+        "title": "AVVR — VR Audio-Visual",
+        "thumbnail": "/thumbnails/placeholder.png",
+        "description": "VR app reconstructing real scenes with accurate spatial audio. Led technical development across Unity VR, ML pipeline, and evaluation workstreams. Developed real-time spatial audio VR app with Steam Audio, redesigned ML pipeline GUI using PyQt6. Team of 6, scored 84%.",
+        "tags": ["Unity", "C#", "Steam Audio", "PyQt6", "Python"],
+        "links": [
+          { "label": "Itch.io", "url": "https://chronohaxx.itch.io/avvr" },
+          { "label": "Resources", "url": "https://linktr.ee/gdp4" }
+        ]
+      }
+    },
+    {
+      "id": "diy-stereo-camera",
+      "type": "painting",
+      "section": "projects",
+      "zone": "main-hall",
+      "position": { "x": 7.8, "z": -17 },
+      "rotation": 270,
+      "content": {
+        "title": "DIY Stereo Camera",
+        "thumbnail": "/thumbnails/placeholder.png",
+        "description": "Low-cost stereoscopic camera for 3D video capture with VR viewer. Designed hardware with Raspberry Pi 5 and dual cameras, developed stereo processing pipeline, and created VR 6DOF viewing app in Godot 4.",
+        "tags": ["Raspberry Pi 5", "Godot 4", "GDScript", "OpenCV", "3D Printing"],
+        "links": [
+          { "label": "GitHub", "url": "https://github.com/Muhammad-Hazimi-Yusri/COMP3200" },
+          { "label": "Pipeline Demo", "url": "https://youtu.be/AcH3xw2EPmc" },
+          { "label": "VR Demo", "url": "https://youtu.be/MtZ8gLKz6AU" }
+        ]
+      }
+    },
+    {
+      "id": "medical-emg",
+      "type": "painting",
+      "section": "projects",
+      "zone": "main-hall",
+      "position": { "x": 6, "z": -21.8 },
+      "rotation": 180,
+      "content": {
+        "title": "Medical EMG Control",
+        "thumbnail": "/thumbnails/placeholder.png",
+        "description": "EMG signal processing for robotic hand control. Developed processing pipeline for finger control, integrated Delsys Trigno sensors with real-time acquisition. Created Random Forest classifier (72% accuracy). Extended with wheelchair integration for assistive robotics. Scored 84%.",
+        "tags": ["Python", "Delsys Trigno", "scikit-learn", "Signal Processing"]
+      }
+    },
+    {
+      "id": "stormed",
+      "type": "painting",
+      "section": "projects",
+      "zone": "main-hall",
+      "position": { "x": -7.8, "z": -20 },
+      "rotation": 90,
+      "content": {
+        "title": "StormMed Smart Meter",
+        "thumbnail": "/thumbnails/placeholder.png",
+        "description": "Autonomous smart electricity meter managing renewable power sources for disaster recovery field hospital. Led system integration and ran LabVIEW simulation achieving 71.8% score. Team of 6, scored 71%.",
+        "tags": ["LabVIEW", "Embedded C", "AVR", "Power Electronics"]
+      }
+    },
+    {
+      "id": "skills",
+      "type": "display-case",
+      "section": "skills",
+      "zone": "garden",
+      "position": { "x": -14, "z": 0 },
+      "rotation": 90,
+      "content": {
+        "title": "Skills & Tech",
+        "thumbnail": "/thumbnails/placeholder.png",
+        "description": "Expert: Python. Proficient: C++, C#, JS/TS, MATLAB. Familiar: Java, Dart, GDScript, embedded C. Frameworks: React, Next.js, Astro, Flask, Unity, Godot, Babylon.js, Flutter. DevOps: Docker, GitHub Actions, Cloudflare, Supabase, Vercel. Hardware: Raspberry Pi, Arduino, ESP32.",
+        "tags": ["Python", "TypeScript", "React", "Unity", "Docker", "Raspberry Pi", "Flutter", "Next.js"]
+      }
+    },
+    {
+      "id": "kibo-rpc",
+      "type": "pedestal",
+      "section": "hackathons",
+      "zone": "garden",
+      "position": { "x": -14, "z": -4 },
+      "rotation": 90,
+      "content": {
+        "title": "Kibo Robot Challenge",
+        "thumbnail": "/thumbnails/placeholder.png",
+        "description": "7th place International Final (represented Malaysia). 1st place Malaysia 2023 (OpenCV ArUco detection). 2nd place Malaysia 2022 (RM1000 prize). Developed 3D pathfinding for ISS simulation using quadtrees.",
+        "tags": ["Java", "Android", "OpenCV", "ArUco", "Pathfinding"]
+      }
+    },
+    {
+      "id": "robohack",
+      "type": "pedestal",
+      "section": "hackathons",
+      "zone": "garden",
+      "position": { "x": -14, "z": 4 },
+      "rotation": 90,
+      "content": {
+        "title": "RoboHack 2024 & 2025",
+        "thumbnail": "/thumbnails/placeholder.png",
+        "description": "University of Southampton robotics hackathon. Competed in 2024 and 2025 editions using Python robotics API for autonomous robot control and navigation challenges.",
+        "tags": ["Python", "Robotics", "Hackathon"]
+      }
+    },
+    {
+      "id": "game-jam",
+      "type": "pedestal",
+      "section": "hackathons",
+      "zone": "garden",
+      "position": { "x": -18, "z": 0 },
+      "rotation": 270,
+      "content": {
+        "title": "Global Game Jam 2025",
+        "thumbnail": "/thumbnails/placeholder.png",
+        "description": "48-hour game development hackathon at Southampton. Developed an asymmetrical VR puzzle game with Unity in a team of 3 — VR player in a submarine, PC player helping navigate.",
+        "tags": ["Unity", "VR", "C#", "Game Dev"],
+        "links": [
+          { "label": "GitHub", "url": "https://github.com/Muhammad-Hazimi-Yusri/GGJ25" },
+          { "label": "GGJ Page", "url": "https://globalgamejam.org/games/2025/under-pressure-9" }
+        ]
+      }
+    },
+    {
+      "id": "ai-hackathon",
+      "type": "pedestal",
+      "section": "hackathons",
+      "zone": "garden",
+      "position": { "x": -18, "z": -4 },
+      "rotation": 270,
+      "content": {
+        "title": "AI Hackathon 2022",
+        "thumbnail": "/thumbnails/placeholder.png",
+        "description": "University of Southampton AI hackathon. Early exploration into machine learning and AI application development during first year of studies.",
+        "tags": ["AI", "Machine Learning", "Hackathon"]
       }
     }
   ]
