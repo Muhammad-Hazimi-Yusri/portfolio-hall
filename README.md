@@ -137,6 +137,8 @@ Balairung uses a **Javanese/Malay royal hall** aesthetic inspired by traditional
 | **Styling** | Tailwind CSS | Rapid UI development |
 | **Hosting** | GitHub Pages | Free, CI/CD via Actions |
 | **Mobile Controls** | Nipple.js (planned) | Virtual joystick library |
+| **3D Scanning** | Scaniverse / Polycam | iPhone LiDAR capture, gaussian splat + mesh export |
+| **VR** | Babylon.js WebXR | Native Quest browser support |
 
 ---
 
@@ -217,6 +219,14 @@ portfolio-hall/
 │                     └─────────────────────────────┘         │
 └─────────────────────────────────────────────────────────────┘
 ```
+
+### Asset Strategy
+
+Balairung uses a **hybrid geometry approach**:
+
+- **Procedural geometry** handles room structure (floors, walls, ceilings, zone boundaries) — fast, no file loading, easily tweakable
+- **Blender .glb assets** (planned v1.7.0) layer decorative architectural elements on top — pillars, arches, crown molding, centrepiece — without replacing the procedural rooms
+- **Gaussian splats** (planned v1.8.0) loaded via Babylon.js 8.0 native `GaussianSplattingMesh`, used for the self-portrait avatar and per-project physical displays; gracefully degrade to low-poly mesh on weak devices
 
 ---
 
@@ -395,17 +405,55 @@ Multi-zone castle layout (Reception, Courtyard, Main Hall, Garden). 20 real POIs
 #### v1.4.0 — Multi-Zone Castle & Content Population
 Multi-zone castle layout (Reception, Courtyard, Main Hall, Garden). 20 real POIs from CV data. Procedural skybox, sun lighting, gold doorway frames, glass-walled garden. Zone-based sidebar, expanded minimap/floorplan. SEO meta tags. Unique placeholder thumbnails. Hotfixed lighting, painting placement, and minimap bounds.
 
-### 🔧 In Progress
+### 🔧 Upcoming
 
-#### v1.5.0 — 3D Modelling & Thumbnails
-- [ ] Real project thumbnails (screenshots / generated images)
-- [ ] OG image for social media previews
+#### v1.5.0 — WebXR / VR Foundation
+- [ ] WebXR immersive-VR session (Quest Pro / Quest 2 via browser)
+- [ ] Controller locomotion (thumbstick + teleport + snap turn)
+- [ ] Hand tracking with pinch interaction
+- [ ] VR POI interaction (ray pointer + floating 3D inspect panels)
+- [ ] Performance profiling and comfort options (vignette, seated mode)
 
-#### v2.0.0 — VR Support
-- [ ] WebXR session handling
-- [ ] VR controller input
-- [ ] Teleport locomotion
-- [ ] VR-specific UI panels
+#### v1.5.1 — Minimap Dynamic Zoom
+- [ ] Camera-centered view showing player + nearest POIs
+- [ ] Dynamic zoom level based on POI proximity
+- [ ] Manual zoom override (pinch/scroll)
+- [ ] Full map toggle in corner
+
+#### v1.6.0 — 2D Mode Revamp
+- [ ] Redesign fallback mode as a spatial-themed but recruiter-optimized portfolio
+- [ ] Sections: hero/intro, projects grid, experience timeline, skills, hackathons, contact
+- [ ] Teak & gold aesthetic preserved
+- [ ] All info scannable without excessive modals
+- [ ] "Source of truth" layout for both visitors and self-reference
+- [ ] Mobile-first responsive
+
+#### v1.7.0 — Blender Asset Pipeline
+- [ ] .glb import pipeline with material mapping and shadow support
+- [ ] Config-driven asset placement system for swappable Blender models
+- [ ] First assets: pillars, doorway arches, crown molding, reception centerpiece
+- [ ] Fallback to procedural geometry when .glb not available
+- [ ] Asset manifest with lazy loading
+
+#### v1.8.0 — 3D Self-Portrait (Scan + Splat Avatar)
+- [ ] iPhone LiDAR self-scan (via Scaniverse/Polycam)
+- [ ] Low-poly mesh avatar (.glb) in reception area
+- [ ] Gaussian splat toggle using Babylon.js native GaussianSplattingMesh (.ply/.splat)
+- [ ] UI toggle between low-poly and splat with loading indicator
+- [ ] Graceful degradation (low-poly only on weak devices)
+
+#### v1.9.0 — Rich Project Displays
+- [ ] 3D slideshow panels for website projects (screenshot carousel on 3D plane)
+- [ ] Gaussian splat displays for physical projects on pedestals
+- [ ] Enhanced inspect modal with richer content
+
+#### v2.0.0 — Interactive Web Panels + Polish
+- [ ] Iframe-on-3D-plane for live website project browsing (desktop only)
+- [ ] DOM overlay positioned to match 3D plane projection
+- [ ] VR fallback to slideshow mode
+- [ ] Full content population, all placeholders replaced
+- [ ] Performance optimization pass (LOD, occlusion culling)
+- [ ] Launch-ready state
 
 #### v3.0.0 — AI Integration (Backlog)
 - [ ] Visitor type detection

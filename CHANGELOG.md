@@ -10,7 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- Real project thumbnails (screenshots / generated images)
+- v1.5.0: WebXR / VR foundation (Quest Pro/2 via browser, controllers + hand tracking)
+- v1.5.1: Minimap dynamic zoom (camera-centered, nearest POIs)
+- v1.6.0: 2D fallback mode revamp (recruiter-optimized spatial portfolio)
+- v1.7.0: Blender .glb asset pipeline (hybrid procedural + modeled architecture)
+- v1.8.0: 3D self-portrait (iPhone LiDAR scan, low-poly mesh + gaussian splat toggle)
+- v1.9.0: Rich project displays (3D slideshows, per-project gaussian splats)
+- v2.0.0: Interactive web panels, full content polish, launch-ready
+- v3.0.0: AI integration (backlog)
 
 ---
 
