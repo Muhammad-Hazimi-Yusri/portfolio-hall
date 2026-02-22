@@ -5,7 +5,7 @@
 > A grand royal hall or throne room; the ceremonial heart of a palace where audiences are received and important gatherings held.
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
-[![Version](https://img.shields.io/badge/version-1.5.0--slice3-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-1.5.0--slice4-blue.svg)]()
 [![Status](https://img.shields.io/badge/status-In%20Development-yellow.svg)]()
 
 <details>
@@ -139,6 +139,10 @@ Balairung uses a **Javanese/Malay royal hall** aesthetic inspired by traditional
 - **Right thumbstick forward**: parabolic teleport arc with gold landing ring; floor-meshes-only targeting
 - **Right thumbstick L/R**: 45° snap turn with 300 ms vignette flash for comfort
 - **Hand tracking**: default Babylon.js hand meshes; right pinch = select; gaze disc + left pinch = teleport; graceful controller ↔ hand switching
+- **POI hover highlight**: controller aim ray and hand index-finger ray cast against POI meshes each frame; `HighlightLayer` applies gold glow to hovered mesh; floating billboard label shows POI title above the mesh; 10 m distance limit prevents accidental far picks
+- **VR inspect panel** (`src/3d/vrUI.ts`): trigger/pinch while pointing at a highlighted POI opens a 1.4 × 0.9 m floating teak-and-gold panel 1.5 m in front of the player at chest height; panel shows title, description, word-wrapped text, tag pills, and link buttons; no DOM involved — pure Babylon.js geometry + `DynamicTexture`
+- **Panel interaction**: controller trigger or right-hand pinch selects close button ("✕") or link buttons; link URLs are queued and opened in new browser tabs when the VR session ends; B/Y controller button closes the panel instantly
+- **Parallel systems**: VR panel and desktop DOM modal are fully independent — switching mode is seamless
 
 ---
 
@@ -185,7 +189,8 @@ portfolio-hall/
 │   │   ├── interaction.ts        # Proximity detection + E key handler
 │   │   ├── pointerLock.ts        # Pointer lock management
 │   │   ├── webxr.ts              # WebXR support check, XR experience factory, VR locomotion setup
-│   │   ├── vrInteraction.ts      # Hand tracking, pinch detection, gaze teleport
+│   │   ├── vrInteraction.ts      # Hand tracking, pinch/trigger, hover ray casting, POI select
+│   │   ├── vrUI.ts               # VR hover label + floating teak-and-gold inspect panel
 │   │   └── BabylonScene.tsx      # Main 3D React component
 │   │
 │   ├── components/
@@ -332,8 +337,8 @@ type AppState = {
 | Desktop | WASD / Arrow keys | Mouse (pointer lock) | E key or Left click |
 | Mobile (portrait) | D-pad | Touch drag or Gyro | A button |
 | Mobile (landscape) | Virtual joystick | Touch drag or Gyro | Tap on POI |
-| VR – Controllers (v1.5.0+) | Left stick: walk · Right fwd: teleport arc · Right L/R: 45° snap turn | Headset tracking | Controller trigger (coming) |
-| VR – Hand Tracking (v1.5.0+) | Gaze + left pinch to teleport | Headset tracking | Right pinch |
+| VR – Controllers (v1.5.0+) | Left stick: walk · Right fwd: teleport arc · Right L/R: 45° snap turn | Headset tracking | Trigger: inspect highlighted POI · B/Y: close panel |
+| VR – Hand Tracking (v1.5.0+) | Gaze + left pinch to teleport | Headset tracking | Right pinch: inspect / confirm link / close panel |
 
 ### Gyro & Landscape Mode
 When gyro is enabled, a **Landscape** toggle appears. This manually switches the control layout and gyro axis mapping — no auto-detection needed. Portrait uses beta/alpha; landscape uses gamma/alpha. Toggling recalibrates the gyro automatically.
@@ -345,12 +350,22 @@ iOS Safari doesn't support fullscreen API. For best landscape experience, add th
 - **Left thumbstick** — smooth walk (head-relative, collisions active)
 - **Right thumbstick forward** — show parabolic arc; release to teleport (floor meshes only)
 - **Right thumbstick left/right** — 45° snap turn with vignette flash
+- **Trigger** — inspect the highlighted POI; or click a link / close button while panel is open
+- **B button** (right) / **Y button** (left) — close the open inspect panel
+- **Aim controller at POI** — gold HighlightLayer glow + title label appear; point within 10 m to be eligible
 
 **Hand Tracking mode** (set controllers aside — detected automatically)
 - **Both hands** — rendered with natural Babylon.js joint meshes
-- **Right hand pinch** (thumb + index) — select / confirm action
+- **Right hand pinch** (thumb + index) — inspect highlighted POI, click link button, or close panel
 - **Left hand pinch** — teleport to the gold gaze disc on the floor
+- **Point right index finger at POI** — same hover highlight + label as controllers
 - Switch back to controllers at any time; hand visuals hide gracefully
+
+**VR Inspect Panel**
+- Opens 1.5 m in front of you at chest height, facing you
+- Shows: title (gold), description, tag pills, link buttons
+- Close: aim at "✕" and pinch/trigger, or press B/Y button
+- Links: tapping a link button queues the URL; all queued links open in new browser tabs when you exit VR
 
 ### Teleportation
 - Click minimap location → fade out → fly to → fade in → face nearest POI
@@ -439,7 +454,10 @@ Immersive-VR session support via Babylon.js `WebXRDefaultExperience`. "Enter VR"
 Controller-based movement via Babylon.js `WebXRFeatureName.MOVEMENT` and `TELEPORTATION`. Left thumbstick smooth walk (head-relative, 0.2 dead zone, wall/POI collisions active). Right thumbstick forward shows parabolic teleport arc with gold landing ring; release teleports to any floor mesh. Right thumbstick left/right fires 45° snap turn with a 300 ms black vignette flash for comfort. Teleportation restricted to castle ground planes — cannot land on walls, ceilings, or POI meshes.
 
 #### v1.5.0 Slice 3 — Hand Tracking
-Hand tracking via `WebXRFeatureName.HAND_TRACKING` in `src/3d/vrInteraction.ts`. Babylon.js default joint meshes render both hands with natural finger movement. Right-hand pinch (thumb ↔ index < 3.5 cm, 5 cm release hysteresis) dispatches `xr-pinch-select` CustomEvent on the canvas. Right index-finger direction EMA-smoothed each frame for slice-4 ray casting. Gaze teleport: XR camera forward ray casts onto floor; gold preview disc follows gaze; left-hand pinch confirms and moves the XR rig (X/Z only). Graceful controller ↔ hand switching via `onHandAdded/RemovedObservable` — hand visuals hide when controllers are picked up, no crash.
+Hand tracking via `WebXRFeatureName.HAND_TRACKING` in `src/3d/vrInteraction.ts`. Babylon.js default joint meshes render both hands with natural finger movement. Right-hand pinch (thumb ↔ index < 3.5 cm, 5 cm release hysteresis) initiates VR selection. Right index-finger direction EMA-smoothed each frame (α = 0.3) for ray casting. Gaze teleport: XR camera forward ray casts onto floor; gold preview disc follows gaze; left-hand pinch confirms and moves the XR rig (X/Z only). Graceful controller ↔ hand switching via `onHandAdded/RemovedObservable` — hand visuals hide when controllers are picked up.
+
+#### v1.5.0 Slice 4 — VR POI Interaction
+Full POI interaction in VR. Hover detection via per-frame ray casting: controller aim ray takes priority; hand index-finger ray as fallback; 10 m distance cap. `HighlightLayer` applies gold glow to hovered POI mesh and all children; billboard `DynamicTexture` label floats 2.2 m above the mesh. Trigger (controller) or right-hand pinch while pointing at a POI opens a floating teak-and-gold inspect panel (`src/3d/vrUI.ts`): 1.4 × 0.9 m plane at chest height 1.5 m in front, content rendered with `DynamicTexture` (title, word-wrapped description, tag pills, link buttons). Panel close: B/Y button or pinch on "✕". Link URLs are queued in a `pendingLinks` array and opened in new tabs on VR exit. No DOM involved — parallel to the desktop modal. No new npm packages added.
 
 ### 🔧 Upcoming
 
@@ -447,7 +465,7 @@ Hand tracking via `WebXRFeatureName.HAND_TRACKING` in `src/3d/vrInteraction.ts`.
 - [x] WebXR immersive-VR session entry (Quest Pro / Quest 2 via browser) — Slice 1
 - [x] Controller locomotion: left-stick walk, right-stick teleport arc, 45° snap turn + vignette — Slice 2
 - [x] Hand tracking with pinch interaction — Slice 3
-- [ ] VR POI interaction (ray pointer + floating 3D inspect panels)
+- [x] VR POI interaction: hover highlight, floating inspect panel, link queueing — Slice 4
 - [ ] Performance profiling and comfort options (seated mode)
 
 #### v1.5.1 — Minimap Dynamic Zoom

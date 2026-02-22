@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- v1.5.0 (remaining): VR POI interaction (ray pointer + floating panels), comfort options (seated mode)
+- v1.5.0 (remaining): comfort options (seated mode)
 - v1.5.1: Minimap dynamic zoom (camera-centered, nearest POIs)
 - v1.6.0: 2D fallback mode revamp (recruiter-optimized spatial portfolio)
 - v1.7.0: Blender .glb asset pipeline (hybrid procedural + modeled architecture)
@@ -21,16 +21,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.5.0-slice4] - 2026-02-22
+
+### Added
+- VR POI hover: right-hand index-finger ray and controller aim ray cast against POI meshes
+  each frame; `HighlightLayer` applies gold glow (`#CA9933`) to hovered mesh + all children;
+  POIs beyond 10 m are excluded to prevent accidental far picks
+- Hover label: `DynamicTexture` billboard plane renders POI title in gold serif text 2.2 m
+  above the hovered mesh (`billboardMode = BILLBOARDMODE_ALL`, non-pickable); hidden when a
+  panel is open
+- VR inspect panel (`src/3d/vrUI.ts`): 1.4 × 0.9 m teak-and-gold floating panel spawned 1.5 m
+  in front of the XR camera at chest height (0.3 m below eye), facing the player via
+  `lookAt`; content rendered via `DynamicTexture` (title in gold, word-wrapped description,
+  tag pills with gold borders, "Links ▶" header when links exist)
+- Panel close button: 0.09 m gold `DynamicTexture` plane ("✕") in top-right corner; pickable
+- Panel link buttons: one 0.36 × 0.07 m gold plane per `poi.content.links` entry; right-hand
+  pinch or controller trigger while pointing at a button queues the URL; all queued URLs open
+  in new browser tabs automatically when the XR session ends (`WebXRState.NOT_IN_XR`)
+- Panel close: B button (right controller) / Y button (left controller); or pinch/trigger while
+  pointing at the "✕" close button
+- Controller integration: `onControllerAddedObservable` attaches trigger listener and
+  B/Y-button listener per controller via `onMotionControllerInitObservable`; trigger fires
+  `onVRSelectAttempt` using the controller aim-ray (pointer mesh forward vector)
+- Controller priority in hover: controller aim rays are checked first each frame; hand index-
+  finger ray is fallback when no controller hit and `handsDetected > 0`
+- Backward-compatible: `setupHandTracking` in `src/3d/vrInteraction.ts` accepts optional
+  `poiOptions` fourth argument; existing call sites without it retain Slice 3 behaviour
+- Links queue: `pendingLinks` array in `BabylonScene.tsx` collects URLs during the VR session;
+  `Array.splice(0).forEach(window.open)` drains and opens them on VR exit
+- Non-VR mode: DOM inspect modal, proximity hint, minimap, sidebar — all completely unaffected
+
+---
+
 ## [1.5.0-slice3] - 2026-02-22
 
 ### Added
 - Hand tracking support via `WebXRFeatureName.HAND_TRACKING`; Babylon.js renders default
   joint/hand meshes automatically — both hands visible with natural finger movement
-- Right-hand pinch (thumb tip ↔ index tip < 3.5 cm) fires `xr-pinch-select` CustomEvent
-  on the canvas with 5.0 cm release hysteresis to prevent chatter; logged to console as
-  `[HandTracking] right pinch` (slice 4 will listen and trigger POI inspection)
+- Right-hand pinch (thumb tip ↔ index tip < 3.5 cm) with 5.0 cm release hysteresis; logged
+  to console as `[HandTracking] right pinch`; wired to `onVRSelectAttempt` in slice 4
 - Right-hand index-finger direction smoothed via exponential moving average (α = 0.3)
-  each frame — stored for slice-4 ray-cast POI selection infrastructure
+  each frame — consumed by slice-4 ray cast for POI hover and selection
 - Gaze-teleport locomotion: `xrCamera.getForwardRay(12)` cast onto floor meshes each frame;
   gold disc (`#CA9933`, α = 0.75) previews landing spot; left-hand pinch moves XR rig to
   hit X/Z (Y preserved from headset tracking); vignette flash reused from `flashVignette`

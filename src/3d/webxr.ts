@@ -30,7 +30,10 @@ export async function createXRExperience(
     uiOptions: {
       sessionMode: 'immersive-vr',
       referenceSpaceType: 'local-floor',
-      // Suppress Babylon's default button; we render our own styled one
+      // Suppress Babylon's default button; we render our own styled one.
+      // htmlButtonFactory was removed from the public type in Babylon.js v7 but
+      // still works at runtime — suppress the excess-property error.
+      // @ts-ignore
       htmlButtonFactory: () => {
         const el = document.createElement('button')
         el.style.display = 'none'

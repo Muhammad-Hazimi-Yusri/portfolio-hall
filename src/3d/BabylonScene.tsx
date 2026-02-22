@@ -187,6 +187,8 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress }: Babylo
     engine.runRenderLoop(() => scene.render())
 
     // WebXR — check support and set up experience helper
+    const pendingLinks: string[] = []
+
     checkVRSupport().then(async (supported) => {
       if (unmounted) return
       setIsVRSupported(supported)
@@ -196,7 +198,10 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress }: Babylo
         if (unmounted) { xr.dispose(); return }
         xrExperienceRef.current = xr
         setupVRLocomotion(scene, xr, castle.grounds)
-        cleanupHands = setupHandTracking(scene, xr, castle.grounds)
+        cleanupHands = setupHandTracking(scene, xr, castle.grounds, {
+          poiMeshes,
+          onLinkQueued: (url) => { pendingLinks.push(url) },
+        })
         xr.baseExperience.onStateChangedObservable.add((state) => {
           if (state === WebXRState.IN_XR) {
             setIsInVR(true)
@@ -207,6 +212,8 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress }: Babylo
             setIsInVR(false)
             cameraRef.current.isInVR = false
             camera.attachControl(canvas, true)
+            // Open any links the user queued while in VR
+            pendingLinks.splice(0).forEach(url => window.open(url, '_blank', 'noopener'))
           }
         })
       } catch (e) {
