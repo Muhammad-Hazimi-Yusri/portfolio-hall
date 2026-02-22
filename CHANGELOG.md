@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- v1.5.0 (remaining): hand tracking with pinch interaction, VR POI interaction (ray pointer + floating panels), comfort options (seated mode)
+- v1.5.0 (remaining): VR POI interaction (ray pointer + floating panels), comfort options (seated mode)
 - v1.5.1: Minimap dynamic zoom (camera-centered, nearest POIs)
 - v1.6.0: 2D fallback mode revamp (recruiter-optimized spatial portfolio)
 - v1.7.0: Blender .glb asset pipeline (hybrid procedural + modeled architecture)
@@ -18,6 +18,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - v1.9.0: Rich project displays (3D slideshows, per-project gaussian splats)
 - v2.0.0: Interactive web panels, full content polish, launch-ready
 - v3.0.0: AI integration (backlog)
+
+---
+
+## [1.5.0-slice3] - 2026-02-22
+
+### Added
+- Hand tracking support via `WebXRFeatureName.HAND_TRACKING`; Babylon.js renders default
+  joint/hand meshes automatically — both hands visible with natural finger movement
+- Right-hand pinch (thumb tip ↔ index tip < 3.5 cm) fires `xr-pinch-select` CustomEvent
+  on the canvas with 5.0 cm release hysteresis to prevent chatter; logged to console as
+  `[HandTracking] right pinch` (slice 4 will listen and trigger POI inspection)
+- Right-hand index-finger direction smoothed via exponential moving average (α = 0.3)
+  each frame — stored for slice-4 ray-cast POI selection infrastructure
+- Gaze-teleport locomotion: `xrCamera.getForwardRay(12)` cast onto floor meshes each frame;
+  gold disc (`#CA9933`, α = 0.75) previews landing spot; left-hand pinch moves XR rig to
+  hit X/Z (Y preserved from headset tracking); vignette flash reused from `flashVignette`
+- Graceful controller ↔ hand switching: `onHandAddedObservable` / `onHandRemovedObservable`
+  track active hand count; tip indicator and gaze disc hidden when `handsDetected` drops to
+  zero; controller thumbstick features require no changes — no thumbstick input = no action
+- `setupHandTracking(scene, xr, grounds)` exported from new `src/3d/vrInteraction.ts`;
+  called from `BabylonScene.tsx` after `setupVRLocomotion`; cleanup fn stored in closure
+  and called before `scene.dispose()` in the `useEffect` cleanup
+
+### Changed
+- `_flashVignette` in `src/3d/webxr.ts` renamed to `flashVignette` and exported so
+  `vrInteraction.ts` can reuse it for the hand-teleport vignette flash
 
 ---
 

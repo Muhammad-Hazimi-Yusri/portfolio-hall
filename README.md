@@ -5,7 +5,7 @@
 > A grand royal hall or throne room; the ceremonial heart of a palace where audiences are received and important gatherings held.
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
-[![Version](https://img.shields.io/badge/version-1.5.0--slice2-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-1.5.0--slice3-blue.svg)]()
 [![Status](https://img.shields.io/badge/status-In%20Development-yellow.svg)]()
 
 <details>
@@ -138,6 +138,7 @@ Balairung uses a **Javanese/Malay royal hall** aesthetic inspired by traditional
 - **Left thumbstick**: smooth walk with head-relative orientation and wall/POI collision
 - **Right thumbstick forward**: parabolic teleport arc with gold landing ring; floor-meshes-only targeting
 - **Right thumbstick L/R**: 45° snap turn with 300 ms vignette flash for comfort
+- **Hand tracking**: default Babylon.js hand meshes; right pinch = select; gaze disc + left pinch = teleport; graceful controller ↔ hand switching
 
 ---
 
@@ -184,6 +185,7 @@ portfolio-hall/
 │   │   ├── interaction.ts        # Proximity detection + E key handler
 │   │   ├── pointerLock.ts        # Pointer lock management
 │   │   ├── webxr.ts              # WebXR support check, XR experience factory, VR locomotion setup
+│   │   ├── vrInteraction.ts      # Hand tracking, pinch detection, gaze teleport
 │   │   └── BabylonScene.tsx      # Main 3D React component
 │   │
 │   ├── components/
@@ -330,7 +332,8 @@ type AppState = {
 | Desktop | WASD / Arrow keys | Mouse (pointer lock) | E key or Left click |
 | Mobile (portrait) | D-pad | Touch drag or Gyro | A button |
 | Mobile (landscape) | Virtual joystick | Touch drag or Gyro | Tap on POI |
-| VR (v1.5.0+) | Left stick: walk · Right fwd: teleport arc · Right L/R: 45° snap turn | Headset tracking | Controller trigger (coming) |
+| VR – Controllers (v1.5.0+) | Left stick: walk · Right fwd: teleport arc · Right L/R: 45° snap turn | Headset tracking | Controller trigger (coming) |
+| VR – Hand Tracking (v1.5.0+) | Gaze + left pinch to teleport | Headset tracking | Right pinch |
 
 ### Gyro & Landscape Mode
 When gyro is enabled, a **Landscape** toggle appears. This manually switches the control layout and gyro axis mapping — no auto-detection needed. Portrait uses beta/alpha; landscape uses gamma/alpha. Toggling recalibrates the gyro automatically.
@@ -342,6 +345,12 @@ iOS Safari doesn't support fullscreen API. For best landscape experience, add th
 - **Left thumbstick** — smooth walk (head-relative, collisions active)
 - **Right thumbstick forward** — show parabolic arc; release to teleport (floor meshes only)
 - **Right thumbstick left/right** — 45° snap turn with vignette flash
+
+**Hand Tracking mode** (set controllers aside — detected automatically)
+- **Both hands** — rendered with natural Babylon.js joint meshes
+- **Right hand pinch** (thumb + index) — select / confirm action
+- **Left hand pinch** — teleport to the gold gaze disc on the floor
+- Switch back to controllers at any time; hand visuals hide gracefully
 
 ### Teleportation
 - Click minimap location → fade out → fly to → fade in → face nearest POI
@@ -429,12 +438,15 @@ Immersive-VR session support via Babylon.js `WebXRDefaultExperience`. "Enter VR"
 #### v1.5.0 Slice 2 — VR Locomotion
 Controller-based movement via Babylon.js `WebXRFeatureName.MOVEMENT` and `TELEPORTATION`. Left thumbstick smooth walk (head-relative, 0.2 dead zone, wall/POI collisions active). Right thumbstick forward shows parabolic teleport arc with gold landing ring; release teleports to any floor mesh. Right thumbstick left/right fires 45° snap turn with a 300 ms black vignette flash for comfort. Teleportation restricted to castle ground planes — cannot land on walls, ceilings, or POI meshes.
 
+#### v1.5.0 Slice 3 — Hand Tracking
+Hand tracking via `WebXRFeatureName.HAND_TRACKING` in `src/3d/vrInteraction.ts`. Babylon.js default joint meshes render both hands with natural finger movement. Right-hand pinch (thumb ↔ index < 3.5 cm, 5 cm release hysteresis) dispatches `xr-pinch-select` CustomEvent on the canvas. Right index-finger direction EMA-smoothed each frame for slice-4 ray casting. Gaze teleport: XR camera forward ray casts onto floor; gold preview disc follows gaze; left-hand pinch confirms and moves the XR rig (X/Z only). Graceful controller ↔ hand switching via `onHandAdded/RemovedObservable` — hand visuals hide when controllers are picked up, no crash.
+
 ### 🔧 Upcoming
 
 #### v1.5.0 — WebXR / VR Foundation (remaining)
 - [x] WebXR immersive-VR session entry (Quest Pro / Quest 2 via browser) — Slice 1
 - [x] Controller locomotion: left-stick walk, right-stick teleport arc, 45° snap turn + vignette — Slice 2
-- [ ] Hand tracking with pinch interaction
+- [x] Hand tracking with pinch interaction — Slice 3
 - [ ] VR POI interaction (ray pointer + floating 3D inspect panels)
 - [ ] Performance profiling and comfort options (seated mode)
 

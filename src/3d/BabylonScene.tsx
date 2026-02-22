@@ -9,6 +9,7 @@ import { setupInteraction } from './interaction'
 import { createCameraRefDefault } from './cameraRef'
 import { flyToCinematic, getApproachPosition } from './flyTo'
 import { checkVRSupport, createXRExperience, setupVRLocomotion } from './webxr'
+import { setupHandTracking } from './vrInteraction'
 import poisData from '@/data/pois.json'
 import type { POI } from '@/types/poi'
 import type { UniversalCamera } from '@babylonjs/core/Cameras/universalCamera'
@@ -152,6 +153,7 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress }: Babylo
     if (!canvas) return
 
     let unmounted = false
+    let cleanupHands: (() => void) | null = null
 
     onLoadProgress?.(0, 'engine')
     const engine = createEngine(canvas)
@@ -194,6 +196,7 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress }: Babylo
         if (unmounted) { xr.dispose(); return }
         xrExperienceRef.current = xr
         setupVRLocomotion(scene, xr, castle.grounds)
+        cleanupHands = setupHandTracking(scene, xr, castle.grounds)
         xr.baseExperience.onStateChangedObservable.add((state) => {
           if (state === WebXRState.IN_XR) {
             setIsInVR(true)
@@ -213,6 +216,7 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress }: Babylo
 
     return () => {
       unmounted = true
+      cleanupHands?.()
       babylonCameraRef.current = null
       sceneRef.current = null
       xrExperienceRef.current = null

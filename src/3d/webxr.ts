@@ -84,10 +84,10 @@ export function setupVRLocomotion(
   teleportation.parabolicCheckRadius = 5
 
   // Brief vignette flash on snap turn for comfort
-  teleportation.onAfterCameraTeleportRotation.add(() => _flashVignette(scene))
+  teleportation.onAfterCameraTeleportRotation.add(() => flashVignette(scene))
 }
 
-function _flashVignette(scene: Scene): void {
+export function flashVignette(scene: Scene): void {
   const layer = new Layer('snapFade', null, scene, false)  // false = foreground overlay
   layer.color = new Color4(0, 0, 0, 0.7)
   let ms = 0
