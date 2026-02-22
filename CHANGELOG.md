@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- v1.5.0: WebXR / VR foundation (Quest Pro/2 via browser, controllers + hand tracking)
+- v1.5.0 (remaining): controller locomotion (thumbstick + teleport + snap turn), hand tracking with pinch interaction, VR POI interaction (ray pointer + floating panels), comfort options (vignette, seated mode)
 - v1.5.1: Minimap dynamic zoom (camera-centered, nearest POIs)
 - v1.6.0: 2D fallback mode revamp (recruiter-optimized spatial portfolio)
 - v1.7.0: Blender .glb asset pipeline (hybrid procedural + modeled architecture)
@@ -18,6 +18,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - v1.9.0: Rich project displays (3D slideshows, per-project gaussian splats)
 - v2.0.0: Interactive web panels, full content polish, launch-ready
 - v3.0.0: AI integration (backlog)
+
+---
+
+## [1.5.0-slice1] - 2026-02-22
+
+### Added
+- WebXR immersive-VR session support via Babylon.js `WebXRDefaultExperience`
+- `src/3d/webxr.ts`: `checkVRSupport()` helper (uses `navigator.xr.isSessionSupported`) and `createXRExperience()` factory with `local-floor` reference space
+- "Enter VR" / "Exit VR" button (teak & gold, `bg-hall-accent`) at top-right below "Exit 3D"; only rendered when `isVRSupported` is true — invisible on non-XR devices
+- On VR enter: `camera.detachControl()`, `document.exitPointerLock()`, `cameraRef.isInVR = true`; DOM overlays (sidebar, minimap, mobile controls, POI hint) hidden
+- On VR exit: `camera.attachControl()` restored, all overlays re-shown
+- `local-floor` XR reference space; XR rig positioned at player's current x,z on session start (floor at y=0, head height tracked by headset)
+- `isInVR: boolean` field added to `CameraRefValue`; camera `onBeforeRenderObservable` skips all input when `isInVR` is active
+- Unmount guard (`unmounted` flag) for async XR setup prevents state updates after component disposal
+- Babylon's default XR button suppressed via `htmlButtonFactory`; custom styled button used instead
 
 ---
 

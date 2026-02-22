@@ -8,10 +8,13 @@ import { createPOIMeshes } from './pois'
 import { setupInteraction } from './interaction'
 import { createCameraRefDefault } from './cameraRef'
 import { flyToCinematic, getApproachPosition } from './flyTo'
+import { checkVRSupport, createXRExperience } from './webxr'
 import poisData from '@/data/pois.json'
 import type { POI } from '@/types/poi'
 import type { UniversalCamera } from '@babylonjs/core/Cameras/universalCamera'
 import type { Scene as BabylonScene_ } from '@babylonjs/core/scene'
+import type { WebXRDefaultExperience } from '@babylonjs/core/XR/webXRDefaultExperience'
+import { WebXRState } from '@babylonjs/core/XR/webXRTypes'
 import { isMobile } from '@/utils/detection'
 import { MobileControls } from '@/components/MobileControls'
 import { Minimap } from '@/components/Minimap'
@@ -44,6 +47,11 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress }: Babylo
   const babylonCameraRef = useRef<UniversalCamera | null>(null)
   const sceneRef = useRef<BabylonScene_ | null>(null)
   const [sidebarOpen, setSidebarOpen] = useState(true)
+
+  // WebXR state
+  const [isVRSupported, setIsVRSupported] = useState(false)
+  const [isInVR, setIsInVR] = useState(false)
+  const xrExperienceRef = useRef<WebXRDefaultExperience | null>(null)
 
   useEffect(() => {
     const handleResize = () => setIsPortrait(window.innerHeight > window.innerWidth)
@@ -126,9 +134,24 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress }: Babylo
     handleTeleport(approach.x, approach.z, poi.position.x, poi.position.z)
   }, [handleTeleport])
 
+  const handleEnterVR = useCallback(async () => {
+    const xr = xrExperienceRef.current
+    const fpCam = babylonCameraRef.current
+    if (!xr || !fpCam) return
+    // Place XR rig at player's x,z; y=0 because local-floor tracks head height from floor
+    xr.baseExperience.camera.position.set(fpCam.position.x, 0, fpCam.position.z)
+    await xr.baseExperience.enterXRAsync('immersive-vr', 'local-floor')
+  }, [])
+
+  const handleExitVR = useCallback(async () => {
+    await xrExperienceRef.current?.baseExperience.exitXRAsync()
+  }, [])
+
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
+
+    let unmounted = false
 
     onLoadProgress?.(0, 'engine')
     const engine = createEngine(canvas)
@@ -161,9 +184,37 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress }: Babylo
     onLoadProgress?.(100, 'ready')
     engine.runRenderLoop(() => scene.render())
 
+    // WebXR — check support and set up experience helper
+    checkVRSupport().then(async (supported) => {
+      if (unmounted) return
+      setIsVRSupported(supported)
+      if (!supported) return
+      try {
+        const xr = await createXRExperience(scene, castle.grounds)
+        if (unmounted) { xr.dispose(); return }
+        xrExperienceRef.current = xr
+        xr.baseExperience.onStateChangedObservable.add((state) => {
+          if (state === WebXRState.IN_XR) {
+            setIsInVR(true)
+            cameraRef.current.isInVR = true
+            camera.detachControl()
+            document.exitPointerLock()
+          } else if (state === WebXRState.NOT_IN_XR) {
+            setIsInVR(false)
+            cameraRef.current.isInVR = false
+            camera.attachControl(canvas, true)
+          }
+        })
+      } catch (e) {
+        console.error('[WebXR] setup failed', e)
+      }
+    })
+
     return () => {
+      unmounted = true
       babylonCameraRef.current = null
       sceneRef.current = null
+      xrExperienceRef.current = null
       cleanupPointerLock()
       cleanupInteraction()
       scene.dispose()
@@ -191,23 +242,36 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress }: Babylo
     >
       <canvas ref={canvasRef} className="w-full h-full outline-none" />
 
-      <Minimap
-        pois={poisData.pois as POI[]}
-        cameraRef={cameraRef}
-        onTeleport={handleTeleport}
-        onTeleportToPOI={handleTeleportToPOI}
-        isPortrait={isPortrait}
-      />
+      {isVRSupported && (
+        <button
+          onClick={isInVR ? handleExitVR : handleEnterVR}
+          className="absolute top-14 right-4 z-50 px-4 py-2 bg-hall-accent text-white rounded text-sm font-medium hover:opacity-90 transition-opacity shadow-lg"
+        >
+          {isInVR ? 'Exit VR' : 'Enter VR'}
+        </button>
+      )}
 
-      <ThreeDSidebar
-        pois={poisData.pois as POI[]}
-        isOpen={sidebarOpen}
-        onToggle={() => setSidebarOpen(prev => !prev)}
-        onTeleportToPOI={handleTeleportToPOI}
-        isPortrait={isPortrait}
-      />
+      {!isInVR && (
+        <Minimap
+          pois={poisData.pois as POI[]}
+          cameraRef={cameraRef}
+          onTeleport={handleTeleport}
+          onTeleportToPOI={handleTeleportToPOI}
+          isPortrait={isPortrait}
+        />
+      )}
 
-      {showMobileControls && (
+      {!isInVR && (
+        <ThreeDSidebar
+          pois={poisData.pois as POI[]}
+          isOpen={sidebarOpen}
+          onToggle={() => setSidebarOpen(prev => !prev)}
+          onTeleportToPOI={handleTeleportToPOI}
+          isPortrait={isPortrait}
+        />
+      )}
+
+      {!isInVR && showMobileControls && (
         <MobileControls
           onMove={handleMove}
           onMoveEnd={handleMoveEnd}
@@ -264,7 +328,7 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress }: Babylo
         />
       )}
             
-      {nearbyPOI && !(showMobileControls && isPortrait) && (
+      {!isInVR && nearbyPOI && !(showMobileControls && isPortrait) && (
         <button
           onClick={() => onInspect(nearbyPOI)}
           className="absolute bottom-8 left-1/2 -translate-x-1/2 bg-hall-surface/90 px-4 py-2 rounded z-50"

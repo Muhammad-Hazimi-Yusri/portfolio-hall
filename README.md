@@ -5,7 +5,7 @@
 > A grand royal hall or throne room; the ceremonial heart of a palace where audiences are received and important gatherings held.
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
-[![Version](https://img.shields.io/badge/version-1.4.0-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-1.5.0--slice1-blue.svg)]()
 [![Status](https://img.shields.io/badge/status-In%20Development-yellow.svg)]()
 
 <details>
@@ -136,7 +136,7 @@ Balairung uses a **Javanese/Malay royal hall** aesthetic inspired by traditional
 | **Language** | TypeScript | Type safety for complex 3D logic |
 | **Styling** | Tailwind CSS | Rapid UI development |
 | **Hosting** | GitHub Pages | Free, CI/CD via Actions |
-| **Mobile Controls** | Nipple.js (planned) | Virtual joystick library |
+| **Mobile Controls** | Nipple.js | Virtual joystick library |
 | **3D Scanning** | Scaniverse / Polycam | iPhone LiDAR capture, gaussian splat + mesh export |
 | **VR** | Babylon.js WebXR | Native Quest browser support |
 
@@ -168,6 +168,7 @@ portfolio-hall/
 │   │   ├── pois.ts               # POI mesh creation
 │   │   ├── interaction.ts        # Proximity detection + E key handler
 │   │   ├── pointerLock.ts        # Pointer lock management
+│   │   ├── webxr.ts              # WebXR support check + XR experience factory
 │   │   └── BabylonScene.tsx      # Main 3D React component
 │   │
 │   ├── components/
@@ -314,7 +315,7 @@ type AppState = {
 | Desktop | WASD / Arrow keys | Mouse (pointer lock) | E key or Left click |
 | Mobile (portrait) | D-pad | Touch drag or Gyro | A button |
 | Mobile (landscape) | Virtual joystick | Touch drag or Gyro | Tap on POI |
-| VR (future) | Thumbstick / Teleport | Headset tracking | Controller trigger |
+| VR (v1.5.0+) | Thumbstick / Teleport (coming) | Headset tracking | Controller trigger (coming) |
 
 ### Gyro & Landscape Mode
 When gyro is enabled, a **Landscape** toggle appears. This manually switches the control layout and gyro axis mapping — no auto-detection needed. Portrait uses beta/alpha; landscape uses gamma/alpha. Toggling recalibrates the gyro automatically.
@@ -371,7 +372,7 @@ const shouldDefaultToFallback = (): boolean => {
 ## 🚀 Development Roadmap
 
 <details>
-<summary>✅ Completed Versions (v0.1.0 – v1.3.1)</summary>
+<summary>✅ Completed Versions (v0.1.0 – v1.4.0)</summary>
 
 #### v0.1.0 — Scaffold
 Vite + React + TypeScript project setup, Tailwind CSS, Babylon.js deps, GitHub Pages CI/CD.
@@ -386,7 +387,7 @@ SVG floor plan, sidebar navigation, POI data loading, inspect modal, section fil
 Babylon.js procedural hall, first-person camera, WASD + sprint + jump, POI placeholders, collision detection, interaction system, lazy loading with tree-shaking.
 
 #### v1.1.0 – v1.1.6 — Mobile Controls + Gyroscope
-Virtual joystick, touch-drag camera, portrait D-pad + A/B buttons, landscape joystick layout, optional gyro camera, manual landscape toggle with axis remapping, fullscreen support, controls hints.
+Virtual joystick (nipplejs), touch-drag camera, portrait D-pad + A/B buttons, landscape joystick layout, optional gyro camera, manual landscape toggle with axis remapping, fullscreen support, controls hints.
 
 #### v1.2.0 – v1.2.1 — Navigation & UX
 Minimap overlay with player tracking and POI labels, click-to-teleport (approach position for POIs), cinematic fly-to camera animation (rise → pan → descend), collapsible 3D sidebar with auto-collapse on pointer lock, "Exit 3D" button across all modes, Game Boy 3DS-style portrait controls, floaty jump physics, mobile speed parity.
@@ -398,17 +399,17 @@ Javanese/Malay royal hall "Teak & Gold" theme: color palette, Cinzel typography,
 Enhanced 3D hall with ceiling, doorway, baseboards, gold crown molding, corner pillars, procedural wood grain floor. Gold painting frames with thumbnail textures, glass display cases, 3-tier pedestals. Gallery lighting with directional shadows, per-painting spotlights, gold accent lights. Loading screen with progress bar.
 
 #### v1.4.0 — Multi-Zone Castle & Content Population
-Multi-zone castle layout (Reception, Courtyard, Main Hall, Garden). 20 real POIs from CV data. Procedural skybox, sun lighting, gold doorway frames, glass-walled garden. Zone-based sidebar, expanded minimap/floorplan. SEO meta tags. Unique placeholder thumbnails.
+Multi-zone castle layout (Reception, Courtyard, Main Hall, Garden). 20 real POIs from CV data. Procedural skybox, sun lighting, gold doorway frames, glass-walled garden. Zone-based sidebar, expanded minimap/floorplan. SEO meta tags. Unique placeholder thumbnails. Hotfixed lighting, painting placement, and minimap bounds.
 
 </details>
 
-#### v1.4.0 — Multi-Zone Castle & Content Population
-Multi-zone castle layout (Reception, Courtyard, Main Hall, Garden). 20 real POIs from CV data. Procedural skybox, sun lighting, gold doorway frames, glass-walled garden. Zone-based sidebar, expanded minimap/floorplan. SEO meta tags. Unique placeholder thumbnails. Hotfixed lighting, painting placement, and minimap bounds.
+#### v1.5.0 Slice 1 — WebXR Session Entry
+Immersive-VR session support via Babylon.js `WebXRDefaultExperience`. "Enter VR" button (teak & gold) appears only when `navigator.xr.isSessionSupported('immersive-vr')` resolves true (Quest Pro / Quest 2 browser). Head tracking with `local-floor` reference space. All DOM overlays hidden on VR enter; restored on exit. Keyboard, mouse, and touch controls disabled during VR session.
 
 ### 🔧 Upcoming
 
-#### v1.5.0 — WebXR / VR Foundation
-- [ ] WebXR immersive-VR session (Quest Pro / Quest 2 via browser)
+#### v1.5.0 — WebXR / VR Foundation (remaining)
+- [x] WebXR immersive-VR session entry (Quest Pro / Quest 2 via browser) — Slice 1
 - [ ] Controller locomotion (thumbstick + teleport + snap turn)
 - [ ] Hand tracking with pinch interaction
 - [ ] VR POI interaction (ray pointer + floating 3D inspect panels)

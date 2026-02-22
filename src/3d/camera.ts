@@ -140,6 +140,9 @@ export function createFirstPersonCamera(
   window.addEventListener('deviceorientation', handleOrientation)
 
   scene.onBeforeRenderObservable.add(() => {
+    // Skip all input while in VR — XR camera takes over
+    if (cameraRef?.current.isInVR) return
+
     // Skip movement during fly-to animation
     if (!cameraRef?.current.isFlyingTo) {
       // Joystick movement
