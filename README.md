@@ -5,7 +5,7 @@
 > A grand royal hall or throne room; the ceremonial heart of a palace where audiences are received and important gatherings held.
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
-[![Version](https://img.shields.io/badge/version-1.5.0--slice1-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-1.5.0--slice2-blue.svg)]()
 [![Status](https://img.shields.io/badge/status-In%20Development-yellow.svg)]()
 
 <details>
@@ -124,6 +124,21 @@ Balairung uses a **Javanese/Malay royal hall** aesthetic inspired by traditional
 - Gallery lighting: directional light with shadows, per-painting spotlights, gold accent lights
 - Loading screen with progress bar and stage labels
 
+### Multi-Zone Castle (v1.4)
+- 4 distinct zones: Reception (entrance foyer), Courtyard (open-air hub with fountain), Main Hall (project gallery), Garden (greenhouse, skills & hackathons)
+- 20 real POIs populated from CV data across all zones
+- Procedural skybox and sun-style directional lighting with shadow casters
+- Gold doorway frames, glass-walled garden, zone-based sidebar grouping
+- Expanded minimap and floor plan reflecting multi-zone layout
+
+### WebXR / VR (v1.5)
+- WebXR immersive-VR session entry via Babylon.js `WebXRDefaultExperience` (Quest browser)
+- "Enter VR" / "Exit VR" button (teak & gold) — only visible on XR-capable devices
+- `local-floor` reference space; head tracking; all DOM overlays hidden in VR
+- **Left thumbstick**: smooth walk with head-relative orientation and wall/POI collision
+- **Right thumbstick forward**: parabolic teleport arc with gold landing ring; floor-meshes-only targeting
+- **Right thumbstick L/R**: 45° snap turn with 300 ms vignette flash for comfort
+
 ---
 
 ## 🛠 Tech Stack
@@ -168,7 +183,7 @@ portfolio-hall/
 │   │   ├── pois.ts               # POI mesh creation
 │   │   ├── interaction.ts        # Proximity detection + E key handler
 │   │   ├── pointerLock.ts        # Pointer lock management
-│   │   ├── webxr.ts              # WebXR support check + XR experience factory
+│   │   ├── webxr.ts              # WebXR support check, XR experience factory, VR locomotion setup
 │   │   └── BabylonScene.tsx      # Main 3D React component
 │   │
 │   ├── components/
@@ -315,13 +330,18 @@ type AppState = {
 | Desktop | WASD / Arrow keys | Mouse (pointer lock) | E key or Left click |
 | Mobile (portrait) | D-pad | Touch drag or Gyro | A button |
 | Mobile (landscape) | Virtual joystick | Touch drag or Gyro | Tap on POI |
-| VR (v1.5.0+) | Thumbstick / Teleport (coming) | Headset tracking | Controller trigger (coming) |
+| VR (v1.5.0+) | Left stick: walk · Right fwd: teleport arc · Right L/R: 45° snap turn | Headset tracking | Controller trigger (coming) |
 
 ### Gyro & Landscape Mode
 When gyro is enabled, a **Landscape** toggle appears. This manually switches the control layout and gyro axis mapping — no auto-detection needed. Portrait uses beta/alpha; landscape uses gamma/alpha. Toggling recalibrates the gyro automatically.
 
 ### iOS Note
 iOS Safari doesn't support fullscreen API. For best landscape experience, add the site to your home screen (PWA mode).
+
+### VR Controls (Quest / WebXR)
+- **Left thumbstick** — smooth walk (head-relative, collisions active)
+- **Right thumbstick forward** — show parabolic arc; release to teleport (floor meshes only)
+- **Right thumbstick left/right** — 45° snap turn with vignette flash
 
 ### Teleportation
 - Click minimap location → fade out → fly to → fade in → face nearest POI
@@ -406,14 +426,17 @@ Multi-zone castle layout (Reception, Courtyard, Main Hall, Garden). 20 real POIs
 #### v1.5.0 Slice 1 — WebXR Session Entry
 Immersive-VR session support via Babylon.js `WebXRDefaultExperience`. "Enter VR" button (teak & gold) appears only when `navigator.xr.isSessionSupported('immersive-vr')` resolves true (Quest Pro / Quest 2 browser). Head tracking with `local-floor` reference space. All DOM overlays hidden on VR enter; restored on exit. Keyboard, mouse, and touch controls disabled during VR session.
 
+#### v1.5.0 Slice 2 — VR Locomotion
+Controller-based movement via Babylon.js `WebXRFeatureName.MOVEMENT` and `TELEPORTATION`. Left thumbstick smooth walk (head-relative, 0.2 dead zone, wall/POI collisions active). Right thumbstick forward shows parabolic teleport arc with gold landing ring; release teleports to any floor mesh. Right thumbstick left/right fires 45° snap turn with a 300 ms black vignette flash for comfort. Teleportation restricted to castle ground planes — cannot land on walls, ceilings, or POI meshes.
+
 ### 🔧 Upcoming
 
 #### v1.5.0 — WebXR / VR Foundation (remaining)
 - [x] WebXR immersive-VR session entry (Quest Pro / Quest 2 via browser) — Slice 1
-- [ ] Controller locomotion (thumbstick + teleport + snap turn)
+- [x] Controller locomotion: left-stick walk, right-stick teleport arc, 45° snap turn + vignette — Slice 2
 - [ ] Hand tracking with pinch interaction
 - [ ] VR POI interaction (ray pointer + floating 3D inspect panels)
-- [ ] Performance profiling and comfort options (vignette, seated mode)
+- [ ] Performance profiling and comfort options (seated mode)
 
 #### v1.5.1 — Minimap Dynamic Zoom
 - [ ] Camera-centered view showing player + nearest POIs

@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- v1.5.0 (remaining): controller locomotion (thumbstick + teleport + snap turn), hand tracking with pinch interaction, VR POI interaction (ray pointer + floating panels), comfort options (vignette, seated mode)
+- v1.5.0 (remaining): hand tracking with pinch interaction, VR POI interaction (ray pointer + floating panels), comfort options (seated mode)
 - v1.5.1: Minimap dynamic zoom (camera-centered, nearest POIs)
 - v1.6.0: 2D fallback mode revamp (recruiter-optimized spatial portfolio)
 - v1.7.0: Blender .glb asset pipeline (hybrid procedural + modeled architecture)
@@ -18,6 +18,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - v1.9.0: Rich project displays (3D slideshows, per-project gaussian splats)
 - v2.0.0: Interactive web panels, full content polish, launch-ready
 - v3.0.0: AI integration (backlog)
+
+---
+
+## [1.5.0-slice2] - 2026-02-22
+
+### Added
+- VR locomotion: left thumbstick smooth walk via `WebXRFeatureName.MOVEMENT` (head-relative,
+  0.2 dead zone, ~0.1 speed factor matching desktop walkSpeed)
+- XR camera `checkCollisions = true` with ellipsoid `0.5 × 0.9 × 0.5` — wall/POI boundaries
+  respected in VR using the existing `collisionCoordinator` from `scene.ts`
+- VR teleportation: right thumbstick forward activates parabolic arc; release teleports to
+  highlighted floor mesh; only the 4 ground planes (`castle.grounds`) are valid targets
+- Gold landing ring (`#CA9933` fill, `#A07720` border) via `defaultTargetMeshOptions`
+- 45° snap turn on right thumbstick left/right; 300 ms vignette fade via `Layer` overlay for comfort
+- `setupVRLocomotion(scene, xr, grounds)` exported from `src/3d/webxr.ts`; called from
+  `BabylonScene.tsx` immediately after `createXRExperience`
 
 ---
 

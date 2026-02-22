@@ -8,7 +8,7 @@ import { createPOIMeshes } from './pois'
 import { setupInteraction } from './interaction'
 import { createCameraRefDefault } from './cameraRef'
 import { flyToCinematic, getApproachPosition } from './flyTo'
-import { checkVRSupport, createXRExperience } from './webxr'
+import { checkVRSupport, createXRExperience, setupVRLocomotion } from './webxr'
 import poisData from '@/data/pois.json'
 import type { POI } from '@/types/poi'
 import type { UniversalCamera } from '@babylonjs/core/Cameras/universalCamera'
@@ -193,6 +193,7 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress }: Babylo
         const xr = await createXRExperience(scene, castle.grounds)
         if (unmounted) { xr.dispose(); return }
         xrExperienceRef.current = xr
+        setupVRLocomotion(scene, xr, castle.grounds)
         xr.baseExperience.onStateChangedObservable.add((state) => {
           if (state === WebXRState.IN_XR) {
             setIsInVR(true)
