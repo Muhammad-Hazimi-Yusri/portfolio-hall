@@ -4,6 +4,7 @@ import type { WebXRMotionControllerTeleportation } from '@babylonjs/core/XR/feat
 import { Vector3 } from '@babylonjs/core/Maths/math.vector'
 import { Layer } from '@babylonjs/core/Layers/layer'
 import { Color4 } from '@babylonjs/core/Maths/math.color'
+import { TransformNode } from '@babylonjs/core/Meshes/transformNode'
 import type { Scene } from '@babylonjs/core/scene'
 import type { AbstractMesh } from '@babylonjs/core/Meshes/abstractMesh'
 
@@ -88,6 +89,33 @@ export function setupVRLocomotion(
 
   // Brief vignette flash on snap turn for comfort
   teleportation.onAfterCameraTeleportRotation.add(() => flashVignette(scene))
+
+  // ── Smooth locomotion vignette ────────────────────────────────────────────
+  // Persistent layer that fades IN while the left thumbstick is active and
+  // fades OUT when released. Softer than the snap-turn flash (max 0.4 vs 0.7).
+  const locoLayer = new Layer('locoFade', null, scene, false)  // false = foreground
+  locoLayer.color = new Color4(0, 0, 0, 0)
+  let locoAlpha = 0
+
+  scene.onBeforeRenderObservable.add(() => {
+    const dt = scene.getEngine().getDeltaTime()
+    const leftCtrl = xr.input.controllers.find(
+      (c) => c.inputSource.handedness === 'left',
+    )
+    let isMoving = false
+    // Read thumbstick axes directly from the gamepad (axes[2] = X, axes[3] = Y
+    // on Quest Pro left controller per the WebXR Gamepad standard mapping).
+    const gp = leftCtrl?.inputSource.gamepad
+    if (gp) {
+      const ax = gp.axes[2] ?? 0
+      const ay = gp.axes[3] ?? 0
+      isMoving = Math.sqrt(ax * ax + ay * ay) > 0.2  // matches movementThreshold
+    }
+    const target = isMoving ? 0.4 : 0
+    // Faster fade-in (30 ms) than fade-out (100 ms) to feel responsive
+    locoAlpha += (target - locoAlpha) * Math.min(dt / (isMoving ? 30 : 100), 1)
+    locoLayer.color.a = locoAlpha
+  })
 }
 
 export function flashVignette(scene: Scene): void {
@@ -103,4 +131,65 @@ export function flashVignette(scene: Scene): void {
       layer.dispose()
     }
   })
+}
+
+/**
+ * Poll left-controller buttons each frame and fire callbacks on rising edge.
+ *
+ * Meta Quest Pro left controller mapping (WebXR Gamepad API):
+ *   button[3] → X button  (onXButton)
+ *   button[4] → Y button  (onYButton)
+ *
+ * Returns the scene observer so the caller can remove it on cleanup.
+ */
+export function setupVRMenuButton(
+  xr: WebXRDefaultExperience,
+  scene: Scene,
+  onYButton: () => void,
+  onXButton: () => void,
+) {
+  let prevY = false
+  let prevX = false
+
+  return scene.onBeforeRenderObservable.add(() => {
+    const leftCtrl = xr.input.controllers.find(
+      (c) => c.inputSource.handedness === 'left',
+    )
+    const gp = leftCtrl?.inputSource.gamepad
+    if (!gp) return
+
+    const curY = gp.buttons[4]?.pressed ?? false
+    const curX = gp.buttons[3]?.pressed ?? false
+
+    if (curY && !prevY) onYButton()
+    if (curX && !prevX) onXButton()
+
+    prevY = curY
+    prevX = curX
+  })!
+}
+
+/**
+ * Offset the XR camera rig so a seated player (eye height ~0.9 m) sees the
+ * scene at a comfortable standing-equivalent scale.
+ *
+ * The offset is applied to the camera's parent TransformNode (the rig),
+ * which shifts the entire tracked coordinate frame up without fighting the
+ * native per-frame head-position updates on the camera itself.
+ *
+ * Returns toggle(): call to switch seated ↔ standing mode.
+ */
+export function setupSeatedMode(xr: WebXRDefaultExperience): () => void {
+  const SEATED_OFFSET = 0.7  // metres — lifts rig for a seated eye height of ~0.9 m
+  let isSeated = false
+
+  return function toggle() {
+    isSeated = !isSeated
+    const rig = xr.baseExperience.camera.parent
+    if (rig) {
+      // TransformNode.position is safe to set here; XR tracking updates the
+      // camera's own position relative to the rig each frame.
+      ;(rig as TransformNode).position.y = isSeated ? SEATED_OFFSET : 0
+    }
+  }
 }

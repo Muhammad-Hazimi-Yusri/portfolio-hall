@@ -8,8 +8,11 @@ import { createPOIMeshes } from './pois'
 import { setupInteraction } from './interaction'
 import { createCameraRefDefault } from './cameraRef'
 import { flyToCinematic, getApproachPosition } from './flyTo'
-import { checkVRSupport, createXRExperience, setupVRLocomotion } from './webxr'
+import { checkVRSupport, createXRExperience, setupVRLocomotion, setupVRMenuButton, setupSeatedMode } from './webxr'
 import { setupHandTracking } from './vrInteraction'
+import { createVRFpsCounter } from './vrUI'
+import { applyVRLighting } from './lights'
+import type { LightsResult } from './lights'
 import poisData from '@/data/pois.json'
 import type { POI } from '@/types/poi'
 import type { UniversalCamera } from '@babylonjs/core/Cameras/universalCamera'
@@ -154,6 +157,8 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress }: Babylo
 
     let unmounted = false
     let cleanupHands: (() => void) | null = null
+    let fpsCtr: ReturnType<typeof createVRFpsCounter> | null = null
+    let lightsResult: LightsResult | null = null
 
     onLoadProgress?.(0, 'engine')
     const engine = createEngine(canvas)
@@ -171,7 +176,8 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress }: Babylo
     const poiMeshes = createPOIMeshes(scene, poisData.pois as POI[])
     onLoadProgress?.(70, 'textures')
 
-    createLights(scene, castle, poiMeshes)
+    const lights = createLights(scene, castle, poiMeshes)
+    lightsResult = lights
     onLoadProgress?.(90, 'textures')
 
     const cleanupPointerLock = setupPointerLock(canvas)
@@ -202,16 +208,28 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress }: Babylo
           poiMeshes,
           onLinkQueued: (url) => { pendingLinks.push(url) },
         })
+
+        // VR comfort + performance
+        fpsCtr = createVRFpsCounter(scene, xr)
+        const seatedToggle = setupSeatedMode(xr)
+        setupVRMenuButton(
+          xr, scene,
+          () => fpsCtr!.toggle(),   // Y button — toggle FPS counter
+          () => seatedToggle(),      // X button — toggle seated mode
+        )
+
         xr.baseExperience.onStateChangedObservable.add((state) => {
           if (state === WebXRState.IN_XR) {
             setIsInVR(true)
             cameraRef.current.isInVR = true
             camera.detachControl()
             document.exitPointerLock()
+            if (lightsResult) applyVRLighting(lightsResult, true)
           } else if (state === WebXRState.NOT_IN_XR) {
             setIsInVR(false)
             cameraRef.current.isInVR = false
             camera.attachControl(canvas, true)
+            if (lightsResult) applyVRLighting(lightsResult, false)
             // Open any links the user queued while in VR
             pendingLinks.splice(0).forEach(url => window.open(url, '_blank', 'noopener'))
           }
@@ -224,6 +242,7 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress }: Babylo
     return () => {
       unmounted = true
       cleanupHands?.()
+      fpsCtr?.dispose()
       babylonCameraRef.current = null
       sceneRef.current = null
       xrExperienceRef.current = null

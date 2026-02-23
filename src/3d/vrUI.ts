@@ -7,6 +7,7 @@ import { DynamicTexture } from '@babylonjs/core/Materials/Textures/dynamicTextur
 import { Mesh } from '@babylonjs/core/Meshes/mesh'
 import { TransformNode } from '@babylonjs/core/Meshes/transformNode'
 import type { AbstractMesh } from '@babylonjs/core/Meshes/abstractMesh'
+import type { WebXRDefaultExperience } from '@babylonjs/core/XR/webXRDefaultExperience'
 import type { POI } from '@/types/poi'
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -171,6 +172,73 @@ export function showVRPanel(
     dispose,
     isCloseButton: (mesh) => mesh === closeMesh,
     getLinkUrl: (mesh) => (mesh ? (linkMap.get(mesh) ?? null) : null),
+  }
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// VR FPS counter HUD
+// ──────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Create a small FPS counter HUD parented to the XR camera (top-left of FOV).
+ * Hidden by default; call toggle() to show/hide (Y button on Quest Pro).
+ *
+ * Colour coding: green ≥72 fps | gold ≥60 fps | red <60 fps.
+ * Updates every 30 frames to avoid DynamicTexture re-render overhead.
+ */
+export function createVRFpsCounter(
+  scene: Scene,
+  xr: WebXRDefaultExperience,
+): { toggle: () => void; dispose: () => void } {
+  const hudMesh = MeshBuilder.CreatePlane(
+    'vrFpsHud',
+    { width: 0.22, height: 0.07 },
+    scene,
+  )
+  hudMesh.parent = xr.baseExperience.camera
+  hudMesh.position = new Vector3(-0.22, 0.17, 0.55)  // top-left of FOV, 55 cm from eye
+  hudMesh.isPickable = false
+  hudMesh.setEnabled(false)
+
+  const tex = new DynamicTexture('vrFpsTex', { width: 256, height: 80 }, scene)
+  const mat = new StandardMaterial('vrFpsMat', scene)
+  mat.diffuseTexture  = tex
+  mat.emissiveTexture = tex
+  mat.disableLighting = true
+  mat.backFaceCulling = false
+  hudMesh.material = mat
+
+  let visible = false
+  let frameCount = 0
+
+  const obs = scene.onBeforeRenderObservable.add(() => {
+    if (!visible) return
+    frameCount++
+    if (frameCount % 30 !== 0) return
+
+    const fps = Math.round(scene.getEngine().getFps())
+    const ctx = tex.getContext() as unknown as CanvasRenderingContext2D
+    ctx.fillStyle = 'rgba(10, 5, 0, 0.78)'
+    ctx.fillRect(0, 0, 256, 80)
+    ctx.fillStyle = fps >= 72 ? '#90EE90' : fps >= 60 ? '#FFD700' : '#FF6B6B'
+    ctx.font = 'bold 44px monospace'
+    ctx.textAlign = 'left'
+    ctx.textBaseline = 'middle'
+    ctx.fillText(`${fps} fps`, 10, 40)
+    tex.update()
+  })
+
+  return {
+    toggle() {
+      visible = !visible
+      hudMesh.setEnabled(visible)
+    },
+    dispose() {
+      scene.onBeforeRenderObservable.remove(obs)
+      tex.dispose()
+      mat.dispose()
+      hudMesh.dispose()
+    },
   }
 }
 

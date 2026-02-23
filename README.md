@@ -5,7 +5,7 @@
 > A grand royal hall or throne room; the ceremonial heart of a palace where audiences are received and important gatherings held.
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
-[![Version](https://img.shields.io/badge/version-1.5.0--slice4-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-1.5.0--slice5-blue.svg)]()
 [![Status](https://img.shields.io/badge/status-In%20Development-yellow.svg)]()
 
 <details>
@@ -143,6 +143,37 @@ Balairung uses a **Javanese/Malay royal hall** aesthetic inspired by traditional
 - **VR inspect panel** (`src/3d/vrUI.ts`): trigger/pinch while pointing at a highlighted POI opens a 1.4 × 0.9 m floating teak-and-gold panel 1.5 m in front of the player at chest height; panel shows title, description, word-wrapped text, tag pills, and link buttons; no DOM involved — pure Babylon.js geometry + `DynamicTexture`
 - **Panel interaction**: controller trigger or right-hand pinch selects close button ("✕") or link buttons; link URLs are queued and opened in new browser tabs when the VR session ends; B/Y controller button closes the panel instantly
 - **Parallel systems**: VR panel and desktop DOM modal are fully independent — switching mode is seamless
+- **Locomotion vignette**: persistent dark overlay (max 0.4 alpha) fades in while smooth-walking, fades out at rest — reduces peripheral-vision motion sickness without blocking the scene
+- **FPS counter HUD**: 0.22 × 0.07 m plane parented to XR camera (top-left FOV); green ≥ 72 fps / gold ≥ 60 fps / red < 60 fps; toggle with Y button (left controller)
+- **Seated mode**: X button (left controller) applies +0.7 m rig offset so seated players see the scene at standing scale
+- **Painting height**: canvas center at 1.65 m (bottom 1.15 m, top 2.15 m) — within 1.4–1.7 m VR eye-level target
+
+### VR Performance Notes (Quest Pro browser)
+
+**Target: 72 fps**
+
+Lighting optimisations applied automatically on VR session entry (`applyVRLighting`):
+- Shadow blur scale halved (2 → 1) on both directional shadow generators — reduces blur GPU cost without recreating shadow maps
+- All painting `SpotLight`s disabled; ambient intensity raised from 0.30 to 0.55 to compensate
+- Restored automatically on session exit
+
+**If 72 fps is still not achieved** — next steps for future slices:
+- Dispose and recreate `ShadowGenerator` with 1024/512 px maps on VR entry (vs 2048/1024 currently)
+- Add exponential fog (`scene.fogMode = Scene.FOGMODE_EXP`, density ~0.015) to cull distant draw calls
+- Disable `useBlurExponentialShadowMap` entirely in VR and use standard PCF shadows
+
+**Quick control reference (Quest Pro):**
+
+| Action | Input |
+|---|---|
+| Walk | Left thumbstick |
+| Snap turn (45°) | Right thumbstick L/R |
+| Teleport | Right thumbstick forward → release |
+| Select / pinch POI | Right hand pinch or controller trigger |
+| Gaze teleport | Left hand pinch |
+| Close panel | B (right) / Y (left) controller button |
+| Toggle FPS counter | Left controller Y button |
+| Toggle seated mode | Left controller X button |
 
 ---
 
@@ -188,9 +219,9 @@ portfolio-hall/
 │   │   ├── pois.ts               # POI mesh creation
 │   │   ├── interaction.ts        # Proximity detection + E key handler
 │   │   ├── pointerLock.ts        # Pointer lock management
-│   │   ├── webxr.ts              # WebXR support check, XR experience factory, VR locomotion setup
+│   │   ├── webxr.ts              # WebXR support check, XR experience factory, VR locomotion + vignette, menu buttons, seated mode
 │   │   ├── vrInteraction.ts      # Hand tracking, pinch/trigger, hover ray casting, POI select
-│   │   ├── vrUI.ts               # VR hover label + floating teak-and-gold inspect panel
+│   │   ├── vrUI.ts               # VR hover label, floating inspect panel, FPS counter HUD
 │   │   └── BabylonScene.tsx      # Main 3D React component
 │   │
 │   ├── components/
@@ -337,7 +368,7 @@ type AppState = {
 | Desktop | WASD / Arrow keys | Mouse (pointer lock) | E key or Left click |
 | Mobile (portrait) | D-pad | Touch drag or Gyro | A button |
 | Mobile (landscape) | Virtual joystick | Touch drag or Gyro | Tap on POI |
-| VR – Controllers (v1.5.0+) | Left stick: walk · Right fwd: teleport arc · Right L/R: 45° snap turn | Headset tracking | Trigger: inspect highlighted POI · B/Y: close panel |
+| VR – Controllers (v1.5.0+) | Left stick: walk · Right fwd: teleport arc · Right L/R: 45° snap turn | Headset tracking | Trigger: inspect/select · B (R) / Y (L): close panel · Y (L): FPS counter toggle · X (L): seated mode toggle |
 | VR – Hand Tracking (v1.5.0+) | Gaze + left pinch to teleport | Headset tracking | Right pinch: inspect / confirm link / close panel |
 
 ### Gyro & Landscape Mode
@@ -347,11 +378,13 @@ When gyro is enabled, a **Landscape** toggle appears. This manually switches the
 iOS Safari doesn't support fullscreen API. For best landscape experience, add the site to your home screen (PWA mode).
 
 ### VR Controls (Quest / WebXR)
-- **Left thumbstick** — smooth walk (head-relative, collisions active)
+- **Left thumbstick** — smooth walk (head-relative, collisions active); dark vignette fades in at screen edges while moving
 - **Right thumbstick forward** — show parabolic arc; release to teleport (floor meshes only)
-- **Right thumbstick left/right** — 45° snap turn with vignette flash
+- **Right thumbstick left/right** — 45° snap turn with 300 ms vignette flash
 - **Trigger** — inspect the highlighted POI; or click a link / close button while panel is open
 - **B button** (right) / **Y button** (left) — close the open inspect panel
+- **Y button** (left, `button[4]`) — toggle FPS counter HUD (top-left of view); green ≥ 72 fps, gold ≥ 60, red < 60. Also closes panel if one is open.
+- **X button** (left, `button[3]`) — toggle seated mode (+0.7 m floor offset so seated players see scene at standing scale)
 - **Aim controller at POI** — gold HighlightLayer glow + title label appear; point within 10 m to be eligible
 
 **Hand Tracking mode** (set controllers aside — detected automatically)
@@ -459,6 +492,9 @@ Hand tracking via `WebXRFeatureName.HAND_TRACKING` in `src/3d/vrInteraction.ts`.
 #### v1.5.0 Slice 4 — VR POI Interaction
 Full POI interaction in VR. Hover detection via per-frame ray casting: controller aim ray takes priority; hand index-finger ray as fallback; 10 m distance cap. `HighlightLayer` applies gold glow to hovered POI mesh and all children; billboard `DynamicTexture` label floats 2.2 m above the mesh. Trigger (controller) or right-hand pinch while pointing at a POI opens a floating teak-and-gold inspect panel (`src/3d/vrUI.ts`): 1.4 × 0.9 m plane at chest height 1.5 m in front, content rendered with `DynamicTexture` (title, word-wrapped description, tag pills, link buttons). Panel close: B/Y button or pinch on "✕". Link URLs are queued in a `pendingLinks` array and opened in new tabs on VR exit. No DOM involved — parallel to the desktop modal. No new npm packages added.
 
+#### v1.5.0 Slice 5 — VR Performance + Comfort Pass
+Performance optimisation and comfort features targeting Quest Pro at 72 fps. On VR session entry, `applyVRLighting()` halves shadow blur scale (2 → 1) on both shadow generators and disables all painting `SpotLight`s (ambient raised to 0.55 to compensate); fully restored on exit. FPS counter HUD (`createVRFpsCounter`): 0.22 × 0.07 m plane parented to XR camera, top-left of FOV, colour-coded green/gold/red against 72/60 fps thresholds, toggled with left-controller Y button. Locomotion vignette: persistent screen-edge overlay (max 0.4 alpha) fades in while left thumbstick is active, fades out when released — softer than the existing snap-turn flash. Seated mode: left-controller X button applies +0.7 m Y offset to the XR camera rig, allowing seated players to see the scene at a comfortable standing-equivalent scale without fighting native head tracking. Painting canvas center lowered from Y = 2.0 m to Y = 1.65 m (bottom 1.15 m, top 2.15 m), within the 1.4–1.7 m VR eye-level target. Verified: snap turn, door clearances, and panel text legibility all remain comfortable with no geometry changes.
+
 ### 🔧 Upcoming
 
 #### v1.5.0 — WebXR / VR Foundation (remaining)
@@ -466,7 +502,7 @@ Full POI interaction in VR. Hover detection via per-frame ray casting: controlle
 - [x] Controller locomotion: left-stick walk, right-stick teleport arc, 45° snap turn + vignette — Slice 2
 - [x] Hand tracking with pinch interaction — Slice 3
 - [x] VR POI interaction: hover highlight, floating inspect panel, link queueing — Slice 4
-- [ ] Performance profiling and comfort options (seated mode)
+- [x] VR performance + comfort pass (FPS HUD, locomotion vignette, lighting optimisation, seated mode, painting height) — Slice 5
 
 #### v1.5.1 — Minimap Dynamic Zoom
 - [ ] Camera-centered view showing player + nearest POIs

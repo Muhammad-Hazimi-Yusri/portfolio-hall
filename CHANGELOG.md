@@ -10,7 +10,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- v1.5.0 (remaining): comfort options (seated mode)
 - v1.5.1: Minimap dynamic zoom (camera-centered, nearest POIs)
 - v1.6.0: 2D fallback mode revamp (recruiter-optimized spatial portfolio)
 - v1.7.0: Blender .glb asset pipeline (hybrid procedural + modeled architecture)
@@ -18,6 +17,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - v1.9.0: Rich project displays (3D slideshows, per-project gaussian splats)
 - v2.0.0: Interactive web panels, full content polish, launch-ready
 - v3.0.0: AI integration (backlog)
+
+---
+
+## [1.5.0-slice5] - 2026-02-23
+
+### Added
+- VR FPS counter HUD: `createVRFpsCounter()` renders `"XX fps"` on a 0.22 × 0.07 m plane
+  parented to the XR camera (top-left FOV, 55 cm from eye); updates every 30 frames to avoid
+  DynamicTexture overhead; colour: green ≥ 72 fps / gold ≥ 60 fps / red < 60 fps; toggle with
+  left-controller Y button
+- Locomotion vignette: persistent `Layer` in `setupVRLocomotion` fades to 0.4 alpha while the
+  smooth-walk thumbstick is active and fades out when the thumbstick returns to centre; softer
+  than the existing snap-turn flash (0.7 alpha, 300 ms one-shot)
+- VR lighting optimisation on session entry via `applyVRLighting(lights, vrMode)`:
+  `blurScale` halved on both shadow generators (2 → 1), all painting `SpotLight`s disabled,
+  and ambient intensity raised to 0.55 to compensate; fully restored on VR session exit
+- Seated mode: `setupSeatedMode()` applies +0.7 m Y offset to the XR camera rig so a seated
+  player (eye height ~0.9 m) sees the scene at a comfortable standing-equivalent scale; toggle
+  with left-controller X button; rig offset does not conflict with native per-frame head tracking
+- Controller button handler `setupVRMenuButton(xr, scene, onYButton, onXButton)`: polls left
+  controller gamepad each frame with rising-edge detection (Quest Pro: Y = button[4], X = button[3]);
+  Y button fires both FPS toggle and the existing slice-4 panel-close listener simultaneously — when
+  a panel is open, pressing Y closes it and also toggles the FPS counter (toggle again to revert)
+
+### Changed
+- Painting canvas center height lowered from Y = 2.0 m to Y = 1.65 m, bringing it within the
+  1.4–1.7 m VR eye-level target (bottom 1.15 m, top 2.15 m); spotlight at Y = 3.2 m still
+  illuminates canvases correctly
+
+### Verified (no changes needed)
+- Snap turn: 45° increments with vignette flash — working since slice 2
+- Door clearances: 3 m wide, 4–5 m tall full-room openings — comfortable for standing VR
+- VR inspect panel text: 52 px title / 26 px description at 1.5 m viewing distance — legible
 
 ---
 

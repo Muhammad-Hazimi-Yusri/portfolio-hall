@@ -10,6 +10,8 @@ import { Mesh } from '@babylonjs/core/Meshes/mesh'
 import type { POI } from '@/types/poi'
 import type { CastleGeometry } from './scene'
 
+export type LightsResult = ReturnType<typeof createLights>
+
 // Side-effect for shadow rendering
 import '@babylonjs/core/Lights/Shadows/shadowGeneratorSceneComponent'
 
@@ -64,6 +66,7 @@ export function createLights(
   })
 
   // --- Painting spotlights ---
+  const spots: SpotLight[] = []
   poiMeshes.forEach(({ mesh, poi }) => {
     if (poi.type !== 'painting') return
 
@@ -90,6 +93,7 @@ export function createLights(
     spot.intensity = 0.8
     spot.diffuse = new Color3(1, 0.98, 0.9)
     spot.specular = new Color3(0.5, 0.5, 0.5)
+    spots.push(spot)
 
     mesh.getChildMeshes().forEach((child) => {
       if (child instanceof Mesh) {
@@ -113,5 +117,31 @@ export function createLights(
     accent.range = 3
   })
 
-  return { ambient, sun, indoor, sunShadowGen, indoorShadowGen }
+  return { ambient, sun, indoor, sunShadowGen, indoorShadowGen, spots }
+}
+
+/**
+ * Apply or restore VR-optimised lighting settings.
+ * Called on WebXR session entry/exit to trade visual quality for framerate.
+ *
+ * In VR mode:
+ *   - Shadow blur scale halved (2 → 1) on both shadow generators
+ *   - Painting SpotLights disabled (largest per-POI GPU cost)
+ *   - Ambient boosted to 0.55 to compensate for lost spot illumination
+ *
+ * Note: shadow map *resolution* (2048/1024) cannot change without recreation.
+ * If 72 fps is still not reached, recreate generators at 1024/512 on VR entry.
+ */
+export function applyVRLighting(lights: LightsResult, vrMode: boolean): void {
+  if (vrMode) {
+    lights.sunShadowGen.blurScale = 1
+    lights.indoorShadowGen.blurScale = 1
+    lights.spots.forEach(s => s.setEnabled(false))
+    lights.ambient.intensity = 0.55
+  } else {
+    lights.sunShadowGen.blurScale = 2
+    lights.indoorShadowGen.blurScale = 2
+    lights.spots.forEach(s => s.setEnabled(true))
+    lights.ambient.intensity = 0.30
+  }
 }

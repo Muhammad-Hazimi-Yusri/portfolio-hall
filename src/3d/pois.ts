@@ -41,7 +41,7 @@ function createSharedMaterials(scene: Scene) {
 function createPaintingMesh(poi: POI, scene: Scene, mats: ReturnType<typeof createSharedMaterials>): Mesh {
   const rad = (poi.rotation * Math.PI) / 180
   const group = new Mesh(`${poi.id}-group`, scene)
-  group.position = new Vector3(poi.position.x, 2, poi.position.z)
+  group.position = new Vector3(poi.position.x, 1.65, poi.position.z)
   group.rotation.y = rad
 
   // Canvas plane
