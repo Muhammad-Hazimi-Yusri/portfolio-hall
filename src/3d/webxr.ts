@@ -34,7 +34,7 @@ export async function createXRExperience(
       // Suppress Babylon's default button; we render our own styled one.
       // htmlButtonFactory was removed from the public type in Babylon.js v7 but
       // still works at runtime — suppress the excess-property error.
-      // @ts-ignore
+      // @ts-expect-error htmlButtonFactory removed from public types in Babylon.js v7 but still works at runtime
       htmlButtonFactory: () => {
         const el = document.createElement('button')
         el.style.display = 'none'
@@ -189,7 +189,7 @@ export function setupSeatedMode(xr: WebXRDefaultExperience): () => void {
     if (rig) {
       // TransformNode.position is safe to set here; XR tracking updates the
       // camera's own position relative to the rig each frame.
-      ;(rig as TransformNode).position.y = isSeated ? SEATED_OFFSET : 0
+      (rig as TransformNode).position.y = isSeated ? SEATED_OFFSET : 0
     }
   }
 }

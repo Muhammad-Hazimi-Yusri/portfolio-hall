@@ -20,124 +20,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.5.0-slice5] - 2026-02-23
+## [1.5.0] - 2026-02-23
 
 ### Added
-- VR FPS counter HUD: `createVRFpsCounter()` renders `"XX fps"` on a 0.22 × 0.07 m plane
-  parented to the XR camera (top-left FOV, 55 cm from eye); updates every 30 frames to avoid
-  DynamicTexture overhead; colour: green ≥ 72 fps / gold ≥ 60 fps / red < 60 fps; toggle with
-  left-controller Y button
-- Locomotion vignette: persistent `Layer` in `setupVRLocomotion` fades to 0.4 alpha while the
-  smooth-walk thumbstick is active and fades out when the thumbstick returns to centre; softer
-  than the existing snap-turn flash (0.7 alpha, 300 ms one-shot)
-- VR lighting optimisation on session entry via `applyVRLighting(lights, vrMode)`:
-  `blurScale` halved on both shadow generators (2 → 1), all painting `SpotLight`s disabled,
-  and ambient intensity raised to 0.55 to compensate; fully restored on VR session exit
-- Seated mode: `setupSeatedMode()` applies +0.7 m Y offset to the XR camera rig so a seated
-  player (eye height ~0.9 m) sees the scene at a comfortable standing-equivalent scale; toggle
-  with left-controller X button; rig offset does not conflict with native per-frame head tracking
-- Controller button handler `setupVRMenuButton(xr, scene, onYButton, onXButton)`: polls left
-  controller gamepad each frame with rising-edge detection (Quest Pro: Y = button[4], X = button[3]);
-  Y button fires both FPS toggle and the existing slice-4 panel-close listener simultaneously — when
-  a panel is open, pressing Y closes it and also toggles the FPS counter (toggle again to revert)
+- WebXR immersive-VR session via Babylon.js `WebXRDefaultExperience`; "Enter VR"/"Exit VR" button (teak & gold, `bg-hall-accent`) rendered only when `navigator.xr.isSessionSupported('immersive-vr')` resolves true — invisible on non-XR devices
+- `local-floor` XR reference space; XR rig spawns at player's current x,z; head height tracked by headset; all DOM overlays (sidebar, minimap, mobile controls, POI hint) hidden on VR enter and restored on exit; keyboard/mouse/touch input disabled during VR session
+- VR locomotion: left thumbstick smooth walk via `WebXRFeatureName.MOVEMENT` (head-relative, 0.2 dead zone, wall/POI collisions active); right thumbstick forward parabolic teleport arc with gold landing ring (floor meshes only); right thumbstick L/R 45° snap turn with 300 ms vignette flash
+- Hand tracking via `WebXRFeatureName.HAND_TRACKING`; default Babylon.js joint meshes render both hands; right pinch (thumb ↔ index < 3.5 cm, 5 cm hysteresis) fires `onVRSelectAttempt`; right index-finger direction EMA-smoothed (α = 0.3) for ray casting; gaze teleport via XR camera forward ray + gold disc preview (`#CA9933`, α = 0.75) + left-hand pinch confirm; graceful controller ↔ hand switching via `onHandAdded/RemovedObservable`
+- VR POI hover: per-frame ray cast (controller aim first, hand index-finger fallback); `HighlightLayer` gold glow (`#CA9933`) on hovered mesh and all children; billboard `DynamicTexture` label 2.2 m above mesh; 10 m distance cap prevents accidental far picks
+- VR inspect panel (`src/3d/vrUI.ts`): 1.4 × 0.9 m teak-and-gold floating plane 1.5 m in front of player at chest height; content via `DynamicTexture` (title in gold, word-wrapped description, tag pills with gold borders, link buttons); no DOM involved — fully parallel to the desktop modal
+- Panel close: B button (right controller) / Y button (left controller); or trigger/pinch while pointing at the "✕" plane (0.09 m square, top-right corner of panel)
+- Link queueing: `pendingLinks` array in `BabylonScene.tsx` collects URLs during VR session; `Array.splice(0).forEach(window.open)` drains and opens all queued URLs in new tabs on `WebXRState.NOT_IN_XR`
+- VR FPS counter HUD (`createVRFpsCounter`): 0.22 × 0.07 m plane parented to XR camera (top-left FOV, 55 cm from eye); updates every 30 frames; green ≥ 72 fps / gold ≥ 60 fps / red < 60 fps; toggle with left-controller Y button
+- Locomotion vignette: persistent `Layer` overlay fades to 0.4 alpha while smooth-walk thumbstick is active, fades out on release — softer than the 0.7 alpha snap-turn flash
+- VR lighting optimisation on session entry (`applyVRLighting`): `blurScale` halved on both shadow generators (2 → 1); all painting `SpotLight`s disabled; ambient intensity raised to 0.55 to compensate; fully restored on session exit
+- Seated mode (`setupSeatedMode`): left-controller X button toggles +0.7 m Y offset on XR camera rig so seated players (eye height ~0.9 m) see the scene at standing-equivalent scale; offset does not conflict with per-frame head tracking
+- Controller button handler (`setupVRMenuButton`): polls left controller gamepad each frame with rising-edge detection (Quest Pro: Y = `button[4]`, X = `button[3]`); Y fires FPS toggle and panel-close simultaneously; X toggles seated mode
+- `isInVR: boolean` field added to `CameraRefValue`; camera `onBeforeRenderObservable` skips all input when `isInVR` is active; unmount guard prevents state updates after component disposal
 
 ### Changed
-- Painting canvas center height lowered from Y = 2.0 m to Y = 1.65 m, bringing it within the
-  1.4–1.7 m VR eye-level target (bottom 1.15 m, top 2.15 m); spotlight at Y = 3.2 m still
-  illuminates canvases correctly
+- Painting canvas center lowered from Y = 2.0 m to Y = 1.65 m (bottom 1.15 m, top 2.15 m) — within 1.4–1.7 m VR eye-level target; spotlight at Y = 3.2 m still illuminates canvases correctly
+- `_flashVignette` in `src/3d/webxr.ts` renamed to `flashVignette` and exported so `vrInteraction.ts` can reuse it for the hand-teleport vignette flash
+- Version bumped to v1.5.0
 
-### Verified (no changes needed)
+### Verified (no geometry changes needed)
 - Snap turn: 45° increments with vignette flash — working since slice 2
 - Door clearances: 3 m wide, 4–5 m tall full-room openings — comfortable for standing VR
 - VR inspect panel text: 52 px title / 26 px description at 1.5 m viewing distance — legible
-
----
-
-## [1.5.0-slice4] - 2026-02-22
-
-### Added
-- VR POI hover: right-hand index-finger ray and controller aim ray cast against POI meshes
-  each frame; `HighlightLayer` applies gold glow (`#CA9933`) to hovered mesh + all children;
-  POIs beyond 10 m are excluded to prevent accidental far picks
-- Hover label: `DynamicTexture` billboard plane renders POI title in gold serif text 2.2 m
-  above the hovered mesh (`billboardMode = BILLBOARDMODE_ALL`, non-pickable); hidden when a
-  panel is open
-- VR inspect panel (`src/3d/vrUI.ts`): 1.4 × 0.9 m teak-and-gold floating panel spawned 1.5 m
-  in front of the XR camera at chest height (0.3 m below eye), facing the player via
-  `lookAt`; content rendered via `DynamicTexture` (title in gold, word-wrapped description,
-  tag pills with gold borders, "Links ▶" header when links exist)
-- Panel close button: 0.09 m gold `DynamicTexture` plane ("✕") in top-right corner; pickable
-- Panel link buttons: one 0.36 × 0.07 m gold plane per `poi.content.links` entry; right-hand
-  pinch or controller trigger while pointing at a button queues the URL; all queued URLs open
-  in new browser tabs automatically when the XR session ends (`WebXRState.NOT_IN_XR`)
-- Panel close: B button (right controller) / Y button (left controller); or pinch/trigger while
-  pointing at the "✕" close button
-- Controller integration: `onControllerAddedObservable` attaches trigger listener and
-  B/Y-button listener per controller via `onMotionControllerInitObservable`; trigger fires
-  `onVRSelectAttempt` using the controller aim-ray (pointer mesh forward vector)
-- Controller priority in hover: controller aim rays are checked first each frame; hand index-
-  finger ray is fallback when no controller hit and `handsDetected > 0`
-- Backward-compatible: `setupHandTracking` in `src/3d/vrInteraction.ts` accepts optional
-  `poiOptions` fourth argument; existing call sites without it retain Slice 3 behaviour
-- Links queue: `pendingLinks` array in `BabylonScene.tsx` collects URLs during the VR session;
-  `Array.splice(0).forEach(window.open)` drains and opens them on VR exit
-- Non-VR mode: DOM inspect modal, proximity hint, minimap, sidebar — all completely unaffected
-
----
-
-## [1.5.0-slice3] - 2026-02-22
-
-### Added
-- Hand tracking support via `WebXRFeatureName.HAND_TRACKING`; Babylon.js renders default
-  joint/hand meshes automatically — both hands visible with natural finger movement
-- Right-hand pinch (thumb tip ↔ index tip < 3.5 cm) with 5.0 cm release hysteresis; logged
-  to console as `[HandTracking] right pinch`; wired to `onVRSelectAttempt` in slice 4
-- Right-hand index-finger direction smoothed via exponential moving average (α = 0.3)
-  each frame — consumed by slice-4 ray cast for POI hover and selection
-- Gaze-teleport locomotion: `xrCamera.getForwardRay(12)` cast onto floor meshes each frame;
-  gold disc (`#CA9933`, α = 0.75) previews landing spot; left-hand pinch moves XR rig to
-  hit X/Z (Y preserved from headset tracking); vignette flash reused from `flashVignette`
-- Graceful controller ↔ hand switching: `onHandAddedObservable` / `onHandRemovedObservable`
-  track active hand count; tip indicator and gaze disc hidden when `handsDetected` drops to
-  zero; controller thumbstick features require no changes — no thumbstick input = no action
-- `setupHandTracking(scene, xr, grounds)` exported from new `src/3d/vrInteraction.ts`;
-  called from `BabylonScene.tsx` after `setupVRLocomotion`; cleanup fn stored in closure
-  and called before `scene.dispose()` in the `useEffect` cleanup
-
-### Changed
-- `_flashVignette` in `src/3d/webxr.ts` renamed to `flashVignette` and exported so
-  `vrInteraction.ts` can reuse it for the hand-teleport vignette flash
-
----
-
-## [1.5.0-slice2] - 2026-02-22
-
-### Added
-- VR locomotion: left thumbstick smooth walk via `WebXRFeatureName.MOVEMENT` (head-relative,
-  0.2 dead zone, ~0.1 speed factor matching desktop walkSpeed)
-- XR camera `checkCollisions = true` with ellipsoid `0.5 × 0.9 × 0.5` — wall/POI boundaries
-  respected in VR using the existing `collisionCoordinator` from `scene.ts`
-- VR teleportation: right thumbstick forward activates parabolic arc; release teleports to
-  highlighted floor mesh; only the 4 ground planes (`castle.grounds`) are valid targets
-- Gold landing ring (`#CA9933` fill, `#A07720` border) via `defaultTargetMeshOptions`
-- 45° snap turn on right thumbstick left/right; 300 ms vignette fade via `Layer` overlay for comfort
-- `setupVRLocomotion(scene, xr, grounds)` exported from `src/3d/webxr.ts`; called from
-  `BabylonScene.tsx` immediately after `createXRExperience`
-
----
-
-## [1.5.0-slice1] - 2026-02-22
-
-### Added
-- WebXR immersive-VR session support via Babylon.js `WebXRDefaultExperience`
-- `src/3d/webxr.ts`: `checkVRSupport()` helper (uses `navigator.xr.isSessionSupported`) and `createXRExperience()` factory with `local-floor` reference space
-- "Enter VR" / "Exit VR" button (teak & gold, `bg-hall-accent`) at top-right below "Exit 3D"; only rendered when `isVRSupported` is true — invisible on non-XR devices
-- On VR enter: `camera.detachControl()`, `document.exitPointerLock()`, `cameraRef.isInVR = true`; DOM overlays (sidebar, minimap, mobile controls, POI hint) hidden
-- On VR exit: `camera.attachControl()` restored, all overlays re-shown
-- `local-floor` XR reference space; XR rig positioned at player's current x,z on session start (floor at y=0, head height tracked by headset)
-- `isInVR: boolean` field added to `CameraRefValue`; camera `onBeforeRenderObservable` skips all input when `isInVR` is active
-- Unmount guard (`unmounted` flag) for async XR setup prevents state updates after component disposal
-- Babylon's default XR button suppressed via `htmlButtonFactory`; custom styled button used instead
 
 ---
 

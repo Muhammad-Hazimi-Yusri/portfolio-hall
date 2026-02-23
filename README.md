@@ -5,8 +5,8 @@
 > A grand royal hall or throne room; the ceremonial heart of a palace where audiences are received and important gatherings held.
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
-[![Version](https://img.shields.io/badge/version-1.5.0--slice5-blue.svg)]()
-[![Status](https://img.shields.io/badge/status-In%20Development-yellow.svg)]()
+[![Version](https://img.shields.io/badge/version-1.5.0-blue.svg)]()
+[![Status](https://img.shields.io/badge/status-Released-green.svg)]()
 
 <details>
 <summary>📑 Table of Contents</summary>
@@ -449,7 +449,7 @@ const shouldDefaultToFallback = (): boolean => {
 ## 🚀 Development Roadmap
 
 <details>
-<summary>✅ Completed Versions (v0.1.0 – v1.4.0)</summary>
+<summary>✅ Completed Versions (v0.1.0 – v1.5.0)</summary>
 
 #### v0.1.0 — Scaffold
 Vite + React + TypeScript project setup, Tailwind CSS, Babylon.js deps, GitHub Pages CI/CD.
@@ -478,31 +478,12 @@ Enhanced 3D hall with ceiling, doorway, baseboards, gold crown molding, corner p
 #### v1.4.0 — Multi-Zone Castle & Content Population
 Multi-zone castle layout (Reception, Courtyard, Main Hall, Garden). 20 real POIs from CV data. Procedural skybox, sun lighting, gold doorway frames, glass-walled garden. Zone-based sidebar, expanded minimap/floorplan. SEO meta tags. Unique placeholder thumbnails. Hotfixed lighting, painting placement, and minimap bounds.
 
+#### v1.5.0 — WebXR / VR
+Full WebXR immersive-VR support via Babylon.js `WebXRDefaultExperience`. "Enter VR"/"Exit VR" button (teak & gold) hidden on non-XR devices. Features: session entry with `local-floor` reference space; controller locomotion (left-stick walk, right-stick parabolic teleport, 45° snap turn + vignette); hand tracking (pinch select + gaze-disc teleport, graceful controller ↔ hand switch); VR POI hover highlight (HighlightLayer gold glow, billboard label, 10 m cap) + floating teak-and-gold inspect panel with link-queueing; performance/comfort pass (shadow blur halved, spotlights disabled in VR, locomotion vignette, FPS counter HUD, seated mode, painting canvas lowered to 1.65 m).
+
 </details>
 
-#### v1.5.0 Slice 1 — WebXR Session Entry
-Immersive-VR session support via Babylon.js `WebXRDefaultExperience`. "Enter VR" button (teak & gold) appears only when `navigator.xr.isSessionSupported('immersive-vr')` resolves true (Quest Pro / Quest 2 browser). Head tracking with `local-floor` reference space. All DOM overlays hidden on VR enter; restored on exit. Keyboard, mouse, and touch controls disabled during VR session.
-
-#### v1.5.0 Slice 2 — VR Locomotion
-Controller-based movement via Babylon.js `WebXRFeatureName.MOVEMENT` and `TELEPORTATION`. Left thumbstick smooth walk (head-relative, 0.2 dead zone, wall/POI collisions active). Right thumbstick forward shows parabolic teleport arc with gold landing ring; release teleports to any floor mesh. Right thumbstick left/right fires 45° snap turn with a 300 ms black vignette flash for comfort. Teleportation restricted to castle ground planes — cannot land on walls, ceilings, or POI meshes.
-
-#### v1.5.0 Slice 3 — Hand Tracking
-Hand tracking via `WebXRFeatureName.HAND_TRACKING` in `src/3d/vrInteraction.ts`. Babylon.js default joint meshes render both hands with natural finger movement. Right-hand pinch (thumb ↔ index < 3.5 cm, 5 cm release hysteresis) initiates VR selection. Right index-finger direction EMA-smoothed each frame (α = 0.3) for ray casting. Gaze teleport: XR camera forward ray casts onto floor; gold preview disc follows gaze; left-hand pinch confirms and moves the XR rig (X/Z only). Graceful controller ↔ hand switching via `onHandAdded/RemovedObservable` — hand visuals hide when controllers are picked up.
-
-#### v1.5.0 Slice 4 — VR POI Interaction
-Full POI interaction in VR. Hover detection via per-frame ray casting: controller aim ray takes priority; hand index-finger ray as fallback; 10 m distance cap. `HighlightLayer` applies gold glow to hovered POI mesh and all children; billboard `DynamicTexture` label floats 2.2 m above the mesh. Trigger (controller) or right-hand pinch while pointing at a POI opens a floating teak-and-gold inspect panel (`src/3d/vrUI.ts`): 1.4 × 0.9 m plane at chest height 1.5 m in front, content rendered with `DynamicTexture` (title, word-wrapped description, tag pills, link buttons). Panel close: B/Y button or pinch on "✕". Link URLs are queued in a `pendingLinks` array and opened in new tabs on VR exit. No DOM involved — parallel to the desktop modal. No new npm packages added.
-
-#### v1.5.0 Slice 5 — VR Performance + Comfort Pass
-Performance optimisation and comfort features targeting Quest Pro at 72 fps. On VR session entry, `applyVRLighting()` halves shadow blur scale (2 → 1) on both shadow generators and disables all painting `SpotLight`s (ambient raised to 0.55 to compensate); fully restored on exit. FPS counter HUD (`createVRFpsCounter`): 0.22 × 0.07 m plane parented to XR camera, top-left of FOV, colour-coded green/gold/red against 72/60 fps thresholds, toggled with left-controller Y button. Locomotion vignette: persistent screen-edge overlay (max 0.4 alpha) fades in while left thumbstick is active, fades out when released — softer than the existing snap-turn flash. Seated mode: left-controller X button applies +0.7 m Y offset to the XR camera rig, allowing seated players to see the scene at a comfortable standing-equivalent scale without fighting native head tracking. Painting canvas center lowered from Y = 2.0 m to Y = 1.65 m (bottom 1.15 m, top 2.15 m), within the 1.4–1.7 m VR eye-level target. Verified: snap turn, door clearances, and panel text legibility all remain comfortable with no geometry changes.
-
 ### 🔧 Upcoming
-
-#### v1.5.0 — WebXR / VR Foundation (remaining)
-- [x] WebXR immersive-VR session entry (Quest Pro / Quest 2 via browser) — Slice 1
-- [x] Controller locomotion: left-stick walk, right-stick teleport arc, 45° snap turn + vignette — Slice 2
-- [x] Hand tracking with pinch interaction — Slice 3
-- [x] VR POI interaction: hover highlight, floating inspect panel, link queueing — Slice 4
-- [x] VR performance + comfort pass (FPS HUD, locomotion vignette, lighting optimisation, seated mode, painting height) — Slice 5
 
 #### v1.5.1 — Minimap Dynamic Zoom
 - [ ] Camera-centered view showing player + nearest POIs

@@ -104,7 +104,7 @@ function WelcomeScreen({ onSelectMode, canUse3D, warnings, isChecking }: Welcome
       </div>
 
       <p className="text-hall-muted text-sm mt-8">
-        v1.4.0 — Multi-Zone Castle
+        v1.5.0 — WebXR / VR
       </p>
     </div>
   )
