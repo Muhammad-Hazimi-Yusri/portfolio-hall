@@ -5,8 +5,8 @@
 > A grand royal hall or throne room; the ceremonial heart of a palace where audiences are received and important gatherings held.
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
-[![Version](https://img.shields.io/badge/version-1.5.1-blue.svg)]()
-[![Status](https://img.shields.io/badge/status-Released-green.svg)]()
+[![Version](https://img.shields.io/badge/version-1.6.0--slice1-blue.svg)]()
+[![Status](https://img.shields.io/badge/status-In_Progress-yellow.svg)]()
 
 <details>
 <summary>📑 Table of Contents</summary>
@@ -72,8 +72,21 @@ Balairung uses a **Javanese/Malay royal hall** aesthetic inspired by traditional
 
 ### Foundation (v0.x)
 - Welcome gate with device capability detection and mode selection
-- 2D fallback mode — SVG floor plan, sidebar navigation, section filtering, inspect modal
 - Responsive mobile-first layout
+
+### 2D Portfolio Mode (v1.6.0)
+- Scroll-based portfolio layout replacing the old SVG floor plan placeholder
+- Hero section: full-viewport with Cinzel gold title, tagline, CSS-only floating gold particle animation, "Explore in 3D" CTA, scroll indicator
+- Featured projects: full-width cards with description, tech tags, and live links
+- All projects: compact 2-col mobile / 3-col desktop grid
+- Experience timeline: vertical teak & gold timeline with role, org, dates, and tech tags
+- Skills: categorised tag groups (Languages, Frameworks, DevOps, Hardware) with highlight cross-reference
+- Hackathons: compact cards with descriptions, tags, and links
+- Contact: link cards for GitHub, LinkedIn, Email, GitLab, Website with gold accent styling
+- Footer with secondary "Switch to 3D Experience" CTA
+- Intersection Observer fade-in reveals per section; CSS-only particle animation in hero
+- Self-scrolling container (3D mode `overflow: hidden` on `#root` preserved)
+- Desktop: left sidebar slot reserved for Slice 2 illustrated map nav
 
 ### 3D Experience (v1.0)
 - Babylon.js 3D hall with procedural geometry
@@ -228,8 +241,16 @@ portfolio-hall/
 │   │   └── BabylonScene.tsx      # Main 3D React component
 │   │
 │   ├── components/
+│   │   ├── FallbackMode/         # 2D scroll-based portfolio (v1.6.0+)
+│   │   │   ├── index.ts
+│   │   │   ├── FallbackMode.tsx  # Root layout + data orchestration
+│   │   │   ├── HeroSection.tsx
+│   │   │   ├── ProjectsGrid.tsx
+│   │   │   ├── ExperienceTimeline.tsx
+│   │   │   ├── SkillsSection.tsx
+│   │   │   └── ContactSection.tsx
 │   │   ├── MobileControls.tsx    # Game Boy-style portrait + landscape controls
-│   │   ├── FloorPlan.tsx         # 2D SVG floor plan (fallback mode)
+│   │   ├── FloorPlan.tsx         # 2D SVG floor plan (reserved for Slice 2 map nav)
 │   │   ├── Minimap.tsx           # SVG minimap overlay (3D mode)
 │   │   ├── ThreeDSidebar.tsx     # Collapsible POI sidebar (3D mode)
 │   │   ├── FadeOverlay.tsx       # Fade transition for teleport
@@ -238,6 +259,7 @@ portfolio-hall/
 │   │
 │   ├── hooks/
 │   │   ├── useDeviceCapability.ts
+│   │   ├── useFadeIn.ts          # IntersectionObserver scroll-reveal hook
 │   │   └── usePOIs.ts
 │   │
 │   ├── types/
@@ -452,7 +474,7 @@ const shouldDefaultToFallback = (): boolean => {
 ## 🚀 Development Roadmap
 
 <details>
-<summary>✅ Completed Versions (v0.1.0 – v1.5.1)</summary>
+<summary>✅ Completed Versions (v0.1.0 – v1.6.0-slice1)</summary>
 
 #### v0.1.0 — Scaffold
 Vite + React + TypeScript project setup, Tailwind CSS, Babylon.js deps, GitHub Pages CI/CD.
@@ -487,17 +509,21 @@ Full WebXR immersive-VR support via Babylon.js `WebXRDefaultExperience`. "Enter 
 #### v1.5.1 — Minimap Dynamic Zoom
 Player-centered minimap that auto-zooms to the 3 nearest POIs (8×8 min / 30×30 max viewBox). Smooth 60fps lerp transitions. Full map toggle (`⊞`/`⊡`) inside the minimap corner — full view shows a dashed gold viewport indicator. Current zone label (Main Hall, Courtyard, Reception, Garden) in minimap corner. POI dots filtered to viewBox bounds in dynamic mode. Direction arrow scales with zoom level.
 
+#### v1.6.0-slice1 — 2D Mode Layout Foundation
+Rebuilt 2D fallback mode from scratch as a proper scroll-based portfolio page. New `src/components/FallbackMode/` directory with dedicated section components. Hero section with CSS-only particle animation. Featured + compact project cards. Vertical experience timeline with teak & gold styling. Categorised skill tag groups. Hackathon cards. Contact link cards. Intersection Observer fade-in reveals. Gold/teak custom scrollbar. Desktop left sidebar placeholder reserved for Slice 2 illustrated map nav. Self-scrolling container preserves 3D `overflow: hidden` on `#root`.
+
 </details>
 
 ### 🔧 Upcoming
 
-#### v1.6.0 — 2D Mode Revamp
-- [ ] Redesign fallback mode as a spatial-themed but recruiter-optimized portfolio
-- [ ] Sections: hero/intro, projects grid, experience timeline, skills, hackathons, contact
-- [ ] Teak & gold aesthetic preserved
-- [ ] All info scannable without excessive modals
-- [ ] "Source of truth" layout for both visitors and self-reference
-- [ ] Mobile-first responsive
+#### v1.6.0-slice2 — Illustrated Map Navigation
+- [ ] Illustrated map (SVG or canvas) in left sidebar replacing the empty placeholder
+- [ ] Click zone/section on map to scroll to that section
+- [ ] Active section highlight as user scrolls
+
+#### v1.6.0-slice3 — Rich Project Story Cards
+- [ ] Expanded project cards with full content, gallery, and inspect modal redesign
+- [ ] Per-project story layout
 
 #### v1.7.0 — Blender Asset Pipeline
 - [ ] .glb import pipeline with material mapping and shadow support

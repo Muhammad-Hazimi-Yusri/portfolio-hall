@@ -19,6 +19,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.6.0-slice1] - 2026-02-24
+
+### Added
+- New `src/components/FallbackMode/` directory replacing the inline placeholder component in `App.tsx`
+- `HeroSection`: full-viewport hero with Cinzel gold title, sub-name, tagline from About POI description, CSS-only floating gold particle animation, "Explore in 3D" CTA button, scroll indicator
+- `ProjectsGrid`: 4 featured projects (AVVR, Portfolio Hall, DIY Stereo Camera, EEE Roadmap) as full-width cards with description, tech tags, and links; 6 remaining projects as 2-col mobile / 3-col desktop compact grid
+- `ExperienceTimeline`: vertical teak & gold timeline with hardcoded date/location metadata for both experience POIs (audioscenic, southampton-research)
+- `SkillsSection`: categorised skill tag groups (Languages / Frameworks & Engines / DevOps & Cloud / Hardware) with highlight cross-reference from skills POI tags; hackathon cards from 4 hackathon POIs
+- `ContactSection`: link cards for GitHub, LinkedIn, Email, GitLab, Website with gold accent styling
+- Footer with "Switch to 3D Experience" secondary CTA and version label
+- `useFadeIn` hook (`src/hooks/useFadeIn.ts`) using `IntersectionObserver` for scroll-triggered section reveal
+- CSS-only `particleFloat` keyframe + `.particle-float` class for hero background animation
+- `.fallback-scroll` utility for gold/teak custom scrollbar styling
+- `.fade-in-section` / `.is-visible` CSS classes for intersection-triggered reveal transitions
+- Desktop fixed left sidebar placeholder (reserved for Slice 2 illustrated map nav)
+
+### Changed
+- `FallbackMode` extracted from inline definition in `App.tsx` to `src/components/FallbackMode/` directory
+- `FallbackMode` root container is now a self-scrolling `overflow-y-auto` div — 3D mode `overflow: hidden` on `#root` is preserved unchanged
+- `ModeToggle` in FallbackMode changed from `absolute` to `fixed` positioning to remain visible while scrolling
+
+### Removed
+- Inline `FallbackMode` function from `App.tsx` (lines 113–227)
+- Sidebar with section filter buttons
+- SVG floor plan (`FloorPlan` component) from FallbackMode (component file preserved for Slice 2)
+- Old POI card list below floor plan
+
+---
+
 ## [1.5.1] - 2026-02-24
 
 ### Added

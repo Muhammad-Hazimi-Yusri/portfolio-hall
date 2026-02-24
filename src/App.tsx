@@ -1,9 +1,7 @@
 import { useState, useCallback, lazy, Suspense, useEffect } from 'react'
 import { useDeviceCapability } from '@/hooks/useDeviceCapability'
-import { usePOIs } from '@/hooks/usePOIs'
-import { FloorPlan } from '@/components/FloorPlan'
 import { LoadingScreen } from '@/components/LoadingScreen'
-import { ModeToggle } from '@/components/ModeToggle'
+import { FallbackMode } from '@/components/FallbackMode'
 import type { POI } from '@/types/poi'
 
 const BabylonScene = lazy(() => import('@/3d/BabylonScene').then(m => ({ default: m.BabylonScene })))
@@ -106,122 +104,6 @@ function WelcomeScreen({ onSelectMode, canUse3D, warnings, isChecking }: Welcome
       <p className="text-hall-muted text-sm mt-8">
         v1.5.1 — Minimap Dynamic Zoom
       </p>
-    </div>
-  )
-}
-
-function FallbackMode({ onSwitchMode }: { onSwitchMode: () => void }) {
-  const { pois, isLoading } = usePOIs()
-  const [selectedSection, setSelectedSection] = useState<string | null>(null)
-  const [inspectingId, setInspectingId] = useState<string | null>(null)
-  const inspectedPOI = pois.find((p) => p.id === inspectingId) ?? null
-
-  if (isLoading) {
-    return <div className="text-hall-muted">Loading...</div>
-  }
-
-  return (
-    <div className="w-full h-full flex flex-col md:flex-row relative">
-      {/* Mode toggle - fixed position matching 3D mode */}
-      <div className="absolute top-4 right-4 z-50">
-        <ModeToggle currentMode="fallback" onToggle={onSwitchMode} />
-      </div>
-
-      {/* Sidebar */}
-      <aside className="w-full md:w-64 wood-texture border-b md:border-b-0 md:border-r border-hall-muted/20 p-4 flex flex-col" style={{ '--wood-base': '#2A1F18' } as React.CSSProperties}>
-        <h2 className="text-xl font-bold mb-4 text-hall-accent">Balairung</h2>
-        <nav className="flex-1 flex flex-row md:flex-col gap-2 md:gap-0 md:space-y-4 overflow-x-auto md:overflow-visible">
-          {(['projects', 'about', 'skills', 'contact', 'experience', 'hackathons'] as const).map((section) => {
-            const count = pois.filter((p) => p.section === section).length
-            return (
-              <button
-                key={section}
-                onClick={() => setSelectedSection(selectedSection === section ? null : section)}
-                className={`w-full text-left px-3 py-2 rounded transition-colors ${
-                  selectedSection === section
-                    ? 'bg-hall-accent text-hall-bg'
-                    : 'hover:bg-hall-frame-light/20'
-                }`}
-              >
-                <span className="capitalize">{section}</span>
-                <span className="text-hall-muted text-sm ml-2">({count})</span>
-              </button>
-            )
-          })}
-        </nav>
-      </aside>
-
-      {/* Main content */}
-      <main className="flex-1 p-4 overflow-auto flex flex-col">
-      {/* Floor plan */}
-      <div className="flex-1 flex items-center justify-center">
-        <FloorPlan
-          pois={pois}
-          selectedSection={selectedSection}
-          onSelectPOI={setInspectingId}
-        />
-      </div>
-      
-      {/* POI list below */}
-      <div className="space-y-2 mt-4">
-        {pois
-          .filter((p) => !selectedSection || p.section === selectedSection)
-          .map((poi) => (
-            <div
-              key={poi.id}
-              onClick={() => setInspectingId(poi.id)}
-              className="p-3 bg-hall-surface rounded gold-trim cursor-pointer hover:border-hall-accent transition-colors"
-            >
-              <h3 className="font-semibold">{poi.content.title}</h3>
-              <p className="text-sm text-hall-muted capitalize">{poi.type} · {poi.section}</p>
-            </div>
-          ))}
-      </div>
-    </main>
-      {inspectedPOI && (
-        <div
-          className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50"
-          onClick={() => setInspectingId(null)}
-        >
-          <div
-            className="bg-hall-surface rounded-lg max-w-lg w-full p-6 max-h-[80vh] overflow-auto gold-trim"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h2 className="text-2xl font-bold mb-2">{inspectedPOI.content.title}</h2>
-            <p className="text-hall-muted text-sm capitalize mb-4">
-              {inspectedPOI.type} · {inspectedPOI.section}
-            </p>
-            <p className="mb-4">{inspectedPOI.content.description}</p>
-            
-            {inspectedPOI.content.tags && (
-              <div className="flex flex-wrap gap-2 mb-4">
-                {inspectedPOI.content.tags.map((tag) => (
-                  <span key={tag} className="px-2 py-1 bg-hall-frame rounded text-sm">
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            )}
-
-            {inspectedPOI.content.links && inspectedPOI.content.links.length > 0 && (
-              <div className="flex flex-wrap gap-3 mb-4">
-                {inspectedPOI.content.links.map((link) => (
-                  <a key={link.label} href={link.url} target="_blank" rel="noopener noreferrer" className="px-3 py-1 bg-hall-accent text-hall-bg rounded text-sm hover:opacity-90">
-                    {link.label}
-                  </a>
-                ))}
-              </div>
-            )}
-
-            <button
-              onClick={() => setInspectingId(null)}
-              className="text-hall-accent underline"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

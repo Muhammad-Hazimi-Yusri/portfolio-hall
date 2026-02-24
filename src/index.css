@@ -8,6 +8,34 @@
   }
 }
 
+@layer utilities {
+  .fallback-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: #C9A84C #2A1F18;
+  }
+  .fallback-scroll::-webkit-scrollbar { width: 6px; }
+  .fallback-scroll::-webkit-scrollbar-track { background: #2A1F18; }
+  .fallback-scroll::-webkit-scrollbar-thumb { background: #C9A84C; border-radius: 3px; }
+
+  .fade-in-section {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+  }
+  .fade-in-section.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes particleFloat {
+  0%, 100% { transform: translateY(0px) scale(1); opacity: 0.3; }
+  50%       { transform: translateY(-20px) scale(1.1); opacity: 0.6; }
+}
+.particle-float {
+  animation: particleFloat var(--duration, 5s) ease-in-out infinite;
+}
+
 @layer components {
   .wood-texture {
     background:
