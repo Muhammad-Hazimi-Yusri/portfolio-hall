@@ -46,7 +46,10 @@ export function ExperienceTimeline({ pois }: Props) {
                 className="relative pl-12 md:pl-20"
                 style={{ transitionDelay: `${i * 100}ms` }}
               >
-                <div className="absolute left-2 md:left-6 top-1.5 w-4 h-4 rounded-full bg-hall-accent border-2 border-hall-bg" />
+                <div
+                  className="absolute left-2 md:left-6 top-1.5 w-4 h-4 rounded-full bg-hall-accent border-2 border-hall-bg timeline-dot"
+                  style={{ animationDelay: `${i * 100 + 200}ms` }}
+                />
 
                 <div id={`poi-${poi.id}`} className="bg-hall-surface rounded-lg p-4 md:p-5 gold-trim">
                   <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-1 mb-3">

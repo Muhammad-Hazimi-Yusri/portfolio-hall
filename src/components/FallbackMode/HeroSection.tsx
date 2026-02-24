@@ -21,6 +21,12 @@ const PARTICLES = [
 export function HeroSection({ aboutPOI, onSwitchMode }: Props) {
   return (
     <section id="section-hero" data-section-id="hero" className="min-h-screen flex flex-col items-center justify-center relative px-6 py-20 overflow-hidden">
+      {/* Drifting wood texture — CSS-only pseudo-parallax */}
+      <div
+        className="absolute inset-0 pointer-events-none wood-texture hero-bg-layer opacity-30"
+        aria-hidden="true"
+      />
+
       {/* CSS-only particle background */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
         {PARTICLES.map((p, i) => (

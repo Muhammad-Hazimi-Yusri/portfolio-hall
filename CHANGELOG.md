@@ -19,6 +19,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.6.0-slice4] - 2026-02-24
+
+### Added
+- `@keyframes heroBgDrift` + `.hero-bg-layer`: subtle 25s infinite background pan on hero section wood-texture layer (`background-size: 120%`, alternates `0%/0%` → `8%/4%` position)
+- `@keyframes timelineDotReveal` + `.timeline-dot`: scale-in with overshoot (0→1.4→1), triggered by parent `.fade-in-section.is-visible`; staggered `animationDelay` per dot in `ExperienceTimeline`
+- `.card-lift` (`@media (hover: hover)` only): `translateY(-2px)` + `box-shadow rgba(201,168,76,0.12)` on hover — applied to `StoryCard` and hackathon cards
+- `.section-divider`: 1px gold gradient rule between major sections in `FallbackMode`
+- `.story-text`: `line-height: 1.7` — applied to hackathon card descriptions
+- `.castle-map-zone` extended: `transform-box: fill-box`, `transform-origin: center`, `scale(1.015)` on hover — no TSX changes to `CastleMap.tsx`
+- Drifting `wood-texture` background layer in `HeroSection` (absolutely positioned, `opacity-30`, below particles)
+- Alternating `bg-hall-surface/20` backgrounds on Projects and Skills sections
+
+### Changed
+- `StoryCard`: `overflow-hidden` moved from card root to thumbnail div to fix `box-shadow` clipping; `card-lift` added
+- `StoryCard` expand panel: conditional `{isExpanded && <div>}` replaced with CSS `grid-rows-[0fr→1fr]` animated collapse (300ms ease-out, always in DOM)
+- `ExperienceTimeline` dots: `.timeline-dot` class + `animationDelay` inline style added for staggered reveal
+- `SkillsSection` hackathon cards: `card-lift` added; `leading-relaxed` replaced with `story-text`
+- `FallbackMode` footer version: `v1.6.0-slice2` → `v1.6.0-slice4`
+- `.fade-in-section` easing: `ease-out` → `cubic-bezier(0.4, 0, 0.2, 1)` (smoother deceleration)
+- Cinzel font: `wght@400;700` → `wght@400;600;700` in `index.html`
+
+---
+
 ## [1.6.0-slice3] - 2026-02-24
 
 ### Added

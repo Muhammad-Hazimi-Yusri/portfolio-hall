@@ -77,14 +77,14 @@ export function SkillsSection({ skillsPOI, hackathonPOIs }: Props) {
           <div
             key={poi.id}
             id={`poi-${poi.id}`}
-            className="bg-hall-surface rounded-lg p-4 border border-hall-frame hover:border-hall-accent/40 transition-colors"
+            className="bg-hall-surface rounded-lg p-4 border border-hall-frame hover:border-hall-accent/40 transition-colors card-lift"
             style={{ transitionDelay: `${i * 80}ms` }}
           >
             <h3 className="text-hall-text font-semibold mb-1">{poi.content.title}</h3>
             {poi.content.storyHook && (
               <p className="text-hall-accent text-xs font-medium mb-2">{poi.content.storyHook}</p>
             )}
-            <p className="text-hall-muted text-sm leading-relaxed mb-3">{poi.content.description}</p>
+            <p className="text-hall-muted text-sm story-text mb-3">{poi.content.description}</p>
             {poi.content.tags && poi.content.tags.length > 0 && (
               <div className="flex flex-wrap gap-1 mb-3">
                 {poi.content.tags.map((tag) => (

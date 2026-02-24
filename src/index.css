@@ -20,14 +20,22 @@
   .fade-in-section {
     opacity: 0;
     transform: translateY(24px);
-    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+    transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .fade-in-section.is-visible {
     opacity: 1;
     transform: translateY(0);
   }
 
-  .castle-map-zone { cursor: pointer; }
+  .castle-map-zone {
+    cursor: pointer;
+    transition: fill 0.3s ease, transform 0.25s ease;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  .castle-map-zone:hover {
+    transform: scale(1.015);
+  }
 
   @keyframes poiHighlightPulse {
     0%   { box-shadow: 0 0 0 0px rgba(201, 168, 76, 0.7); }
@@ -38,6 +46,58 @@
   .poi-highlight-pulse {
     animation: poiHighlightPulse 0.9s ease-out forwards;
   }
+}
+
+/* Hero background drift — CSS-only pseudo-parallax */
+@keyframes heroBgDrift {
+  0%   { background-position: 0% 0%; }
+  100% { background-position: 8% 4%; }
+}
+.hero-bg-layer {
+  animation: heroBgDrift 25s ease-in-out infinite alternate;
+  background-size: 120% 120%;
+}
+
+/* Timeline dot scale-in reveal, triggered by parent .is-visible */
+@keyframes timelineDotReveal {
+  0%   { transform: scale(0); opacity: 0; }
+  60%  { transform: scale(1.4); }
+  100% { transform: scale(1); opacity: 1; }
+}
+.timeline-dot {
+  transform: scale(0);
+  opacity: 0;
+}
+.fade-in-section.is-visible .timeline-dot {
+  animation: timelineDotReveal 0.4s ease-out forwards;
+}
+
+/* Card hover lift — desktop only (suppresses sticky hover on iOS) */
+@media (hover: hover) {
+  .card-lift {
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+  }
+  .card-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(201, 168, 76, 0.12);
+  }
+}
+
+/* Gold section divider */
+.section-divider {
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(201, 168, 76, 0.25) 30%,
+    rgba(201, 168, 76, 0.25) 70%,
+    transparent
+  );
+}
+
+/* Story text — slightly more open than leading-relaxed (1.625) */
+.story-text {
+  line-height: 1.7;
 }
 
 @keyframes particleFloat {

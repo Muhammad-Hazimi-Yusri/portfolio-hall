@@ -173,9 +173,17 @@ export function FallbackMode({ onSwitchMode }: Props) {
       <div className="md:pl-64">
         <div className="max-w-[1200px] mx-auto">
           <HeroSection aboutPOI={aboutPOI} onSwitchMode={onSwitchMode} />
-          <ProjectsGrid featured={featuredProjects} remaining={remainingProjects} />
+          <div className="section-divider" />
+          <div className="bg-hall-surface/20">
+            <ProjectsGrid featured={featuredProjects} remaining={remainingProjects} />
+          </div>
+          <div className="section-divider" />
           <ExperienceTimeline pois={experiencePOIs} />
-          <SkillsSection skillsPOI={skillsPOI} hackathonPOIs={hackathonPOIs} />
+          <div className="section-divider" />
+          <div className="bg-hall-surface/20">
+            <SkillsSection skillsPOI={skillsPOI} hackathonPOIs={hackathonPOIs} />
+          </div>
+          <div className="section-divider" />
           <ContactSection contactPOI={contactPOI} />
 
           <footer className="px-6 md:px-12 py-10 border-t border-hall-frame text-center">
@@ -185,7 +193,7 @@ export function FallbackMode({ onSwitchMode }: Props) {
             >
               Switch to 3D Experience
             </button>
-            <p className="text-hall-muted/40 text-xs">v1.6.0-slice2 — 2D Portfolio</p>
+            <p className="text-hall-muted/40 text-xs">v1.6.0-slice4 — 2D Portfolio</p>
           </footer>
         </div>
       </div>
