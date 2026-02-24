@@ -5,7 +5,7 @@
 > A grand royal hall or throne room; the ceremonial heart of a palace where audiences are received and important gatherings held.
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
-[![Version](https://img.shields.io/badge/version-1.5.0-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-1.5.1-blue.svg)]()
 [![Status](https://img.shields.io/badge/status-Released-green.svg)]()
 
 <details>
@@ -94,9 +94,12 @@ Balairung uses a **Javanese/Malay royal hall** aesthetic inspired by traditional
 - Controls hint popups (first load + landscape toggle)
 - Controls info on welcome screen per device type
 
-### Navigation & UX (v1.2)
-- Minimap overlay (SVG synced with 3D camera position) — expanded by default on desktop (top-left)
-- Real-time player position and direction indicator on minimap
+### Navigation & UX (v1.2 – v1.5.1)
+- Minimap overlay (SVG synced with 3D camera position) — top-left on desktop, hidden in portrait mobile
+- Dynamic zoom: minimap auto-centers on player and zooms to show the 3 nearest POIs; min 8×8 / max 30×30 viewBox; smooth lerp transitions at 60fps
+- Full map toggle (`⊞`/`⊡`) inside minimap corner — switches between dynamic zoom and full castle view; full view shows a dashed gold rectangle marking the dynamic zoom area
+- Current zone label (Main Hall, Courtyard, Reception, Garden) displayed in minimap corner
+- Real-time player position and scaled direction arrow on minimap
 - Click minimap to teleport anywhere in the hall; click POI dot to teleport to approach position
 - GTA-style cinematic fly-to animation (rise → overhead pan → descend) with short-distance fallback
 - Collapsible sidebar with POI navigation grouped by section (auto-collapses on pointer lock)
@@ -449,7 +452,7 @@ const shouldDefaultToFallback = (): boolean => {
 ## 🚀 Development Roadmap
 
 <details>
-<summary>✅ Completed Versions (v0.1.0 – v1.5.0)</summary>
+<summary>✅ Completed Versions (v0.1.0 – v1.5.1)</summary>
 
 #### v0.1.0 — Scaffold
 Vite + React + TypeScript project setup, Tailwind CSS, Babylon.js deps, GitHub Pages CI/CD.
@@ -481,15 +484,12 @@ Multi-zone castle layout (Reception, Courtyard, Main Hall, Garden). 20 real POIs
 #### v1.5.0 — WebXR / VR
 Full WebXR immersive-VR support via Babylon.js `WebXRDefaultExperience`. "Enter VR"/"Exit VR" button (teak & gold) hidden on non-XR devices. Features: session entry with `local-floor` reference space; controller locomotion (left-stick walk, right-stick parabolic teleport, 45° snap turn + vignette); hand tracking (pinch select + gaze-disc teleport, graceful controller ↔ hand switch); VR POI hover highlight (HighlightLayer gold glow, billboard label, 10 m cap) + floating teak-and-gold inspect panel with link-queueing; performance/comfort pass (shadow blur halved, spotlights disabled in VR, locomotion vignette, FPS counter HUD, seated mode, painting canvas lowered to 1.65 m).
 
+#### v1.5.1 — Minimap Dynamic Zoom
+Player-centered minimap that auto-zooms to the 3 nearest POIs (8×8 min / 30×30 max viewBox). Smooth 60fps lerp transitions. Full map toggle (`⊞`/`⊡`) inside the minimap corner — full view shows a dashed gold viewport indicator. Current zone label (Main Hall, Courtyard, Reception, Garden) in minimap corner. POI dots filtered to viewBox bounds in dynamic mode. Direction arrow scales with zoom level.
+
 </details>
 
 ### 🔧 Upcoming
-
-#### v1.5.1 — Minimap Dynamic Zoom
-- [ ] Camera-centered view showing player + nearest POIs
-- [ ] Dynamic zoom level based on POI proximity
-- [ ] Manual zoom override (pinch/scroll)
-- [ ] Full map toggle in corner
 
 #### v1.6.0 — 2D Mode Revamp
 - [ ] Redesign fallback mode as a spatial-themed but recruiter-optimized portfolio

@@ -10,13 +10,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- v1.5.1: Minimap dynamic zoom (camera-centered, nearest POIs)
 - v1.6.0: 2D fallback mode revamp (recruiter-optimized spatial portfolio)
 - v1.7.0: Blender .glb asset pipeline (hybrid procedural + modeled architecture)
 - v1.8.0: 3D self-portrait (iPhone LiDAR scan, low-poly mesh + gaussian splat toggle)
 - v1.9.0: Rich project displays (3D slideshows, per-project gaussian splats)
 - v2.0.0: Interactive web panels, full content polish, launch-ready
 - v3.0.0: AI integration (backlog)
+
+---
+
+## [1.5.1] - 2026-02-24
+
+### Added
+- Dynamic player-centered minimap: viewBox always centered on player; zoom level calculated from the 3 nearest POIs so the map stays tight and useful rather than showing the entire castle at a fixed scale
+- `computeDynamicVB` algorithm: finds 3 nearest POIs by Euclidean distance, expands bounding box to fit all 3 from player with 1.5-unit padding; halfW/halfH clamped to min 4 (8×8) and max 15 (30×30) to prevent over-zoom or under-zoom; viewBox edge-clamped to castle SVG extents
+- `getZoneForPosition` helper: determines which named zone the player occupies from world coordinates; displayed as a subtle label in the top-left corner of the minimap
+- Smooth viewBox transitions: RAF loop lerps `currentVB` toward `targetVB` at α = 0.10 per frame (~60fps); target updates at ~10fps with player position; snaps when delta < 0.01 to stop unnecessary re-renders
+- Full map toggle button (`⊞`/`⊡`) inside the minimap (bottom-right corner, gold-trim style); switches between dynamic zoom and full castle view without resizing the minimap panel
+- Viewport indicator: when in full map mode, a dashed gold rectangle marks the area the dynamic zoom would currently show
+- POI visibility filtering: in dynamic zoom mode, only POI dots within the current viewBox bounds are rendered; full map mode shows all POIs as before
+- Current zone label: player's current zone (`Main Hall`, `Courtyard`, `Reception`, `Garden`) displayed in the minimap top-left corner; hidden when transitional
+- Direction arrow scaling: triangle size scaled by `vbW / 44` (clamped 0.25–1.0) so the arrow stays proportional at all zoom levels
+
+### Changed
+- Minimap container is now fixed at the "expanded" size (`w-80 h-80` desktop / `w-56 h-56` mobile) in all non-collapsed states — the dynamic zoom provides the previously size-based distinction
+- Removed the external `[-]`/`[+]` expand toggle button; full map toggle is now the `⊞`/`⊡` button inside the minimap corner
+- `useMemo`-based `smallViewBox` replaced by ref-based animated viewBox driven by the RAF loop
+- `expanded` state replaced by `fullMap` (default `false` — dynamic zoom is the default)
+- Version bumped to v1.5.1
 
 ---
 
