@@ -30,7 +30,7 @@ export function ExperienceTimeline({ pois }: Props) {
     .filter((p): p is POI => Boolean(p))
 
   return (
-    <section className="px-6 py-16 md:px-12">
+    <section id="section-experience" data-section-id="experience" className="px-6 py-16 md:px-12">
       <h2 className="text-2xl md:text-3xl text-hall-accent mb-2">Experience</h2>
       <div className="w-12 h-px bg-hall-accent/40 mb-10" />
 
@@ -48,7 +48,7 @@ export function ExperienceTimeline({ pois }: Props) {
               >
                 <div className="absolute left-2 md:left-6 top-1.5 w-4 h-4 rounded-full bg-hall-accent border-2 border-hall-bg" />
 
-                <div className="bg-hall-surface rounded-lg p-4 md:p-5 gold-trim">
+                <div id={`poi-${poi.id}`} className="bg-hall-surface rounded-lg p-4 md:p-5 gold-trim">
                   <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-1 mb-3">
                     <div>
                       <h3 className="text-hall-text font-semibold">{meta?.role ?? poi.content.title}</h3>

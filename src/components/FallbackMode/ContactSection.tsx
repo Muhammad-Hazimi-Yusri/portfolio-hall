@@ -17,7 +17,7 @@ export function ContactSection({ contactPOI }: Props) {
   const ref = useFadeIn()
 
   return (
-    <section className="px-6 py-16 md:px-12">
+    <section id="section-contact" data-section-id="contact" className="px-6 py-16 md:px-12">
       <h2 className="text-2xl md:text-3xl text-hall-accent mb-2">Contact</h2>
       <div className="w-12 h-px bg-hall-accent/40 mb-6" />
       {contactPOI?.content.description && (

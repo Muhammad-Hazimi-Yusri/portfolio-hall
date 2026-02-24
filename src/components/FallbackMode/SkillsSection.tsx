@@ -38,7 +38,7 @@ export function SkillsSection({ skillsPOI, hackathonPOIs }: Props) {
     .filter((p): p is POI => Boolean(p))
 
   return (
-    <section className="px-6 py-16 md:px-12">
+    <section id="section-skills" data-section-id="skills" className="px-6 py-16 md:px-12">
       <h2 className="text-2xl md:text-3xl text-hall-accent mb-2">Skills & Tech</h2>
       <div className="w-12 h-px bg-hall-accent/40 mb-10" />
 
@@ -76,6 +76,7 @@ export function SkillsSection({ skillsPOI, hackathonPOIs }: Props) {
         {orderedHackathons.map((poi, i) => (
           <div
             key={poi.id}
+            id={`poi-${poi.id}`}
             className="bg-hall-surface rounded-lg p-4 border border-hall-frame hover:border-hall-accent/40 transition-colors"
             style={{ transitionDelay: `${i * 80}ms` }}
           >

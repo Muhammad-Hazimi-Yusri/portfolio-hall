@@ -19,6 +19,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.6.0-slice2] - 2026-02-24
+
+### Added
+- `CastleMap` component (`src/components/FallbackMode/CastleMap.tsx`): inline SVG illustrated castle map styled as a fantasy RPG hand-drawn floor plan with teak & gold aesthetic
+  - Four interactive zone rooms drawn as SVG shapes: Main Hall (top), Courtyard (centre), Reception (bottom), Garden (right)
+  - Decorative elements per zone: pillar pairs and painting outlines (Main Hall), octagonal fountain and corner trees (Courtyard), pillars and entrance arch (Reception), plant markers and trellis lines (Garden)
+  - Gold doorway connectors between adjacent zones
+  - Cinzel-font gold zone labels with opacity-based active/inactive state
+  - SVG glow filter (`feGaussianBlur`) applied to active zone for warm highlight effect
+  - POI dots (gold circles, `r=0.55`) positioned from world coordinates (`svgX = -poi.position.x`, `svgY = poi.position.z`), clickable with `<title>` tooltip
+  - Active zone fill transitions via CSS (`fill 0.3s ease`) — no JS animation needed
+- `useActiveSection` hook (`src/hooks/useActiveSection.ts`): `IntersectionObserver`-based scroll sync
+  - Observes all 5 section elements with `root: scrollContainerRef.current` (correct for `overflow-y-auto` containers)
+  - 11-step threshold array (`[0, 0.1, ..., 1.0]`) for granular ratio tracking
+  - "Most visible section wins" strategy using a ratio Map — prevents flicker at section boundaries
+  - Maps `SectionId` → `Zone` (hero/contact → reception, projects → main-hall, experience → courtyard, skills → garden)
+- Desktop: illustrated map rendered in the reserved 256px left sidebar with "Castle Map" header and "Click a room to navigate" footer hint
+- Mobile: floating "Map" button (`bottom-4 right-4`) opens full-screen overlay with backdrop blur; tapping a zone or POI closes the overlay automatically
+- `poi-highlight-pulse` CSS animation: gold ring expand on POI card scroll target (0.9s, `box-shadow` keyframes)
+- `castle-map-zone` CSS class for clickable SVG zone cursor
+- Section scroll IDs (`id="section-hero"` etc.) and `data-section-id` attributes added to all FallbackMode section components
+- POI card IDs (`id="poi-{poiId}"`) added to FeaturedCard, CompactCard (ProjectsGrid), experience entry cards (ExperienceTimeline), and hackathon cards (SkillsSection) — enables direct POI-dot-to-card scroll targeting
+- POI scroll override map: `contact` POI dot scrolls to `#section-contact` rather than the hero section
+
+### Changed
+- `FallbackMode`: empty `<aside aria-hidden="true">` replaced with live `CastleMap` navigation panel
+- `FallbackMode`: scroll container `<div>` gains a `ref` (`scrollRef`) used as IntersectionObserver root
+- `FallbackMode`: `aria-hidden="true"` removed from aside — sidebar is now interactive
+
+---
+
 ## [1.6.0-slice1] - 2026-02-24
 
 ### Added

@@ -26,6 +26,18 @@
     opacity: 1;
     transform: translateY(0);
   }
+
+  .castle-map-zone { cursor: pointer; }
+
+  @keyframes poiHighlightPulse {
+    0%   { box-shadow: 0 0 0 0px rgba(201, 168, 76, 0.7); }
+    40%  { box-shadow: 0 0 0 8px rgba(201, 168, 76, 0.2); }
+    70%  { box-shadow: 0 0 0 14px rgba(201, 168, 76, 0.05); }
+    100% { box-shadow: 0 0 0 18px rgba(201, 168, 76, 0); }
+  }
+  .poi-highlight-pulse {
+    animation: poiHighlightPulse 0.9s ease-out forwards;
+  }
 }
 
 @keyframes particleFloat {

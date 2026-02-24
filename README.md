@@ -5,7 +5,7 @@
 > A grand royal hall or throne room; the ceremonial heart of a palace where audiences are received and important gatherings held.
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
-[![Version](https://img.shields.io/badge/version-1.6.0--slice1-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-1.6.0--slice2-blue.svg)]()
 [![Status](https://img.shields.io/badge/status-In_Progress-yellow.svg)]()
 
 <details>
@@ -86,7 +86,11 @@ Balairung uses a **Javanese/Malay royal hall** aesthetic inspired by traditional
 - Footer with secondary "Switch to 3D Experience" CTA
 - Intersection Observer fade-in reveals per section; CSS-only particle animation in hero
 - Self-scrolling container (3D mode `overflow: hidden` on `#root` preserved)
-- Desktop: left sidebar slot reserved for Slice 2 illustrated map nav
+- **Illustrated castle map** in 256px left sidebar (desktop): fantasy RPG hand-drawn SVG plan with 4 interactive zones (Main Hall, Courtyard, Reception, Garden), decorative elements per zone, gold doorway connectors, Cinzel labels, and gold glow on the active zone
+- **Scroll sync**: `IntersectionObserver` tracks which section occupies most of the viewport and highlights the corresponding map zone in real time
+- **Zone click** smooth-scrolls to that section; **POI dot click** scrolls to the exact card and fires a gold ring pulse animation
+- **Mobile map overlay**: floating "Map" button (bottom-right) opens the full map as a full-screen backdrop-blur overlay; tapping a zone navigates and closes the overlay
+- POI world coordinates (`svgX = -poi.position.x`, `svgY = poi.position.z`) used to position map dots, matching the Minimap.tsx convention
 
 ### 3D Experience (v1.0)
 - Babylon.js 3D hall with procedural geometry
@@ -243,14 +247,15 @@ portfolio-hall/
 │   ├── components/
 │   │   ├── FallbackMode/         # 2D scroll-based portfolio (v1.6.0+)
 │   │   │   ├── index.ts
-│   │   │   ├── FallbackMode.tsx  # Root layout + data orchestration
+│   │   │   ├── FallbackMode.tsx  # Root layout + data orchestration + map wiring
+│   │   │   ├── CastleMap.tsx     # Illustrated SVG castle map navigation
 │   │   │   ├── HeroSection.tsx
 │   │   │   ├── ProjectsGrid.tsx
 │   │   │   ├── ExperienceTimeline.tsx
 │   │   │   ├── SkillsSection.tsx
 │   │   │   └── ContactSection.tsx
 │   │   ├── MobileControls.tsx    # Game Boy-style portrait + landscape controls
-│   │   ├── FloorPlan.tsx         # 2D SVG floor plan (reserved for Slice 2 map nav)
+│   │   ├── FloorPlan.tsx         # 2D SVG floor plan (legacy, superseded by CastleMap)
 │   │   ├── Minimap.tsx           # SVG minimap overlay (3D mode)
 │   │   ├── ThreeDSidebar.tsx     # Collapsible POI sidebar (3D mode)
 │   │   ├── FadeOverlay.tsx       # Fade transition for teleport
@@ -259,7 +264,8 @@ portfolio-hall/
 │   │
 │   ├── hooks/
 │   │   ├── useDeviceCapability.ts
-│   │   ├── useFadeIn.ts          # IntersectionObserver scroll-reveal hook
+│   │   ├── useFadeIn.ts          # IntersectionObserver scroll-reveal hook (one-shot)
+│   │   ├── useActiveSection.ts   # IntersectionObserver scroll-sync → active zone
 │   │   └── usePOIs.ts
 │   │
 │   ├── types/
@@ -474,7 +480,7 @@ const shouldDefaultToFallback = (): boolean => {
 ## 🚀 Development Roadmap
 
 <details>
-<summary>✅ Completed Versions (v0.1.0 – v1.6.0-slice1)</summary>
+<summary>✅ Completed Versions (v0.1.0 – v1.6.0-slice2)</summary>
 
 #### v0.1.0 — Scaffold
 Vite + React + TypeScript project setup, Tailwind CSS, Babylon.js deps, GitHub Pages CI/CD.
@@ -512,14 +518,12 @@ Player-centered minimap that auto-zooms to the 3 nearest POIs (8×8 min / 30×30
 #### v1.6.0-slice1 — 2D Mode Layout Foundation
 Rebuilt 2D fallback mode from scratch as a proper scroll-based portfolio page. New `src/components/FallbackMode/` directory with dedicated section components. Hero section with CSS-only particle animation. Featured + compact project cards. Vertical experience timeline with teak & gold styling. Categorised skill tag groups. Hackathon cards. Contact link cards. Intersection Observer fade-in reveals. Gold/teak custom scrollbar. Desktop left sidebar placeholder reserved for Slice 2 illustrated map nav. Self-scrolling container preserves 3D `overflow: hidden` on `#root`.
 
+#### v1.6.0-slice2 — Illustrated Castle Map Navigation
+Illustrated SVG castle map in the 256px left sidebar. Hand-drawn fantasy RPG aesthetic: four interactive zone rooms (Main Hall, Courtyard, Reception, Garden) with per-zone decorative elements (pillar pairs and painting outlines, octagonal fountain, entrance arch, plant markers), gold doorway connectors, Cinzel labels, and an SVG glow filter on the active zone. `useActiveSection` hook using `IntersectionObserver` with 11-step thresholds and "most-visible section wins" strategy syncs scroll position to the active map zone. Zone click smooth-scrolls to the section; POI dot click scrolls to the specific card and applies a gold ring pulse animation. Mobile: floating "Map" button opens a full-screen backdrop-blur overlay. POI world coordinates directly position the map dots (`svgX = -poi.position.x`, `svgY = poi.position.z`) matching the Minimap.tsx coordinate convention.
+
 </details>
 
 ### 🔧 Upcoming
-
-#### v1.6.0-slice2 — Illustrated Map Navigation
-- [ ] Illustrated map (SVG or canvas) in left sidebar replacing the empty placeholder
-- [ ] Click zone/section on map to scroll to that section
-- [ ] Active section highlight as user scrolls
 
 #### v1.6.0-slice3 — Rich Project Story Cards
 - [ ] Expanded project cards with full content, gallery, and inspect modal redesign

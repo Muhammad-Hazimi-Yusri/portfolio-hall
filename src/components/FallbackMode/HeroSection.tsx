@@ -20,7 +20,7 @@ const PARTICLES = [
 
 export function HeroSection({ aboutPOI, onSwitchMode }: Props) {
   return (
-    <section className="min-h-screen flex flex-col items-center justify-center relative px-6 py-20 overflow-hidden">
+    <section id="section-hero" data-section-id="hero" className="min-h-screen flex flex-col items-center justify-center relative px-6 py-20 overflow-hidden">
       {/* CSS-only particle background */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
         {PARTICLES.map((p, i) => (

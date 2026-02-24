@@ -9,6 +9,7 @@ type Props = {
 function FeaturedCard({ poi, delay }: { poi: POI; delay: number }) {
   return (
     <div
+      id={`poi-${poi.id}`}
       className="fade-in-section bg-hall-surface rounded-lg gold-trim overflow-hidden"
       style={{ transitionDelay: `${delay}ms` }}
     >
@@ -53,6 +54,7 @@ function CompactCard({ poi, delay }: { poi: POI; delay: number }) {
   const typeLabel = poi.type === 'painting' ? 'Project' : poi.type === 'display-case' ? 'Display' : 'Pedestal'
   return (
     <div
+      id={`poi-${poi.id}`}
       className="fade-in-section bg-hall-surface rounded-lg p-3 border border-hall-frame hover:border-hall-accent/50 transition-colors"
       style={{ transitionDelay: `${delay}ms` }}
     >
@@ -72,7 +74,7 @@ export function ProjectsGrid({ featured, remaining }: Props) {
   const remainingRef = useFadeIn()
 
   return (
-    <section className="px-6 py-16 md:px-12">
+    <section id="section-projects" data-section-id="projects" className="px-6 py-16 md:px-12">
       <h2 className="text-2xl md:text-3xl text-hall-accent mb-2">Projects</h2>
       <div className="w-12 h-px bg-hall-accent/40 mb-10" />
 
