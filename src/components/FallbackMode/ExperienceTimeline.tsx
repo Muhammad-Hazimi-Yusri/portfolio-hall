@@ -62,6 +62,9 @@ export function ExperienceTimeline({ pois }: Props) {
                   <p className="text-hall-muted text-sm leading-relaxed mb-3">
                     {poi.content.description}
                   </p>
+                  {poi.content.storyHook && (
+                    <p className="text-hall-accent/70 text-xs italic mb-3">{poi.content.storyHook}</p>
+                  )}
                   {poi.content.tags && poi.content.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1">
                       {poi.content.tags.map((tag) => (

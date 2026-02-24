@@ -76,6 +76,10 @@
         "title": "EEE Roadmap",
         "thumbnail": "/thumbnails/placeholder.png",
         "description": "Open-source learning platform for EEE students with progress tracking across 50+ topics. Built with Astro and interactive graph visualisation (Cytoscape.js) showing topic connections. Features cross-device sync with Google OAuth via Supabase, 43+ unit tests and E2E tests.",
+        "storyHook": "When the degree map lives in a lecturer's head, someone has to build it.",
+        "challenge": "EEE students at Southampton had no clear visual map of how 50+ topics connected across years. Module guides were scattered PDFs. I built the tool I wished I'd had in year one.",
+        "approach": "Interactive graph with Cytoscape.js showing topic dependencies, progress tracking with cross-device sync via Supabase + Google OAuth, shipped as a fast static site with Astro. 43+ unit and E2E tests.",
+        "outcome": "Adopted by coursemates. Open-sourced on GitHub. The project sharpened my instinct for product decisions — knowing when a feature is genuinely useful vs. just technically interesting.",
         "tags": ["Astro", "TypeScript", "TailwindCSS", "Supabase", "Cytoscape.js", "Vitest"],
         "links": [
           { "label": "GitHub", "url": "https://github.com/Muhammad-Hazimi-Yusri/eee-roadmap" },
@@ -94,6 +98,10 @@
         "title": "Food Wars (食戟)",
         "thumbnail": "/thumbnails/placeholder.png",
         "description": "Cloud-first kitchen inventory app — modern alternative to Grocy. Designed Grocy-compatible PostgreSQL schema (40+ fields) with Supabase RLS. Features dual auth, drag-and-drop tables, product image uploads, and a Japanese diner aesthetic.",
+        "storyHook": "Because spreadsheets shouldn't be the future of kitchen management.",
+        "challenge": "Existing kitchen inventory tools are either desktop-only, ugly, or overkill for a shared household. I wanted something that felt like a real product — fast, mobile-friendly, and actually pleasant to use.",
+        "approach": "Grocy-compatible PostgreSQL schema with Supabase RLS, drag-and-drop tables, product image uploads, and dual auth. A Japanese diner aesthetic makes the mundane task of tracking groceries feel like a game.",
+        "outcome": "A fully functional inventory app live in production. The project pushed my Next.js 14 and Tailwind CSS 4 knowledge to production quality.",
         "tags": ["Next.js 14", "TypeScript", "Tailwind CSS 4", "Supabase", "shadcn/ui", "Vercel"],
         "links": [
           { "label": "GitHub", "url": "https://github.com/Muhammad-Hazimi-Yusri/food-wars" },
@@ -112,6 +120,10 @@
         "title": "Portfolio Hall (This!)",
         "thumbnail": "/thumbnails/placeholder.png",
         "description": "Immersive 3D portfolio website — the very castle you're exploring right now! Built interactive 3D museum with Babylon.js, procedural hall generation, collision detection, and three cross-platform control schemes. Features gyroscope camera, minimap, cinematic fly-to, and 2D fallback.",
+        "storyHook": "What if your portfolio was a castle you could walk through?",
+        "challenge": "Most portfolios are read — scanned for keywords in 30 seconds. I wanted mine to be experienced: a place where the work itself becomes the environment.",
+        "approach": "Built a 3D castle in the browser with Babylon.js — procedural hall generation, spatial audio cues, collision detection, and three control schemes for desktop, mobile, and VR. The 2D fallback (you're in it now) mirrors the castle map.",
+        "outcome": "A portfolio that recruiters remember by name. Every technical decision — gyroscope camera, minimap, WebXR — became a story in its own right.",
         "tags": ["React", "Babylon.js", "TypeScript", "Vite", "Tailwind CSS"],
         "links": [
           { "label": "GitHub", "url": "https://github.com/Muhammad-Hazimi-Yusri/portfolio-hall" },
@@ -161,6 +173,10 @@
         "title": "PetBot",
         "thumbnail": "/thumbnails/placeholder.png",
         "description": "Social companion robot with local LLM for privacy-focused users. Integrated Ollama LLM on Raspberry Pi 5, developed Flask server with Socket.IO for real-time communication. Created 3D chassis design and programmed servo/DC motor control. Integrated TTS (Piper) and STT (Vosk).",
+        "storyHook": "A robot that knows your name and doesn't phone home to a server farm.",
+        "challenge": "Smart home devices are either cloud-dependent or expensive. I wanted a companion robot with a real LLM on-device — no internet required, no data leaving the house.",
+        "approach": "Integrated Ollama on a Raspberry Pi 5 for local inference, built a Flask + Socket.IO server for real-time control, designed and 3D-printed the chassis, added TTS (Piper) and STT (Vosk) for voice interaction.",
+        "outcome": "PetBot responds to voice, holds conversation, and moves around — entirely offline. A proof that consumer hardware is now powerful enough for meaningful AI at the edge.",
         "tags": ["Raspberry Pi 5", "Python", "Flask", "Ollama", "Socket.IO", "3D Printing"],
         "links": [
           { "label": "Demo", "url": "https://youtu.be/3umn0yt_FcE" }
@@ -178,6 +194,10 @@
         "title": "AVVR — VR Audio-Visual",
         "thumbnail": "/thumbnails/placeholder.png",
         "description": "VR app reconstructing real scenes with accurate spatial audio. Led technical development across Unity VR, ML pipeline, and evaluation workstreams. Developed real-time spatial audio VR app with Steam Audio, redesigned ML pipeline GUI using PyQt6. Team of 6, scored 84%.",
+        "storyHook": "What would it feel like to stand inside a room you've never set foot in?",
+        "challenge": "Spatial audio in VR is notoriously hard to get right — most implementations feel pasted on. Our final-year project aimed to reconstruct real-world scenes with accurate acoustic behaviour.",
+        "approach": "Led a team of 6 across Unity VR, ML pipeline, and acoustic evaluation. Integrated Steam Audio for physics-based reverb, redesigned the ML pipeline GUI with PyQt6, and developed a custom room impulse response recording system.",
+        "outcome": "Scored 84%. Presented to industry judges. The project demonstrated that photorealistic 3D reconstruction and spatial audio can be achieved together on consumer hardware.",
         "tags": ["Unity", "C#", "Steam Audio", "PyQt6", "Python"],
         "links": [
           { "label": "Itch.io", "url": "https://chronohaxx.itch.io/avvr" },
@@ -196,6 +216,10 @@
         "title": "DIY Stereo Camera",
         "thumbnail": "/thumbnails/placeholder.png",
         "description": "Low-cost stereoscopic camera for 3D video capture with VR viewer. Designed hardware with Raspberry Pi 5 and dual cameras, developed stereo processing pipeline, and created VR 6DOF viewing app in Godot 4.",
+        "storyHook": "Building eyes that see in 3D for under £100.",
+        "challenge": "Commercial 3D cameras cost thousands. I wanted to capture stereoscopic video and view it in VR — without spending a month's rent.",
+        "approach": "Designed a Raspberry Pi 5 rig with dual CSI cameras, built a stereo processing pipeline with OpenCV for depth estimation and 3D-180° video, then created a VR viewing app in Godot 4 with 6DOF playback.",
+        "outcome": "Functional stereoscopic capture and VR viewing on a tight budget. Submitted as my final-year individual project — open-source and documented for others to replicate.",
         "tags": ["Raspberry Pi 5", "Godot 4", "GDScript", "OpenCV", "3D Printing"],
         "links": [
           { "label": "GitHub", "url": "https://github.com/Muhammad-Hazimi-Yusri/COMP3200" },
@@ -257,6 +281,7 @@
         "title": "Kibo Robot Challenge",
         "thumbnail": "/thumbnails/placeholder.png",
         "description": "7th place International Final (represented Malaysia). 1st place Malaysia 2023 (OpenCV ArUco detection). 2nd place Malaysia 2022 (RM1000 prize). Developed 3D pathfinding for ISS simulation using quadtrees.",
+        "storyHook": "🏆 7th place internationally — representing Malaysia at the NASA Kibo Robot Challenge",
         "tags": ["Java", "Android", "OpenCV", "ArUco", "Pathfinding"]
       }
     },
@@ -285,6 +310,7 @@
         "title": "Global Game Jam 2025",
         "thumbnail": "/thumbnails/placeholder.png",
         "description": "48-hour game development hackathon at Southampton. Developed an asymmetrical VR puzzle game with Unity in a team of 3 — VR player in a submarine, PC player helping navigate.",
+        "storyHook": "🎮 An asymmetric VR puzzle game built in 48 hours at Global Game Jam 2025",
         "tags": ["Unity", "VR", "C#", "Game Dev"],
         "links": [
           { "label": "GitHub", "url": "https://github.com/Muhammad-Hazimi-Yusri/GGJ25" },

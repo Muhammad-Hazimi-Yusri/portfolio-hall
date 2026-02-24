@@ -5,7 +5,7 @@
 > A grand royal hall or throne room; the ceremonial heart of a palace where audiences are received and important gatherings held.
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
-[![Version](https://img.shields.io/badge/version-1.6.0--slice2-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-1.6.0--slice3-blue.svg)]()
 [![Status](https://img.shields.io/badge/status-In_Progress-yellow.svg)]()
 
 <details>
@@ -77,11 +77,15 @@ Balairung uses a **Javanese/Malay royal hall** aesthetic inspired by traditional
 ### 2D Portfolio Mode (v1.6.0)
 - Scroll-based portfolio layout replacing the old SVG floor plan placeholder
 - Hero section: full-viewport with Cinzel gold title, tagline, CSS-only floating gold particle animation, "Explore in 3D" CTA, scroll indicator
-- Featured projects: full-width cards with description, tech tags, and live links
-- All projects: compact 2-col mobile / 3-col desktop grid
+- **Story-driven project cards** (`StoryCard`): each card answers "why does this project exist?" rather than listing bullet points
+  - Collapsed state: Cinzel gold title, 1-line story hook (or first 80 chars of description as fallback), up to 3 primary tech tags, type icon badge (🖼 painting / 🔮 display-case / 🏛 pedestal)
+  - Expanded panel (click to toggle, one open at a time): 3-part narrative — *The Challenge*, *The Approach*, *The Outcome* — when story fields are populated; falls back to full description otherwise
+  - Native `<details>/<summary>` Technical Details section: full tech stack tags + links
+  - Accessible: `role="button"`, `aria-expanded`, keyboard (`Enter`/`Space`) toggle
+  - Top 6 projects have full story content; all remaining POIs have graceful fallback
 - Experience timeline: vertical teak & gold timeline with role, org, dates, and tech tags
 - Skills: categorised tag groups (Languages, Frameworks, DevOps, Hardware) with highlight cross-reference
-- Hackathons: compact cards with descriptions, tags, and links
+- Hackathons: compact cards with story hook achievement line (e.g. "🏆 7th place internationally…") shown in gold above description
 - Contact: link cards for GitHub, LinkedIn, Email, GitLab, Website with gold accent styling
 - Footer with secondary "Switch to 3D Experience" CTA
 - Intersection Observer fade-in reveals per section; CSS-only particle animation in hero
@@ -250,6 +254,7 @@ portfolio-hall/
 │   │   │   ├── FallbackMode.tsx  # Root layout + data orchestration + map wiring
 │   │   │   ├── CastleMap.tsx     # Illustrated SVG castle map navigation
 │   │   │   ├── HeroSection.tsx
+│   │   │   ├── ProjectCard.tsx   # StoryCard — expandable story-driven project card
 │   │   │   ├── ProjectsGrid.tsx
 │   │   │   ├── ExperienceTimeline.tsx
 │   │   │   ├── SkillsSection.tsx
@@ -331,6 +336,10 @@ type POI = {
     title: string
     thumbnail: string       // path to image
     description: string
+    storyHook?: string      // 1-line hook shown in collapsed card state
+    challenge?: string      // "The Challenge" paragraph (expanded view)
+    approach?: string       // "The Approach" paragraph (expanded view)
+    outcome?: string        // "The Outcome" paragraph (expanded view)
     links?: Array<{
       label: string
       url: string
@@ -480,7 +489,7 @@ const shouldDefaultToFallback = (): boolean => {
 ## 🚀 Development Roadmap
 
 <details>
-<summary>✅ Completed Versions (v0.1.0 – v1.6.0-slice2)</summary>
+<summary>✅ Completed Versions (v0.1.0 – v1.6.0-slice3)</summary>
 
 #### v0.1.0 — Scaffold
 Vite + React + TypeScript project setup, Tailwind CSS, Babylon.js deps, GitHub Pages CI/CD.
@@ -521,13 +530,18 @@ Rebuilt 2D fallback mode from scratch as a proper scroll-based portfolio page. N
 #### v1.6.0-slice2 — Illustrated Castle Map Navigation
 Illustrated SVG castle map in the 256px left sidebar. Hand-drawn fantasy RPG aesthetic: four interactive zone rooms (Main Hall, Courtyard, Reception, Garden) with per-zone decorative elements (pillar pairs and painting outlines, octagonal fountain, entrance arch, plant markers), gold doorway connectors, Cinzel labels, and an SVG glow filter on the active zone. `useActiveSection` hook using `IntersectionObserver` with 11-step thresholds and "most-visible section wins" strategy syncs scroll position to the active map zone. Zone click smooth-scrolls to the section; POI dot click scrolls to the specific card and applies a gold ring pulse animation. Mobile: floating "Map" button opens a full-screen backdrop-blur overlay. POI world coordinates directly position the map dots (`svgX = -poi.position.x`, `svgY = poi.position.z`) matching the Minimap.tsx coordinate convention.
 
+#### v1.6.0-slice3 — Rich Project Story Cards
+Story-driven project cards replacing generic description + tag listings. New `StoryCard` component (`ProjectCard.tsx`) with two states: collapsed (Cinzel gold title, 1-line story hook, up to 3 primary tech tags, type icon badge) and expanded (3-part narrative: The Challenge / The Approach / The Outcome, with native `<details>` Technical Details section for full tags and links). One card open at a time (`expandedId` state in `ProjectsGrid`). Accessible with `role="button"`, `aria-expanded`, and keyboard support. Four optional fields added to `POIContent`: `storyHook`, `challenge`, `approach`, `outcome`. Full story content for 6 projects (portfolio-hall, avvr, diy-stereo-camera, eee-roadmap, food-wars, petbot). Graceful fallback: POIs without `storyHook` show first 80 chars of description; POIs without challenge/approach/outcome show full description in expanded view. Hackathon cards gain gold achievement lines via `storyHook` (kibo-rpc, game-jam). Experience timeline forward-compatible with `storyHook` display.
+
 </details>
 
 ### 🔧 Upcoming
 
-#### v1.6.0-slice3 — Rich Project Story Cards
-- [ ] Expanded project cards with full content, gallery, and inspect modal redesign
-- [ ] Per-project story layout
+#### v1.6.0-slice3 — Rich Project Story Cards ✅
+- [x] `StoryCard` component: collapsed hook + expandable 3-part narrative (Challenge / Approach / Outcome)
+- [x] `storyHook`, `challenge`, `approach`, `outcome` optional fields on `POIContent`
+- [x] Story content for top 6 projects; graceful fallback for all others
+- [x] Hackathon achievement lines; experience timeline forward-compatible hook
 
 #### v1.7.0 — Blender Asset Pipeline
 - [ ] .glb import pipeline with material mapping and shadow support

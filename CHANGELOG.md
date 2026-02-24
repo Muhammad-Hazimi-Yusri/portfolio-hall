@@ -19,6 +19,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.6.0-slice3] - 2026-02-24
+
+### Added
+- `StoryCard` component (`src/components/FallbackMode/ProjectCard.tsx`): replaces generic `FeaturedCard` and `CompactCard` with story-driven expandable cards
+  - Collapsed state: title (Cinzel, gold), story hook (1-line hook or first 80 chars of description as fallback), up to 3 primary tech tags, type icon badge (🖼 painting / 🔮 display-case / 🏛 pedestal)
+  - Expanded panel (click to toggle, one card open at a time): 3-part narrative (The Challenge / The Approach / The Outcome) when story fields are populated; falls back to full description otherwise
+  - Native `<details>/<summary>` for collapsible Technical Details section (full tags + links)
+  - Accessible: `role="button"`, `aria-expanded`, keyboard (`Enter`/`Space`) toggle
+  - Graceful fallback: POIs without `storyHook` show first 80 chars of `description`; POIs without `challenge`/`approach`/`outcome` show `description` in expanded view without 3-part structure
+- 4 optional story fields added to `POIContent` type (`src/types/poi.ts`): `storyHook`, `challenge`, `approach`, `outcome`
+- Story content populated in `src/data/pois.json` for top 6 projects: `portfolio-hall`, `avvr`, `diy-stereo-camera`, `eee-roadmap`, `food-wars`, `petbot`
+- `storyHook` (achievement line) added to hackathon POIs: `kibo-rpc` ("🏆 7th place internationally…"), `game-jam` ("🎮 An asymmetric VR puzzle game…")
+
+### Changed
+- `ProjectsGrid`: `FeaturedCard` and `CompactCard` replaced by `StoryCard` with `variant="featured"|"compact"`; `expandedId` state ensures only one card is expanded at a time
+- `ExperienceTimeline`: shows `poi.content.storyHook` (italic gold) below description if present — forward-compatible for future experience story content
+- `SkillsSection`: hackathon cards show `poi.content.storyHook` as a prominent gold achievement line between title and description
+
+---
+
 ## [1.6.0-slice2] - 2026-02-24
 
 ### Added
