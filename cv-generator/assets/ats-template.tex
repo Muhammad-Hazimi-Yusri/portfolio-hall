@@ -1,0 +1,107 @@
+% ATS-Friendly CV Template
+% Clean, minimal styling optimised for Applicant Tracking Systems
+% Best for: Large tech companies, startups, modern companies
+
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[top=0.7in, bottom=0.7in, left=0.6in, right=0.6in]{geometry}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{fontawesome5}
+\usepackage{xcolor}
+
+% Remove page numbers
+\pagenumbering{gobble}
+
+% Define colors
+\definecolor{linkblue}{HTML}{0066CC}
+
+% Hyperlink setup
+\hypersetup{
+    colorlinks=true,
+    linkcolor=linkblue,
+    urlcolor=linkblue,
+    pdfborder={0 0 0}
+}
+
+% Section formatting
+\titleformat{\section}{\large\bfseries}{}{0em}{}[\titlerule]
+\titlespacing*{\section}{0pt}{6pt}{4pt}
+
+% Remove paragraph indentation
+\setlength{\parindent}{0pt}
+
+% Custom bullet list
+\setlist[itemize]{leftmargin=1.5em, itemsep=1pt, parsep=0pt, topsep=2pt, label=\small$\circ$}
+
+\begin{document}
+
+% ============================================
+% HEADER - Update with your details
+% ============================================
+\begin{center}
+    {\LARGE\bfseries Muhammad Hazimi Yusri}\\[4pt]
+    \faPhone\ +44 (0) 7825 393685 \quad
+    \faEnvelope\ \href{mailto:muhammadhazimiyusri@gmail.com}{muhammadhazimiyusri@gmail.com}\\[2pt]
+    \faGlobe\ \href{https://muhammadhazimiyusri.uk}{muhammadhazimiyusri.uk} \quad
+    \faLinkedin\ \href{https://linkedin.com/in/muhammadhazimiyusri}{muhammadhazimiyusri} \quad
+    \faGithub\ \href{https://github.com/Muhammad-Hazimi-Yusri}{Muhammad-Hazimi-Yusri}
+\end{center}
+
+% ============================================
+% EDUCATION
+% ============================================
+\section{Education}
+\textbf{University of Southampton} \hfill \textbf{First Class Honours}\\
+MEng Electrical and Electronic Engineering \hfill 2021--2025\\
+Relevant modules: [SELECT RELEVANT MODULES - NO GRADES]
+
+% ============================================
+% EXPERIENCE
+% ============================================
+\section{Experience}
+\textbf{Company Name} \hfill Location\\
+\textit{Job Title} \hfill Date Range
+\begin{itemize}
+    \item Bullet starting with action verb
+    \item Use specific numbers where possible
+\end{itemize}
+
+% ============================================
+% PROJECTS
+% Order: Ongoing projects first, then reverse chronological
+% First bullet must explain WHAT it is and WHY
+% ============================================
+\section{Projects}
+\textbf{Project Name} \hfill Date Range
+\begin{itemize}
+    \item [FIRST: What is it and why does it matter]
+    \item [THEN: Technical implementation details]
+    \item [THEN: Results/outcomes if applicable]
+\end{itemize}
+
+% For team projects, include in first bullet:
+% - Team size
+% - Your role
+% - Your specific contribution
+
+% ============================================
+% HACKATHONS & AWARDS
+% Check master-cv.md for ALL relevant entries
+% ============================================
+\section{Hackathons \& Awards}
+\textbf{Year}: Event Name -- Achievement/Description\\
+\textbf{Year}: Event Name -- Achievement/Description
+
+% ============================================
+% TECHNICAL SKILLS - ALWAYS LAST SECTION
+% ============================================
+\section{Technical Skills}
+\textbf{Languages}: List here\\
+\textbf{DevOps}: List here\\
+\textbf{Frameworks}: List here\\
+\textbf{Testing}: List here\\
+\textbf{Protocols}: List here
+
+\end{document}

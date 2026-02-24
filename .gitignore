@@ -26,3 +26,10 @@ npm-debug.log*
 
 # Vite
 vite.config.ts.timestamp-*
+
+# Claude Code local config and worktrees
+.claude/
+
+# CV generator — personal data and bundled binary
+cv-generator/references/master-cv.md
+cv-generator.skill
