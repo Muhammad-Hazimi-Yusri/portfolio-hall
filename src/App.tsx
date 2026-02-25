@@ -102,7 +102,7 @@ function WelcomeScreen({ onSelectMode, canUse3D, warnings, isChecking }: Welcome
       </div>
 
       <p className="text-hall-muted text-sm mt-8">
-        v1.5.1 — Minimap Dynamic Zoom
+        v1.6.0 — Spatial Portfolio
       </p>
     </div>
   )
