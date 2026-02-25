@@ -40,7 +40,7 @@ export function FallbackMode({ onSwitchMode }: Props) {
   const poiMarkers = useMemo<POIMarker[]>(() =>
     pois.map((p) => ({
       id: p.id,
-      svgX: -p.position.x,
+      svgX: p.position.x,
       svgY: p.position.z,
       label: p.content.title,
       zone: p.zone as Zone,
