@@ -5,7 +5,7 @@
 > A grand royal hall or throne room; the ceremonial heart of a palace where audiences are received and important gatherings held.
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
-[![Version](https://img.shields.io/badge/version-1.6.0--slice4-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-1.6.0-blue.svg)]()
 [![Status](https://img.shields.io/badge/status-In_Progress-yellow.svg)]()
 
 <details>
@@ -95,7 +95,7 @@ Balairung uses a **Javanese/Malay royal hall** aesthetic inspired by traditional
 - **Zone click** smooth-scrolls to that section; **POI dot click** scrolls to the exact card and fires a gold ring pulse animation
 - **Mobile map overlay**: floating "Map" button (bottom-right) opens the full map as a full-screen backdrop-blur overlay; tapping a zone navigates and closes the overlay
 - POI world coordinates (`svgX = -poi.position.x`, `svgY = poi.position.z`) used to position map dots, matching the Minimap.tsx convention
-- **Polish pass** (v1.6.0-slice4): smooth micro-interactions and visual refinement throughout
+- **Polish pass**: smooth micro-interactions and visual refinement throughout
   - Card expand: CSS `grid-rows-[0fr→1fr]` animated collapse (300ms ease-out); expand panel stays in DOM for accessibility/screen readers
   - Card hover lift (desktop only, `@media (hover: hover)`): `translateY(-2px)` + faint gold drop shadow — suppressed on touch devices to prevent sticky-hover
   - Timeline dots: scale-in with overshoot (`0 → 1.4 → 1`) triggered by parent scroll-reveal, staggered per entry
@@ -499,7 +499,7 @@ const shouldDefaultToFallback = (): boolean => {
 ## 🚀 Development Roadmap
 
 <details>
-<summary>✅ Completed Versions (v0.1.0 – v1.6.0-slice3)</summary>
+<summary>✅ Completed Versions (v0.1.0 – v1.6.0)</summary>
 
 #### v0.1.0 — Scaffold
 Vite + React + TypeScript project setup, Tailwind CSS, Babylon.js deps, GitHub Pages CI/CD.
@@ -526,7 +526,7 @@ Javanese/Malay royal hall "Teak & Gold" theme: color palette, Cinzel typography,
 Enhanced 3D hall with ceiling, doorway, baseboards, gold crown molding, corner pillars, procedural wood grain floor. Gold painting frames with thumbnail textures, glass display cases, 3-tier pedestals. Gallery lighting with directional shadows, per-painting spotlights, gold accent lights. Loading screen with progress bar.
 
 #### v1.4.0 — Multi-Zone Castle & Content Population
-Multi-zone castle layout (Reception, Courtyard, Main Hall, Garden). 20 real POIs from CV data. Procedural skybox, sun lighting, gold doorway frames, glass-walled garden. Zone-based sidebar, expanded minimap/floorplan. SEO meta tags. Unique placeholder thumbnails. Hotfixed lighting, painting placement, and minimap bounds.
+Multi-zone castle layout (Reception, Courtyard, Main Hall, Garden). 19 real POIs from CV data. Procedural skybox, sun lighting, gold doorway frames, glass-walled garden. Zone-based sidebar, expanded minimap/floorplan. SEO meta tags. Unique placeholder thumbnails. Hotfixed lighting, painting placement, and minimap bounds.
 
 #### v1.5.0 — WebXR / VR
 Full WebXR immersive-VR support via Babylon.js `WebXRDefaultExperience`. "Enter VR"/"Exit VR" button (teak & gold) hidden on non-XR devices. Features: session entry with `local-floor` reference space; controller locomotion (left-stick walk, right-stick parabolic teleport, 45° snap turn + vignette); hand tracking (pinch select + gaze-disc teleport, graceful controller ↔ hand switch); VR POI hover highlight (HighlightLayer gold glow, billboard label, 10 m cap) + floating teak-and-gold inspect panel with link-queueing; performance/comfort pass (shadow blur halved, spotlights disabled in VR, locomotion vignette, FPS counter HUD, seated mode, painting canvas lowered to 1.65 m).
@@ -534,30 +534,12 @@ Full WebXR immersive-VR support via Babylon.js `WebXRDefaultExperience`. "Enter 
 #### v1.5.1 — Minimap Dynamic Zoom
 Player-centered minimap that auto-zooms to the 3 nearest POIs (8×8 min / 30×30 max viewBox). Smooth 60fps lerp transitions. Full map toggle (`⊞`/`⊡`) inside the minimap corner — full view shows a dashed gold viewport indicator. Current zone label (Main Hall, Courtyard, Reception, Garden) in minimap corner. POI dots filtered to viewBox bounds in dynamic mode. Direction arrow scales with zoom level.
 
-#### v1.6.0-slice1 — 2D Mode Layout Foundation
-Rebuilt 2D fallback mode from scratch as a proper scroll-based portfolio page. New `src/components/FallbackMode/` directory with dedicated section components. Hero section with CSS-only particle animation. Featured + compact project cards. Vertical experience timeline with teak & gold styling. Categorised skill tag groups. Hackathon cards. Contact link cards. Intersection Observer fade-in reveals. Gold/teak custom scrollbar. Desktop left sidebar placeholder reserved for Slice 2 illustrated map nav. Self-scrolling container preserves 3D `overflow: hidden` on `#root`.
-
-#### v1.6.0-slice2 — Illustrated Castle Map Navigation
-Illustrated SVG castle map in the 256px left sidebar. Hand-drawn fantasy RPG aesthetic: four interactive zone rooms (Main Hall, Courtyard, Reception, Garden) with per-zone decorative elements (pillar pairs and painting outlines, octagonal fountain, entrance arch, plant markers), gold doorway connectors, Cinzel labels, and an SVG glow filter on the active zone. `useActiveSection` hook using `IntersectionObserver` with 11-step thresholds and "most-visible section wins" strategy syncs scroll position to the active map zone. Zone click smooth-scrolls to the section; POI dot click scrolls to the specific card and applies a gold ring pulse animation. Mobile: floating "Map" button opens a full-screen backdrop-blur overlay. POI world coordinates directly position the map dots (`svgX = -poi.position.x`, `svgY = poi.position.z`) matching the Minimap.tsx coordinate convention.
-
-#### v1.6.0-slice3 — Rich Project Story Cards
-Story-driven project cards replacing generic description + tag listings. New `StoryCard` component (`ProjectCard.tsx`) with two states: collapsed (Cinzel gold title, 1-line story hook, up to 3 primary tech tags, type icon badge) and expanded (3-part narrative: The Challenge / The Approach / The Outcome, with native `<details>` Technical Details section for full tags and links). One card open at a time (`expandedId` state in `ProjectsGrid`). Accessible with `role="button"`, `aria-expanded`, and keyboard support. Four optional fields added to `POIContent`: `storyHook`, `challenge`, `approach`, `outcome`. Full story content for 6 projects (portfolio-hall, avvr, diy-stereo-camera, eee-roadmap, food-wars, petbot). Graceful fallback: POIs without `storyHook` show first 80 chars of description; POIs without challenge/approach/outcome show full description in expanded view. Hackathon cards gain gold achievement lines via `storyHook` (kibo-rpc, game-jam). Experience timeline forward-compatible with `storyHook` display.
-
-#### v1.6.0-slice4 — 2D Mode Polish Pass
-Visual quality, animation, and typography refinement pass for the full 2D fallback mode. New CSS utilities: `heroBgDrift` keyframe (25s CSS-only background pan on hero `wood-texture` layer), `timelineDotReveal` keyframe (scale-in with 1.4× overshoot, chained off `.fade-in-section.is-visible` parent state), `.card-lift` (`@media (hover: hover)` — `translateY(-2px)` + faint gold shadow, suppressed on touch), `.section-divider` (1px horizontal gold gradient rule), `.story-text` (`line-height: 1.7`). `StoryCard` expand panel migrated from conditional `{isExpanded && <div>}` to CSS `grid-rows-[0fr→1fr]` animated collapse — always in DOM (screen-reader accessible), 300ms ease-out. `overflow-hidden` moved from card root to thumbnail area to unblock outer drop shadow. Section dividers and alternating `bg-hall-surface/20` backgrounds added between all major sections in `FallbackMode`. Castle map zone hover scale via `transform-box: fill-box` — no TSX changes required. Cinzel weight 600 added to Google Fonts load (`wght@400;600;700`) for correct `font-semibold` rendering. Fade-in easing upgraded to `cubic-bezier(0.4, 0, 0.2, 1)`.
+#### v1.6.0 — 2D Mode Revamp (Spatial Portfolio)
+Complete rebuild of the 2D fallback mode as a recruiter-optimized scroll portfolio. Illustrated SVG castle map navigation with scroll sync (IntersectionObserver links scroll position to active map zone). Story-driven project cards with challenge/approach/outcome narrative for 6 top projects, graceful description fallback for others. Hero section with CSS-only floating gold particles and drifting wood-texture background. Vertical experience timeline with teak & gold styling and staggered dot reveal animations. Categorized skill tag groups and hackathon cards with gold achievement lines. Mobile-first responsive design: single-column scroll with floating map button → fullscreen overlay on mobile, sticky illustrated map sidebar + scrollable content on desktop. Card hover lift, CSS grid-rows expand/collapse animation, section dividers, and alternating section backgrounds. Accessible (role=button, aria-expanded, keyboard support). Visual QA pass across mobile/tablet/desktop breakpoints.
 
 </details>
 
 ### 🔧 Upcoming
-
-#### v1.6.0-slice4 — 2D Mode Polish Pass ✅
-- [x] Smooth card expand animation (CSS `grid-rows-[0fr→1fr]`, always-in-DOM, screen-reader safe)
-- [x] Card hover lift (`@media (hover: hover)` only — no sticky hover on touch)
-- [x] Timeline dot scale-in with overshoot, staggered per entry
-- [x] Hero drifting wood-texture background layer (CSS-only, 25s)
-- [x] Castle map zone scale-hover via `transform-box: fill-box`
-- [x] Section dividers + alternating section backgrounds
-- [x] Cinzel weight 600 loaded; fade-in easing upgraded to cubic-bezier
 
 #### v1.7.0 — Blender Asset Pipeline
 - [ ] .glb import pipeline with material mapping and shadow support

@@ -40,7 +40,7 @@ export function FallbackMode({ onSwitchMode }: Props) {
   const poiMarkers = useMemo<POIMarker[]>(() =>
     pois.map((p) => ({
       id: p.id,
-      svgX: -p.position.x,
+      svgX: p.position.x,
       svgY: p.position.z,
       label: p.content.title,
       zone: p.zone as Zone,
@@ -193,7 +193,7 @@ export function FallbackMode({ onSwitchMode }: Props) {
             >
               Switch to 3D Experience
             </button>
-            <p className="text-hall-muted/40 text-xs">v1.6.0-slice4 — 2D Portfolio</p>
+            <p className="text-hall-muted/40 text-xs">v1.6.0 — Spatial Portfolio</p>
           </footer>
         </div>
       </div>

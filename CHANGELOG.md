@@ -10,7 +10,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- v1.6.0: 2D fallback mode revamp (recruiter-optimized spatial portfolio)
 - v1.7.0: Blender .glb asset pipeline (hybrid procedural + modeled architecture)
 - v1.8.0: 3D self-portrait (iPhone LiDAR scan, low-poly mesh + gaussian splat toggle)
 - v1.9.0: Rich project displays (3D slideshows, per-project gaussian splats)
@@ -19,106 +18,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.6.0-slice4] - 2026-02-24
+## [1.6.0] - 2026-02-25
 
 ### Added
-- `@keyframes heroBgDrift` + `.hero-bg-layer`: subtle 25s infinite background pan on hero section wood-texture layer (`background-size: 120%`, alternates `0%/0%` → `8%/4%` position)
-- `@keyframes timelineDotReveal` + `.timeline-dot`: scale-in with overshoot (0→1.4→1), triggered by parent `.fade-in-section.is-visible`; staggered `animationDelay` per dot in `ExperienceTimeline`
-- `.card-lift` (`@media (hover: hover)` only): `translateY(-2px)` + `box-shadow rgba(201,168,76,0.12)` on hover — applied to `StoryCard` and hackathon cards
-- `.section-divider`: 1px gold gradient rule between major sections in `FallbackMode`
-- `.story-text`: `line-height: 1.7` — applied to hackathon card descriptions
-- `.castle-map-zone` extended: `transform-box: fill-box`, `transform-origin: center`, `scale(1.015)` on hover — no TSX changes to `CastleMap.tsx`
-- Drifting `wood-texture` background layer in `HeroSection` (absolutely positioned, `opacity-30`, below particles)
-- Alternating `bg-hall-surface/20` backgrounds on Projects and Skills sections
+- Rebuilt 2D fallback mode as scroll-based spatial portfolio
+- Hero section with animated teak & gold theme
+- Illustrated SVG castle map with zone navigation and scroll sync
+- Story-driven project cards with challenge/approach/outcome narrative
+- Experience vertical timeline with teak & gold styling
+- Skills categorized tag groups and hackathon cards
+- Mobile map overlay (floating button → fullscreen)
+- Scroll reveal animations (fade-in, slide-up)
+- Card hover/expand micro-interactions
+- Desktop sticky map panel with active zone highlighting
+- Click POI dot on map scrolls to and highlights specific card
+- POI type: added storyHook, challenge, approach, outcome optional fields
 
 ### Changed
-- `StoryCard`: `overflow-hidden` moved from card root to thumbnail div to fix `box-shadow` clipping; `card-lift` added
-- `StoryCard` expand panel: conditional `{isExpanded && <div>}` replaced with CSS `grid-rows-[0fr→1fr]` animated collapse (300ms ease-out, always in DOM)
-- `ExperienceTimeline` dots: `.timeline-dot` class + `animationDelay` inline style added for staggered reveal
-- `SkillsSection` hackathon cards: `card-lift` added; `leading-relaxed` replaced with `story-text`
-- `FallbackMode` footer version: `v1.6.0-slice2` → `v1.6.0-slice4`
-- `.fade-in-section` easing: `ease-out` → `cubic-bezier(0.4, 0, 0.2, 1)` (smoother deceleration)
-- Cinzel font: `wght@400;700` → `wght@400;600;700` in `index.html`
-
----
-
-## [1.6.0-slice3] - 2026-02-24
-
-### Added
-- `StoryCard` component (`src/components/FallbackMode/ProjectCard.tsx`): replaces generic `FeaturedCard` and `CompactCard` with story-driven expandable cards
-  - Collapsed state: title (Cinzel, gold), story hook (1-line hook or first 80 chars of description as fallback), up to 3 primary tech tags, type icon badge (🖼 painting / 🔮 display-case / 🏛 pedestal)
-  - Expanded panel (click to toggle, one card open at a time): 3-part narrative (The Challenge / The Approach / The Outcome) when story fields are populated; falls back to full description otherwise
-  - Native `<details>/<summary>` for collapsible Technical Details section (full tags + links)
-  - Accessible: `role="button"`, `aria-expanded`, keyboard (`Enter`/`Space`) toggle
-  - Graceful fallback: POIs without `storyHook` show first 80 chars of `description`; POIs without `challenge`/`approach`/`outcome` show `description` in expanded view without 3-part structure
-- 4 optional story fields added to `POIContent` type (`src/types/poi.ts`): `storyHook`, `challenge`, `approach`, `outcome`
-- Story content populated in `src/data/pois.json` for top 6 projects: `portfolio-hall`, `avvr`, `diy-stereo-camera`, `eee-roadmap`, `food-wars`, `petbot`
-- `storyHook` (achievement line) added to hackathon POIs: `kibo-rpc` ("🏆 7th place internationally…"), `game-jam` ("🎮 An asymmetric VR puzzle game…")
-
-### Changed
-- `ProjectsGrid`: `FeaturedCard` and `CompactCard` replaced by `StoryCard` with `variant="featured"|"compact"`; `expandedId` state ensures only one card is expanded at a time
-- `ExperienceTimeline`: shows `poi.content.storyHook` (italic gold) below description if present — forward-compatible for future experience story content
-- `SkillsSection`: hackathon cards show `poi.content.storyHook` as a prominent gold achievement line between title and description
-
----
-
-## [1.6.0-slice2] - 2026-02-24
-
-### Added
-- `CastleMap` component (`src/components/FallbackMode/CastleMap.tsx`): inline SVG illustrated castle map styled as a fantasy RPG hand-drawn floor plan with teak & gold aesthetic
-  - Four interactive zone rooms drawn as SVG shapes: Main Hall (top), Courtyard (centre), Reception (bottom), Garden (right)
-  - Decorative elements per zone: pillar pairs and painting outlines (Main Hall), octagonal fountain and corner trees (Courtyard), pillars and entrance arch (Reception), plant markers and trellis lines (Garden)
-  - Gold doorway connectors between adjacent zones
-  - Cinzel-font gold zone labels with opacity-based active/inactive state
-  - SVG glow filter (`feGaussianBlur`) applied to active zone for warm highlight effect
-  - POI dots (gold circles, `r=0.55`) positioned from world coordinates (`svgX = -poi.position.x`, `svgY = poi.position.z`), clickable with `<title>` tooltip
-  - Active zone fill transitions via CSS (`fill 0.3s ease`) — no JS animation needed
-- `useActiveSection` hook (`src/hooks/useActiveSection.ts`): `IntersectionObserver`-based scroll sync
-  - Observes all 5 section elements with `root: scrollContainerRef.current` (correct for `overflow-y-auto` containers)
-  - 11-step threshold array (`[0, 0.1, ..., 1.0]`) for granular ratio tracking
-  - "Most visible section wins" strategy using a ratio Map — prevents flicker at section boundaries
-  - Maps `SectionId` → `Zone` (hero/contact → reception, projects → main-hall, experience → courtyard, skills → garden)
-- Desktop: illustrated map rendered in the reserved 256px left sidebar with "Castle Map" header and "Click a room to navigate" footer hint
-- Mobile: floating "Map" button (`bottom-4 right-4`) opens full-screen overlay with backdrop blur; tapping a zone or POI closes the overlay automatically
-- `poi-highlight-pulse` CSS animation: gold ring expand on POI card scroll target (0.9s, `box-shadow` keyframes)
-- `castle-map-zone` CSS class for clickable SVG zone cursor
-- Section scroll IDs (`id="section-hero"` etc.) and `data-section-id` attributes added to all FallbackMode section components
-- POI card IDs (`id="poi-{poiId}"`) added to FeaturedCard, CompactCard (ProjectsGrid), experience entry cards (ExperienceTimeline), and hackathon cards (SkillsSection) — enables direct POI-dot-to-card scroll targeting
-- POI scroll override map: `contact` POI dot scrolls to `#section-contact` rather than the hero section
-
-### Changed
-- `FallbackMode`: empty `<aside aria-hidden="true">` replaced with live `CastleMap` navigation panel
-- `FallbackMode`: scroll container `<div>` gains a `ref` (`scrollRef`) used as IntersectionObserver root
-- `FallbackMode`: `aria-hidden="true"` removed from aside — sidebar is now interactive
-
----
-
-## [1.6.0-slice1] - 2026-02-24
-
-### Added
-- New `src/components/FallbackMode/` directory replacing the inline placeholder component in `App.tsx`
-- `HeroSection`: full-viewport hero with Cinzel gold title, sub-name, tagline from About POI description, CSS-only floating gold particle animation, "Explore in 3D" CTA button, scroll indicator
-- `ProjectsGrid`: 4 featured projects (AVVR, Portfolio Hall, DIY Stereo Camera, EEE Roadmap) as full-width cards with description, tech tags, and links; 6 remaining projects as 2-col mobile / 3-col desktop compact grid
-- `ExperienceTimeline`: vertical teak & gold timeline with hardcoded date/location metadata for both experience POIs (audioscenic, southampton-research)
-- `SkillsSection`: categorised skill tag groups (Languages / Frameworks & Engines / DevOps & Cloud / Hardware) with highlight cross-reference from skills POI tags; hackathon cards from 4 hackathon POIs
-- `ContactSection`: link cards for GitHub, LinkedIn, Email, GitLab, Website with gold accent styling
-- Footer with "Switch to 3D Experience" secondary CTA and version label
-- `useFadeIn` hook (`src/hooks/useFadeIn.ts`) using `IntersectionObserver` for scroll-triggered section reveal
-- CSS-only `particleFloat` keyframe + `.particle-float` class for hero background animation
-- `.fallback-scroll` utility for gold/teak custom scrollbar styling
-- `.fade-in-section` / `.is-visible` CSS classes for intersection-triggered reveal transitions
-- Desktop fixed left sidebar placeholder (reserved for Slice 2 illustrated map nav)
-
-### Changed
-- `FallbackMode` extracted from inline definition in `App.tsx` to `src/components/FallbackMode/` directory
-- `FallbackMode` root container is now a self-scrolling `overflow-y-auto` div — 3D mode `overflow: hidden` on `#root` is preserved unchanged
-- `ModeToggle` in FallbackMode changed from `absolute` to `fixed` positioning to remain visible while scrolling
+- 2D mode completely redesigned from sidebar+floorplan to scroll portfolio
+- Project cards prioritize story hooks over tech stack lists
+- Mobile layout: single-column scroll replacing sidebar+grid
+- Desktop layout: sticky illustrated map + scrollable content
 
 ### Removed
-- Inline `FallbackMode` function from `App.tsx` (lines 113–227)
-- Sidebar with section filter buttons
-- SVG floor plan (`FloorPlan` component) from FallbackMode (component file preserved for Slice 2)
-- Old POI card list below floor plan
+- Old sidebar section filter navigation
+- Old SVG floor plan component
+- Old flat card list layout
 
 ---
 
