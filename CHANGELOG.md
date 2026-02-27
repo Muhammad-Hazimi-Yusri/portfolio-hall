@@ -10,11 +10,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- v1.7.0 slice 2: Extract procedural pillars/doorways/molding into manifest-driven fallbacks; swap real Blender exports when ready
 - v1.8.0: 3D self-portrait (iPhone LiDAR scan, low-poly mesh + gaussian splat toggle)
 - v1.9.0: Rich project displays (3D slideshows, per-project gaussian splats)
 - v2.0.0: Interactive web panels, full content polish, launch-ready
 - v3.0.0: AI integration (backlog)
+
+---
+
+## [1.7.0-slice2] - 2026-02-27
+
+### Added
+- `src/3d/materials.ts` — shared material factory module
+  - `createTeakMat`, `createGoldMat`, `createWallMat`, `createFloorMat`, `createStoneMat`, `createGlassMat`, `createGrassFloorMat`, `createCeilingMat` — individual named factories
+  - `SceneMaterials` type — typed bag of all shared material instances
+  - `createSceneMaterials(scene)` — convenience factory; call once and share the result
+  - Consolidates two previously identical inline ceiling materials (`receptionCeilingMat`, `mhCeilingMat`) into a single shared `ceilingMat`, halving ceiling GPU material count
+
+### Changed
+- `src/3d/assetManifest.ts`: `AssetEntry` extended with material and collision config
+  - `MaterialOverrideProps` type — per-mesh override properties (`sceneMat`, `diffuseColor`, `albedoColor`, `emissiveColor`, `metallic`, `roughness`)
+  - `materialMode?: 'keep' | 'remap' | 'hybrid'` — material strategy for loaded .glb (default: `'keep'`)
+  - `materialOverrides?: Record<string, MaterialOverrideProps>` — per-mesh overrides; use `'*'` as wildcard
+  - `collision?: 'none' | 'mesh' | 'box' | 'cylinder'` — collision strategy (default: `'none'`)
+  - `collisionSize?: { width, height, depth }` — dimensions for box/cylinder collision proxy
+- `src/3d/scene.ts`: all six private material factory functions removed (~90 lines); imports from `materials.ts`; `createCastle(scene, mats)` now accepts `SceneMaterials`; all zone builders propagate shared material instances
+- `src/3d/assetLoader.ts`: `LoadAssetsOptions` extended with `sceneMaterials?`; new private helpers:
+  - `hexToColor3(hex)` — safe hex-to-Color3 conversion with malformed-input guard
+  - `applyMaterialMode(meshes, entry, sceneMaterials)` — implements keep/remap/hybrid strategies; handles both `PBRMaterial` (Blender GLTF exports) and `StandardMaterial`
+  - `setupCollision(scene, rootMesh, entry)` — creates invisible box/cylinder proxy parented to loaded root mesh, or enables `checkCollisions` directly on mesh geometry; proxy excluded from shadow generators
+  - `createFallback` prefers shared `sceneMaterials.teak` over creating a new `StandardMaterial` instance
+- `src/3d/BabylonScene.tsx`: calls `createSceneMaterials(scene)` after scene creation; passes resulting `SceneMaterials` to both `createCastle` and `loadAssets`; single shared material instance guaranteed across procedural geometry and loaded .glb assets
 
 ---
 

@@ -14,6 +14,7 @@ import { createVRFpsCounter } from './vrUI'
 import { applyVRLighting } from './lights'
 import type { LightsResult } from './lights'
 import { loadAssets } from './assetLoader'
+import { createSceneMaterials } from './materials'
 import poisData from '@/data/pois.json'
 import type { POI } from '@/types/poi'
 import type { UniversalCamera } from '@babylonjs/core/Cameras/universalCamera'
@@ -166,7 +167,8 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress }: Babylo
     const scene = createScene(engine)
     onLoadProgress?.(15, 'scene')
 
-    const castle = createCastle(scene)
+    const mats = createSceneMaterials(scene)
+    const castle = createCastle(scene, mats)
     onLoadProgress?.(40, 'scene')
 
     const camera = createFirstPersonCamera(scene, canvas, joystickRef, lookRef, jumpRef, sprintRef, gyroRef, landscapeModeRef, cameraRef)
@@ -181,7 +183,7 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress }: Babylo
     lightsResult = lights
 
     // Load architectural .glb assets — non-blocking, scene renders immediately with fallbacks
-    loadAssets(scene, { sunShadowGen: lights.sunShadowGen, indoorShadowGen: lights.indoorShadowGen })
+    loadAssets(scene, { sunShadowGen: lights.sunShadowGen, indoorShadowGen: lights.indoorShadowGen, sceneMaterials: mats })
 
     onLoadProgress?.(90, 'textures')
 

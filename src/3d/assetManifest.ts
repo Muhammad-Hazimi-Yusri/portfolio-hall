@@ -1,6 +1,27 @@
 import type { Zone } from '@/types/poi'
+import type { SceneMaterials } from './materials'
 
 // ── Types ──
+
+/**
+ * Per-mesh material override properties.
+ * Keys in materialOverrides map to mesh names inside the .glb.
+ * Use '*' as a wildcard to apply to all meshes that lack a named entry.
+ */
+export type MaterialOverrideProps = {
+  /** For remap mode: which SceneMaterials key to assign. Defaults to 'teak'. */
+  sceneMat?: keyof SceneMaterials
+  /** Hex '#rrggbb' — applied to diffuseColor on StandardMaterial (hybrid mode) */
+  diffuseColor?: string
+  /** Hex '#rrggbb' — applied to albedoColor on PBRMaterial (hybrid mode) */
+  albedoColor?: string
+  /** Hex '#rrggbb' — applied to emissiveColor on either material type (hybrid mode) */
+  emissiveColor?: string
+  /** 0–1, PBR only (hybrid mode) */
+  metallic?: number
+  /** 0–1, PBR only (hybrid mode) */
+  roughness?: number
+}
 
 export type AssetEntry = {
   id: string
@@ -8,6 +29,28 @@ export type AssetEntry = {
   fallbackType: 'box' | 'cylinder' | 'none'
   fallbackDimensions?: { width: number; height: number; depth: number }
   category: 'pillar' | 'doorway' | 'molding' | 'furniture' | 'decoration'
+  /**
+   * How to handle .glb materials after loading. Default: 'keep'.
+   * - 'keep'   — use Blender materials exactly as exported
+   * - 'remap'  — replace all materials with scene theme materials (teakMat, goldMat, etc.)
+   * - 'hybrid' — preserve textures but adjust color/PBR properties via materialOverrides
+   */
+  materialMode?: 'keep' | 'remap' | 'hybrid'
+  /**
+   * Per-mesh overrides. Keys are mesh names within the GLB; '*' is a wildcard.
+   * Used by 'remap' (sceneMat key) and 'hybrid' (color/PBR properties).
+   */
+  materialOverrides?: Record<string, MaterialOverrideProps>
+  /**
+   * Collision strategy for the loaded mesh. Default: 'none'.
+   * - 'none'     — no collision (decorative assets)
+   * - 'mesh'     — checkCollisions on the GLB meshes directly (expensive)
+   * - 'box'      — invisible box proxy (recommended for most architectural assets)
+   * - 'cylinder' — invisible cylinder proxy (good for pillars)
+   */
+  collision?: 'none' | 'mesh' | 'box' | 'cylinder'
+  /** Dimensions for the 'box' or 'cylinder' collision proxy. */
+  collisionSize?: { width: number; height: number; depth: number }
 }
 
 export type AssetPlacement = {

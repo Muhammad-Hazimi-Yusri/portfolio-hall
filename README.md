@@ -5,7 +5,7 @@
 > A grand royal hall or throne room; the ceremonial heart of a palace where audiences are received and important gatherings held.
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
-[![Version](https://img.shields.io/badge/version-1.7.0--slice1-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-1.7.0--slice2-blue.svg)]()
 [![Status](https://img.shields.io/badge/status-In_Progress-yellow.svg)]()
 
 <details>
@@ -192,6 +192,21 @@ Balairung uses a **Javanese/Malay royal hall** aesthetic inspired by traditional
 - **Zero-duplicate strategy**: all current decoration placements use `fallbackType: 'none'` — zone-function geometry is the visual fallback; no phantom meshes during development
 - **Test pipeline**: KhronosGroup Box.glb (`public/assets/models/test-cube.glb`, 1.7 KB) placed at front-left reception pillar; loads and replaces the procedural pillar to prove the end-to-end pipeline
 
+### Material System & GLB Integration (v1.7.0-slice2)
+- **Shared material module** (`src/3d/materials.ts`) — all 8 scene materials extracted from `scene.ts` into named factory functions: `createTeakMat`, `createGoldMat`, `createWallMat`, `createFloorMat`, `createStoneMat`, `createGlassMat`, `createGrassFloorMat`, `createCeilingMat`
+  - `SceneMaterials` type — typed record of all shared instances
+  - `createSceneMaterials(scene)` — convenience factory; call once in `BabylonScene.tsx` and pass to both `createCastle` and `loadAssets` so procedural geometry and loaded .glb assets always share the same material objects
+  - Consolidates two previously identical inline ceiling materials into one, halving ceiling GPU material count
+- **Material strategy per asset** — `AssetEntry.materialMode` selects how Blender materials are handled after GLB load:
+  - `'keep'` (default) — use Blender PBR materials exactly as exported; best for fully textured Blender assets
+  - `'remap'` — replace all materials on loaded meshes with shared `SceneMaterials` instances; specify target via `materialOverrides['*'].sceneMat`
+  - `'hybrid'` — preserve textures/UV but adjust colour/PBR values; set `albedoColor`/`diffuseColor`/`emissiveColor`/`metallic`/`roughness` per named mesh or wildcard `'*'`
+- **Collision proxies** — `AssetEntry.collision` controls physics for loaded assets without burdening the renderer:
+  - `'none'` (default) — decorative only
+  - `'mesh'` — `checkCollisions = true` directly on GLB meshes (expensive; use sparingly)
+  - `'box'` / `'cylinder'` (recommended) — invisible low-poly proxy parented to the root mesh; `collisionSize` sets dimensions; excluded from shadow generators
+- **`hexToColor3` helper** — safe hex-to-Color3 conversion with malformed-input guard (`Color3.FromHexString` silently returns black on bad input)
+
 ### VR Performance Notes (Quest Pro browser)
 
 **Target: 72 fps**
@@ -259,8 +274,9 @@ portfolio-hall/
 │   ├── 3d/
 │   │   ├── engine.ts             # Babylon.js engine + scene factory
 │   │   ├── scene.ts              # Castle geometry: walls, floors, ceilings, decorative meshes
+│   │   ├── materials.ts          # Shared material factories + SceneMaterials type
 │   │   ├── assetManifest.ts      # Typed catalogue of all .glb placements + positions
-│   │   ├── assetLoader.ts        # Non-blocking GLB loader with procedural fallback
+│   │   ├── assetLoader.ts        # Non-blocking GLB loader with material mapping + collision
 │   │   ├── camera.ts             # First-person camera (WASD, gyro, touch)
 │   │   ├── cameraRef.ts          # Shared camera position ref (3D → React)
 │   │   ├── flyTo.ts              # Fly-to teleport animation
@@ -340,7 +356,8 @@ portfolio-hall/
 Balairung uses a **hybrid geometry approach**:
 
 - **Procedural geometry** handles room structure (floors, walls, ceilings, zone boundaries) — fast, no file loading, easily tweakable
-- **Blender .glb assets** (pipeline live in v1.7.0-slice1) layer decorative architectural elements on top — pillars, doorway frames, crown molding — without replacing the procedural rooms; `assetLoader.ts` loads them lazily and falls back to procedural geometry until real exports are ready
+- **Shared materials** (`src/3d/materials.ts`, v1.7.0-slice2) — one `SceneMaterials` instance created at scene init and shared across all procedural geometry and loaded .glb assets; guarantees visual consistency; single Babylon.js material object per name in the scene
+- **Blender .glb assets** (`assetLoader.ts`, v1.7.0-slice1+) layer decorative architectural elements on top — pillars, doorway frames, crown molding — without replacing the procedural rooms; each asset entry can specify `materialMode: 'keep' | 'remap' | 'hybrid'` and `collision: 'none' | 'mesh' | 'box' | 'cylinder'`; loader falls back to procedural geometry until real exports are ready
 - **Gaussian splats** (planned v1.8.0) loaded via Babylon.js native `GaussianSplattingMesh`, used for the self-portrait avatar and per-project physical displays; gracefully degrade to low-poly mesh on weak devices
 
 ---
@@ -555,6 +572,9 @@ Complete rebuild of the 2D fallback mode as a recruiter-optimized scroll portfol
 #### v1.7.0-slice1 — GLB Import Pipeline + Asset Manifest
 Asset manifest (`src/3d/assetManifest.ts`) defining typed `AssetEntry` and `AssetPlacement` records for all 22 current decorative placements (12 pillars, 3 doorway frames, 3 molding segments, 1 test). Non-blocking GLB loader (`src/3d/assetLoader.ts`) using `SceneLoader.ImportMeshAsync` with `@babylonjs/loaders/glTF` plugin. Three-strategy fallback: load GLB, generate box/cylinder with teak material, or exit silently when `fallbackType: 'none'` (existing procedural geometry stays — zero duplicates). Shadow generators threaded through `LoadAssetsOptions`. `proceduralFallbackName` field enables clean swap-out when a GLB loads. `public/assets/models/` directory with KhronosGroup Box.glb test asset proving end-to-end pipeline at reception pillar position.
 
+#### v1.7.0-slice2 — Material Mapping + Shadow Integration
+Shared material module (`src/3d/materials.ts`) with 8 named factory functions and `SceneMaterials` aggregate type. `createSceneMaterials(scene)` called once in `BabylonScene.tsx` and threaded into both `createCastle` and `loadAssets` — procedural geometry and GLB assets share identical material objects, guaranteeing palette consistency. `scene.ts` refactored: six private material factory functions removed (~90 lines) and replaced with parameter propagation. `AssetEntry` extended with `materialMode` (`'keep' | 'remap' | 'hybrid'`), `materialOverrides` (per-mesh or `'*'` wildcard, with `sceneMat` / colour / PBR fields), `collision` (`'none' | 'mesh' | 'box' | 'cylinder'`), and `collisionSize`. `assetLoader.ts` gains `applyMaterialMode` (handles both `PBRMaterial` GLTF exports and `StandardMaterial`), `setupCollision` (invisible box/cylinder proxy parented to root, excluded from shadow generators), and `hexToColor3` (safe hex-to-Color3 with malformed-input guard).
+
 </details>
 
 ### 🔧 Upcoming
@@ -569,10 +589,18 @@ Asset manifest (`src/3d/assetManifest.ts`) defining typed `AssetEntry` and `Asse
 - [x] `proceduralFallbackName` field enables clean swap-out of zone-function meshes on successful load
 - [x] `public/assets/models/` directory; test GLB (KhronosGroup Box) proves pipeline end-to-end
 
-**Slice 2 (upcoming):**
+**Slice 2 (done):**
+- [x] Shared material module (`src/3d/materials.ts`) — 8 named factories, `SceneMaterials` type, `createSceneMaterials(scene)` convenience factory
+- [x] `scene.ts` refactored to accept `SceneMaterials` — private factory functions removed, single shared instance propagated through all zone builders
+- [x] `AssetEntry` extended with `materialMode` (`keep` / `remap` / `hybrid`), `materialOverrides`, `collision`, `collisionSize`
+- [x] `applyMaterialMode` in `assetLoader.ts` — handles `PBRMaterial` (Blender GLTF export) and `StandardMaterial`; remap uses `SceneMaterials` keys; hybrid adjusts colour/PBR without discarding textures
+- [x] `setupCollision` — invisible box/cylinder proxy parented to GLB root, excluded from shadow generators; `'mesh'` mode enables `checkCollisions` directly on GLB geometry
+- [x] `hexToColor3` utility — safe hex-to-Color3 with malformed-input guard
+
+**Slice 3 (upcoming):**
 - [ ] First real Blender assets: ornate pillar column, doorway arch, crown molding profile
-- [ ] Extract procedural pillars/doorways/molding from zone functions; manifest becomes sole authority
-- [ ] Material mapping: Blender PBR materials → teak + gold palette
+- [ ] Place each GLB in manifest with appropriate `materialMode`, `collision`, and `collisionSize` values
+- [ ] Dispose corresponding procedural meshes via `proceduralFallbackName` once GLBs are confirmed visually correct
 
 #### v1.8.0 — 3D Self-Portrait (Scan + Splat Avatar)
 - [ ] iPhone LiDAR self-scan (via Scaniverse/Polycam)
