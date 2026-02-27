@@ -10,11 +10,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- v1.7.0: Blender .glb asset pipeline (hybrid procedural + modeled architecture)
+- v1.7.0 slice 2: Extract procedural pillars/doorways/molding into manifest-driven fallbacks; swap real Blender exports when ready
 - v1.8.0: 3D self-portrait (iPhone LiDAR scan, low-poly mesh + gaussian splat toggle)
 - v1.9.0: Rich project displays (3D slideshows, per-project gaussian splats)
 - v2.0.0: Interactive web panels, full content polish, launch-ready
 - v3.0.0: AI integration (backlog)
+
+---
+
+## [1.7.0-slice1] - 2026-02-24
+
+### Added
+- `src/3d/assetManifest.ts` — typed asset catalogue and placement system
+  - `AssetEntry` type: `id`, `glbPath`, `fallbackType` (`'box' | 'cylinder' | 'none'`), optional `fallbackDimensions`, `category`
+  - `AssetPlacement` type: `assetId`, `position`, optional `rotation` / `scale` (all in radians / scene units), `zone`, `receiveShadows`, `castShadows`, `proceduralFallbackName`
+  - `assetLibrary`: catalogue of all planned architectural assets (`pillar-ornate-01`, `doorway-frame-01`, `crown-molding-segment`, `test-cube`)
+  - `assetPlacements`: 22 placements covering all 12 current pillars (reception ×6, main hall ×4, garden ×2), 3 doorway frames, 3 crown molding segments, and 1 test placement
+  - All existing-decoration placements use `fallbackType: 'none'` — zone-function procedural geometry acts as the visual fallback; no duplicates created while real .glb files are absent
+- `src/3d/assetLoader.ts` — non-blocking GLB loader
+  - `loadAssets(scene, options)` — fire-and-forget entry point; iterates placements without blocking the render loop
+  - `@babylonjs/loaders/glTF` side-effect import registers the GLTF/GLB loader plugin (tree-shaken; `@babylonjs/loaders` v7.34.0 was already in `package.json`)
+  - On successful load: applies `position` / `rotation` / `scale` from placement config; registers root mesh with `sunShadowGen` and `indoorShadowGen` shadow casters; sets `receiveShadows` on all result meshes; disposes named procedural mesh (`proceduralFallbackName`) and its children for clean swap-out
+  - On load failure (404 / parse error): logs `console.warn` (not error); if `fallbackType: 'none'` exits silently; otherwise creates a `Box` or `Cylinder` MeshBuilder mesh with teak material at floor-anchored position; wires shadows as configured
+  - `SceneLoader.ImportMeshAsync` split: `rootUrl` = path up to last `/`, `filename` = remainder — handles all `/assets/models/*.glb` paths correctly
+- `public/assets/models/` directory with `.gitkeep` to track in git
+- `public/assets/models/test-cube.glb` — KhronosGroup Box.glb (1.7 KB, single mesh, COLLADA2GLTF origin) used to prove end-to-end pipeline; placed at reception pillar (-4, 0, 10) with `proceduralFallbackName: 'rec-pillar--4-front'` so the procedural pillar is cleanly replaced on load
+
+### Changed
+- `src/3d/BabylonScene.tsx`: `loadAssets(scene, { sunShadowGen, indoorShadowGen })` called immediately after `createLights()` returns — shadow generators available, call is fire-and-forget (no `await`) so scene reaches `onLoadProgress(100, 'ready')` without delay
 
 ---
 

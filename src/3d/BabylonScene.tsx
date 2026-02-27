@@ -13,6 +13,7 @@ import { setupHandTracking } from './vrInteraction'
 import { createVRFpsCounter } from './vrUI'
 import { applyVRLighting } from './lights'
 import type { LightsResult } from './lights'
+import { loadAssets } from './assetLoader'
 import poisData from '@/data/pois.json'
 import type { POI } from '@/types/poi'
 import type { UniversalCamera } from '@babylonjs/core/Cameras/universalCamera'
@@ -178,6 +179,10 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress }: Babylo
 
     const lights = createLights(scene, castle, poiMeshes)
     lightsResult = lights
+
+    // Load architectural .glb assets — non-blocking, scene renders immediately with fallbacks
+    loadAssets(scene, { sunShadowGen: lights.sunShadowGen, indoorShadowGen: lights.indoorShadowGen })
+
     onLoadProgress?.(90, 'textures')
 
     const cleanupPointerLock = setupPointerLock(canvas)

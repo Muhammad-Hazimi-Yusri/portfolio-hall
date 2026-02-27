@@ -5,7 +5,7 @@
 > A grand royal hall or throne room; the ceremonial heart of a palace where audiences are received and important gatherings held.
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
-[![Version](https://img.shields.io/badge/version-1.6.0-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-1.7.0--slice1-blue.svg)]()
 [![Status](https://img.shields.io/badge/status-In_Progress-yellow.svg)]()
 
 <details>
@@ -182,6 +182,16 @@ Balairung uses a **Javanese/Malay royal hall** aesthetic inspired by traditional
 - **Seated mode**: X button (left controller) applies +0.7 m rig offset so seated players see the scene at standing scale
 - **Painting height**: canvas center at 1.65 m (bottom 1.15 m, top 2.15 m) — within 1.4–1.7 m VR eye-level target
 
+### Asset Pipeline (v1.7.0-slice1)
+- **Asset manifest** (`src/3d/assetManifest.ts`) — typed catalogue of every architectural decoration placement: 12 pillars, 3 doorway frames, 3 crown molding segments across all 4 zones, with exact positions mirroring current procedural geometry
+- **`AssetEntry`**: `id`, `glbPath` (relative to `/public/`), `fallbackType: 'box' | 'cylinder' | 'none'`, optional `fallbackDimensions`, `category`
+- **`AssetPlacement`**: `assetId`, `position`/`rotation`/`scale` in scene units/radians, `zone`, shadow flags, and optional `proceduralFallbackName` for clean mesh swap-out when a GLB loads
+- **GLB loader** (`src/3d/assetLoader.ts`) — non-blocking; `loadAssets()` fires all placements without awaiting, so scene reaches ready state immediately
+  - On success: applies transform, wires to `sunShadowGen` + `indoorShadowGen`, disposes named procedural mesh
+  - On failure: `console.warn` (expected while Blender files don't exist); `fallbackType: 'none'` exits silently (existing procedural mesh stays); `'box'` / `'cylinder'` creates simple teak geometry
+- **Zero-duplicate strategy**: all current decoration placements use `fallbackType: 'none'` — zone-function geometry is the visual fallback; no phantom meshes during development
+- **Test pipeline**: KhronosGroup Box.glb (`public/assets/models/test-cube.glb`, 1.7 KB) placed at front-left reception pillar; loads and replaces the procedural pillar to prove the end-to-end pipeline
+
 ### VR Performance Notes (Quest Pro browser)
 
 **Target: 72 fps**
@@ -224,6 +234,7 @@ Lighting optimisations applied automatically on VR session entry (`applyVRLighti
 | **Mobile Controls** | Nipple.js | Virtual joystick library |
 | **3D Scanning** | Scaniverse / Polycam | iPhone LiDAR capture, gaussian splat + mesh export |
 | **VR** | Babylon.js WebXR | Native Quest browser support |
+| **Asset pipeline** | `@babylonjs/loaders` + manifest | Lazy non-blocking GLB loading; procedural fallbacks until Blender assets are ready |
 
 ---
 
@@ -234,10 +245,12 @@ Lighting optimisations applied automatically on VR session entry (`applyVRLighti
 ```
 portfolio-hall/
 ├── public/
-│   ├── models/
-│   │   └── hall.glb              # Main hall 3D model
-│   ├── thumbnails/               # POI preview images
-│   └── custom-meshes/            # Custom project meshes (future)
+│   ├── assets/
+│   │   └── models/               # Blender .glb exports (v1.7.0+)
+│   │       ├── .gitkeep
+│   │       └── test-cube.glb     # Pipeline verification mesh (temporary)
+│   └── thumbnails/               # POI preview images
+│       └── .gitkeep
 │
 ├── src/
 │   ├── data/
@@ -245,12 +258,14 @@ portfolio-hall/
 │   │
 │   ├── 3d/
 │   │   ├── engine.ts             # Babylon.js engine + scene factory
-│   │   ├── scene.ts              # Hall geometry (ground, walls)
+│   │   ├── scene.ts              # Castle geometry: walls, floors, ceilings, decorative meshes
+│   │   ├── assetManifest.ts      # Typed catalogue of all .glb placements + positions
+│   │   ├── assetLoader.ts        # Non-blocking GLB loader with procedural fallback
 │   │   ├── camera.ts             # First-person camera (WASD, gyro, touch)
 │   │   ├── cameraRef.ts          # Shared camera position ref (3D → React)
 │   │   ├── flyTo.ts              # Fly-to teleport animation
-│   │   ├── lights.ts             # Ambient + point lighting
-│   │   ├── pois.ts               # POI mesh creation
+│   │   ├── lights.ts             # Ambient + directional lighting + shadow generators
+│   │   ├── pois.ts               # POI mesh creation (paintings, display cases, pedestals)
 │   │   ├── interaction.ts        # Proximity detection + E key handler
 │   │   ├── pointerLock.ts        # Pointer lock management
 │   │   ├── webxr.ts              # WebXR support check, XR experience factory, VR locomotion + vignette, menu buttons, seated mode
@@ -325,8 +340,8 @@ portfolio-hall/
 Balairung uses a **hybrid geometry approach**:
 
 - **Procedural geometry** handles room structure (floors, walls, ceilings, zone boundaries) — fast, no file loading, easily tweakable
-- **Blender .glb assets** (planned v1.7.0) layer decorative architectural elements on top — pillars, arches, crown molding, centrepiece — without replacing the procedural rooms
-- **Gaussian splats** (planned v1.8.0) loaded via Babylon.js 8.0 native `GaussianSplattingMesh`, used for the self-portrait avatar and per-project physical displays; gracefully degrade to low-poly mesh on weak devices
+- **Blender .glb assets** (pipeline live in v1.7.0-slice1) layer decorative architectural elements on top — pillars, doorway frames, crown molding — without replacing the procedural rooms; `assetLoader.ts` loads them lazily and falls back to procedural geometry until real exports are ready
+- **Gaussian splats** (planned v1.8.0) loaded via Babylon.js native `GaussianSplattingMesh`, used for the self-portrait avatar and per-project physical displays; gracefully degrade to low-poly mesh on weak devices
 
 ---
 
@@ -537,16 +552,27 @@ Player-centered minimap that auto-zooms to the 3 nearest POIs (8×8 min / 30×30
 #### v1.6.0 — 2D Mode Revamp (Spatial Portfolio)
 Complete rebuild of the 2D fallback mode as a recruiter-optimized scroll portfolio. Illustrated SVG castle map navigation with scroll sync (IntersectionObserver links scroll position to active map zone). Story-driven project cards with challenge/approach/outcome narrative for 6 top projects, graceful description fallback for others. Hero section with CSS-only floating gold particles and drifting wood-texture background. Vertical experience timeline with teak & gold styling and staggered dot reveal animations. Categorized skill tag groups and hackathon cards with gold achievement lines. Mobile-first responsive design: single-column scroll with floating map button → fullscreen overlay on mobile, sticky illustrated map sidebar + scrollable content on desktop. Card hover lift, CSS grid-rows expand/collapse animation, section dividers, and alternating section backgrounds. Accessible (role=button, aria-expanded, keyboard support). Visual QA pass across mobile/tablet/desktop breakpoints.
 
+#### v1.7.0-slice1 — GLB Import Pipeline + Asset Manifest
+Asset manifest (`src/3d/assetManifest.ts`) defining typed `AssetEntry` and `AssetPlacement` records for all 22 current decorative placements (12 pillars, 3 doorway frames, 3 molding segments, 1 test). Non-blocking GLB loader (`src/3d/assetLoader.ts`) using `SceneLoader.ImportMeshAsync` with `@babylonjs/loaders/glTF` plugin. Three-strategy fallback: load GLB, generate box/cylinder with teak material, or exit silently when `fallbackType: 'none'` (existing procedural geometry stays — zero duplicates). Shadow generators threaded through `LoadAssetsOptions`. `proceduralFallbackName` field enables clean swap-out when a GLB loads. `public/assets/models/` directory with KhronosGroup Box.glb test asset proving end-to-end pipeline at reception pillar position.
+
 </details>
 
 ### 🔧 Upcoming
 
 #### v1.7.0 — Blender Asset Pipeline
-- [ ] .glb import pipeline with material mapping and shadow support
-- [ ] Config-driven asset placement system for swappable Blender models
-- [ ] First assets: pillars, doorway arches, crown molding, reception centerpiece
-- [ ] Fallback to procedural geometry when .glb not available
-- [ ] Asset manifest with lazy loading
+
+**Slice 1 (done):**
+- [x] `AssetEntry` + `AssetPlacement` typed manifest system (`src/3d/assetManifest.ts`)
+- [x] Non-blocking GLB loader with `SceneLoader.ImportMeshAsync` and `@babylonjs/loaders/glTF` registration (`src/3d/assetLoader.ts`)
+- [x] Three-strategy fallback: load GLB → simple procedural → silent (existing mesh stays)
+- [x] Shadow casting/receiving wired through placement config
+- [x] `proceduralFallbackName` field enables clean swap-out of zone-function meshes on successful load
+- [x] `public/assets/models/` directory; test GLB (KhronosGroup Box) proves pipeline end-to-end
+
+**Slice 2 (upcoming):**
+- [ ] First real Blender assets: ornate pillar column, doorway arch, crown molding profile
+- [ ] Extract procedural pillars/doorways/molding from zone functions; manifest becomes sole authority
+- [ ] Material mapping: Blender PBR materials → teak + gold palette
 
 #### v1.8.0 — 3D Self-Portrait (Scan + Splat Avatar)
 - [ ] iPhone LiDAR self-scan (via Scaniverse/Polycam)
