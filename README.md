@@ -5,7 +5,7 @@
 > A grand royal hall or throne room; the ceremonial heart of a palace where audiences are received and important gatherings held.
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
-[![Version](https://img.shields.io/badge/version-1.7.0--slice2-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-1.7.0--slice3-blue.svg)]()
 [![Status](https://img.shields.io/badge/status-In_Progress-yellow.svg)]()
 
 <details>
@@ -207,6 +207,23 @@ Balairung uses a **Javanese/Malay royal hall** aesthetic inspired by traditional
   - `'box'` / `'cylinder'` (recommended) — invisible low-poly proxy parented to the root mesh; `collisionSize` sets dimensions; excluded from shadow generators
 - **`hexToColor3` helper** — safe hex-to-Color3 conversion with malformed-input guard (`Color3.FromHexString` silently returns black on bad input)
 
+### Blender Export Documentation (v1.7.0-slice3)
+- **`docs/BLENDER_GUIDE.md`** — complete Blender → Babylon.js workflow reference for modeling architectural assets
+  - GLB export settings (GLB format, Selected Objects only, +Y Up, Apply Modifiers/UVs/Normals/Tangents ON, Images JPEG, Animation OFF)
+  - Scale convention: 1 Blender unit = 1 metre; 1.8 m reference-cube technique for human-scale check
+  - Origin point convention: base-centre on every asset — `position.y = 0` places the asset flush on the floor with no offset needed
+  - Triangle budget table (500–2 000 tris per pillar, 200–500 per molding segment); scene budget < 200k tris for Quest browser
+  - Color palette with hex codes and `SceneMaterials` key cross-reference for matching Babylon.js theme
+  - Naming convention (`{category}-{variant}-{number}.glb`) and 6-step end-to-end testing workflow with common pitfall notes
+- **`docs/ASSET_SPECS.md`** — first batch of 4 architectural asset specifications
+  - `pillar-ornate-01.glb` — Javanese/Malay column, h=3.5 m, base Ø0.4 m, teak body + gold capital, 12 placements
+  - `doorway-arch-01.glb` — pointed/horseshoe arch (Malay/Islamic influence), w=3 m, h=3 m, depth=0.3 m, teak frame + gold inner trim, 3 placements
+  - `molding-crown-01.glb` — carved teak crown molding segment, L=1 m × h=0.15 m, gold coloured, tiled along walls (may stay procedural if scene triangle count too high when tiled)
+  - `throne-reception-01.glb` — Reception welcome centerpiece (lectern / throne / decorative stand), h≈1.5 m, footprint 1 m × 1 m, teak + gold
+- **`src/3d/assetManifest.ts`** — `throne-reception-01` added to `assetLibrary` and `assetPlacements`
+  - `fallbackType: 'box'` renders a 1 × 1.5 × 1 m teak-coloured box placeholder at Reception centre while the .glb is not yet exported
+  - Placement: `{ x: 0, y: 0, z: 13 }`, zone `reception`, casts and receives shadows
+
 ### VR Performance Notes (Quest Pro browser)
 
 **Target: 72 fps**
@@ -322,6 +339,10 @@ portfolio-hall/
 │   │
 │   ├── App.tsx                   # Root (WelcomeScreen, FallbackMode, ThreeDMode)
 │   └── main.tsx
+│
+├── docs/
+│   ├── BLENDER_GUIDE.md          # Blender → Babylon.js export workflow
+│   └── ASSET_SPECS.md            # First batch of 4 architectural asset specs
 │
 ├── index.html
 ├── package.json
@@ -575,6 +596,9 @@ Asset manifest (`src/3d/assetManifest.ts`) defining typed `AssetEntry` and `Asse
 #### v1.7.0-slice2 — Material Mapping + Shadow Integration
 Shared material module (`src/3d/materials.ts`) with 8 named factory functions and `SceneMaterials` aggregate type. `createSceneMaterials(scene)` called once in `BabylonScene.tsx` and threaded into both `createCastle` and `loadAssets` — procedural geometry and GLB assets share identical material objects, guaranteeing palette consistency. `scene.ts` refactored: six private material factory functions removed (~90 lines) and replaced with parameter propagation. `AssetEntry` extended with `materialMode` (`'keep' | 'remap' | 'hybrid'`), `materialOverrides` (per-mesh or `'*'` wildcard, with `sceneMat` / colour / PBR fields), `collision` (`'none' | 'mesh' | 'box' | 'cylinder'`), and `collisionSize`. `assetLoader.ts` gains `applyMaterialMode` (handles both `PBRMaterial` GLTF exports and `StandardMaterial`), `setupCollision` (invisible box/cylinder proxy parented to root, excluded from shadow generators), and `hexToColor3` (safe hex-to-Color3 with malformed-input guard).
 
+#### v1.7.0-slice3 — Blender Export Guide + Asset Specs
+Documentation slice unblocking manual Blender modeling work. `docs/BLENDER_GUIDE.md`: complete export workflow covering GLB settings (GLB format, +Y Up, Apply Modifiers, JPEG images, Animation OFF), 1-unit = 1-metre scale convention with 1.8 m human-height reference cube, base-centre origin convention, triangle budget table by asset type (scene target < 200k tris for Quest browser), color palette with hex codes and `SceneMaterials` key mapping, `{category}-{variant}-{number}.glb` naming convention, 6-step testing workflow with common pitfalls. `docs/ASSET_SPECS.md`: per-asset specifications for `pillar-ornate-01.glb` (h=3.5 m, 12 placements), `doorway-arch-01.glb` (w=3 m, h=3 m, 3 placements), `molding-crown-01.glb` (L=1 m, tiled, performance caveat noted), and `throne-reception-01.glb` (h=1.5 m, 1 placement) — each with style notes, dimensions table, material colours, and manifest cross-references. `assetManifest.ts` extended with `throne-reception-01` entry (`fallbackType: 'box'`, 1 × 1.5 × 1 m placeholder, `materialMode: 'remap'`, `collision: 'box'`) and placement at Reception centre `{ x: 0, y: 0, z: 13 }`.
+
 </details>
 
 ### 🔧 Upcoming
@@ -597,10 +621,16 @@ Shared material module (`src/3d/materials.ts`) with 8 named factory functions an
 - [x] `setupCollision` — invisible box/cylinder proxy parented to GLB root, excluded from shadow generators; `'mesh'` mode enables `checkCollisions` directly on GLB geometry
 - [x] `hexToColor3` utility — safe hex-to-Color3 with malformed-input guard
 
-**Slice 3 (upcoming):**
-- [ ] First real Blender assets: ornate pillar column, doorway arch, crown molding profile
-- [ ] Place each GLB in manifest with appropriate `materialMode`, `collision`, and `collisionSize` values
-- [ ] Dispose corresponding procedural meshes via `proceduralFallbackName` once GLBs are confirmed visually correct
+**Slice 3 (done):**
+- [x] `docs/BLENDER_GUIDE.md` — Blender → Babylon.js export workflow (settings, scale, origin, budgets, palette, naming, testing)
+- [x] `docs/ASSET_SPECS.md` — first batch of 4 asset specs with dimensions, style notes, and manifest cross-references
+- [x] `throne-reception-01` manifest entry + 1 × 1.5 × 1 m box placeholder at Reception centre `{ x:0, y:0, z:13 }`
+
+**Slice 4 (upcoming — pending manual Blender work):**
+- [ ] Model and export `pillar-ornate-01.glb`; update manifest entry with `materialMode`, `collision: 'cylinder'`; set `proceduralFallbackName` on placements to swap out procedural pillars
+- [ ] Model and export `doorway-arch-01.glb`; update manifest entry (id: `doorway-frame-01`); verify arch aligns with `WALL_THICKNESS = 0.3` depth and `DOOR_WIDTH = 3` opening
+- [ ] Model and export `molding-crown-01.glb`; tile test — keep procedural if scene triangle count exceeds budget when tiled across all walls
+- [ ] Model and export `throne-reception-01.glb`; swap out box placeholder via `proceduralFallbackName` or direct replacement
 
 #### v1.8.0 — 3D Self-Portrait (Scan + Splat Avatar)
 - [ ] iPhone LiDAR self-scan (via Scaniverse/Polycam)

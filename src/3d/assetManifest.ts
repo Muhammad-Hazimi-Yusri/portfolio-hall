@@ -94,6 +94,17 @@ export const assetLibrary: AssetEntry[] = [
     category: 'molding',
   },
   {
+    id: 'throne-reception-01',
+    glbPath: '/assets/models/throne-reception-01.glb',
+    fallbackType: 'box',
+    fallbackDimensions: { width: 1, height: 1.5, depth: 1 },
+    category: 'furniture',
+    materialMode: 'remap',
+    materialOverrides: { '*': { sceneMat: 'teak' } },
+    collision: 'box',
+    collisionSize: { width: 1.2, height: 1.5, depth: 1.2 },
+  },
+  {
     // Temporary test asset — proves the GLB pipeline works.
     // Replace with pillar-ornate-01 once Blender export is ready.
     id: 'test-cube',
@@ -148,6 +159,10 @@ export const assetPlacements: AssetPlacement[] = [
   { assetId: 'crown-molding-segment', zone: 'main-hall', position: { x:  0,     y: 3.925, z: -21.85 } },
   { assetId: 'crown-molding-segment', zone: 'main-hall', position: { x:  7.85,  y: 3.925, z: -15    } },
   { assetId: 'crown-molding-segment', zone: 'main-hall', position: { x: -7.85,  y: 3.925, z: -15    } },
+
+  // ── Reception centerpiece (1) ─────────────────────────────────────────────
+  // RECEPTION center: x=0, z=(8+18)/2=13; origin at base
+  { assetId: 'throne-reception-01', zone: 'reception', castShadows: true, receiveShadows: true, position: { x: 0, y: 0, z: 13 } },
 
   // ── Test placement ────────────────────────────────────────────────────────
   // Loads test-cube.glb at the north-west reception pillar to prove the pipeline.

@@ -17,6 +17,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.7.0-slice3] - 2026-02-28
+
+### Added
+- `docs/BLENDER_GUIDE.md` — complete Blender → Babylon.js export workflow
+  - GLB export settings (format, transform, geometry, materials, animation flags)
+  - Scale reference (1 unit = 1 metre; 1.8 m human-height test cube convention)
+  - Origin point convention (base-centre for all assets — floor placement just works)
+  - Triangle budget table by asset type; scene budget for Quest browser target (< 200k tris)
+  - Color palette table with hex codes and `SceneMaterials` key mapping
+  - Naming convention (`{category}-{variant}-{number}.glb`) and 6-step testing workflow
+- `docs/ASSET_SPECS.md` — first batch of 4 architectural asset specifications
+  - `pillar-ornate-01.glb` — Javanese/Malay column, h=3.5 m, 12 placements across Reception / Main Hall / Garden
+  - `doorway-arch-01.glb` — pointed / horseshoe arch with Malay/Islamic influence, w=3 m, 3 placements at zone transitions
+  - `molding-crown-01.glb` — carved teak crown molding segment, L=1 m, tiled (may stay procedural if scene tris too high)
+  - `throne-reception-01.glb` — Reception welcome centerpiece (lectern / throne / stand), h=1.5 m, 1 placement
+
+### Changed
+- `src/3d/assetManifest.ts`: added `throne-reception-01` to `assetLibrary` and `assetPlacements`
+  - Entry: `category: 'furniture'`, `fallbackType: 'box'` (1 × 1.5 × 1 m box placeholder), `materialMode: 'remap'`, `materialOverrides: { '*': { sceneMat: 'teak' } }`, `collision: 'box'`
+  - Placement: Reception centre `{ x: 0, y: 0, z: 13 }`, `castShadows: true`, `receiveShadows: true`
+
+---
+
 ## [1.7.0-slice2] - 2026-02-27
 
 ### Added
