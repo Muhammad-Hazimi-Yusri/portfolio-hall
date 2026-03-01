@@ -17,104 +17,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.7.0-slice4] - 2026-02-28
+## [1.7.0] - 2026-03-01
 
 ### Added
-- `vite.config.ts`: inline `glbMimePlugin` serves `.glb` files with `Content-Type: model/gltf-binary` in the Vite dev server; the build pipeline (`vite build` copies `/public/` verbatim) needs no changes
-- `src/3d/assetLoader.ts`:
-  - `AssetLoadStat` type export — `{ status, triangleCount, materialCount, loadTimeMs }` per assetId; `status` is `'pending' | 'loaded' | 'fallback' | 'error'`
-  - `assetLoadStats: Map<string, AssetLoadStat>` module-level export — populated by `loadSingleAsset`; multiple placements of the same asset accumulate triangle/material counts; `'loaded'` status takes priority over `'fallback'` if any placement succeeds
-  - `reloadAllAssets(scene, options)` — disposes all managed mesh roots (`dispose(false, false)` preserves shared `SceneMaterials`), clears stats, re-runs `loadAssets`; invoked by `Ctrl+Shift+R` keyboard shortcut in `BabylonScene.tsx`
-  - `toggleAssetFallback(scene, assetId, options)` — swaps a single assetId between its loaded GLB and its procedural fallback; invoked by the debug overlay A/B toggle button
-  - `createFallback` return type changed from `void` to `AbstractMesh | null` to support root tracking
-  - Triangle counting via `instanceof Mesh` guard and `getTotalIndices() / 3`; material deduplication via `material.uniqueId` set
-- `src/3d/assetDebug.tsx` (new file) — dev-only `AssetDebugOverlay` React component
-  - Fixed top-right overlay; teak/gold colour palette; monospace 11px; `z-index: 9999`
-  - Polls `assetLoadStats` and `scene.getEngine().getFps()` every 500 ms
-  - Header: live FPS, total triangle count, active mesh count, Reload All button
-  - Per-asset table: status icon (⏳/✅/⚠️/❌), triangle count, material count, load time ms, A/B toggle button
-  - Statically imported but eliminated from production by Vite/Rollup dead-code elimination (`import.meta.env.DEV` guard at all render sites)
-- `src/3d/BabylonScene.tsx`:
-  - `loadAssetsOptionsRef` ref — stores `LoadAssetsOptions` at scene init for stable access in the keyboard handler and overlay callbacks
-  - `showDebugOverlay` state — controls overlay visibility
-  - Dev-only `useEffect` keyboard handler: backtick toggles overlay, `Ctrl+Shift+R` calls `reloadAllAssets` with `preventDefault` to block browser hard-refresh
-  - `<AssetDebugOverlay>` rendered inside `import.meta.env.DEV && showDebugOverlay` guard
+- GLB asset import pipeline using Babylon.js `ImportMeshAsync` with `@babylonjs/loaders/glTF` plugin
+- Asset manifest system (`src/3d/assetManifest.ts`) with typed `AssetEntry` and `AssetPlacement` configs for all decoration placements
+- Procedural fallback geometry when `.glb` files unavailable (`fallbackType: 'box' | 'cylinder' | 'none'`)
+- Shared material system extracted to `src/3d/materials.ts` (`SceneMaterials` type, `createSceneMaterials(scene)` factory)
+- Material mapping modes on `AssetEntry`: `keep` (use Blender PBR), `remap` (replace with `SceneMaterials`), `hybrid` (adjust colour/PBR, preserve UVs)
+- Shadow casting/receiving for loaded assets wired through placement config
+- Invisible box/cylinder collision proxies for loaded assets (`collision`, `collisionSize` on `AssetEntry`)
+- `AssetLoadStat` type + `assetLoadStats: Map<string, AssetLoadStat>` module-level export tracking per-asset status, triangle count, material count, and load time
+- `reloadAllAssets(scene, options)` — dispose all managed roots and re-run `loadAssets` without page refresh
+- `toggleAssetFallback(scene, assetId, options)` — in-place A/B switch between GLB and procedural fallback
+- Asset hot-reload dev shortcut (`Ctrl+Shift+R`) in `BabylonScene.tsx`
+- Dev-only `AssetDebugOverlay` React component (`src/3d/assetDebug.tsx`) with live FPS, triangle count, per-asset status table, and A/B toggle buttons; eliminated from production bundle via `import.meta.env.DEV` dead-code elimination
+- `glbMimePlugin` in `vite.config.ts` — serves `.glb` files with `Content-Type: model/gltf-binary` in dev server
+- Blender export guide (`docs/BLENDER_GUIDE.md`) — settings, scale, origin, budgets, palette, naming, testing workflow, dev iteration loop
+- Asset specifications for first batch (`docs/ASSET_SPECS.md`) — pillar-ornate-01, doorway-arch-01, molding-crown-01, throne-reception-01
+- `throne-reception-01` manifest entry with `fallbackType: 'box'` (1 × 1.5 × 1 m placeholder), `materialMode: 'remap'`, `collision: 'box'`, placed at Reception centre
+- `public/assets/models/test-cube.glb` — KhronosGroup Box.glb proves end-to-end pipeline at reception pillar position
 
 ### Changed
-- `.gitignore`: added comment section explaining GLB commit policy (files committed directly; keep under 5 MB; Git LFS as fallback if repo grows large)
-- `docs/BLENDER_GUIDE.md`: added "Dev Iteration Workflow" section covering the debug overlay, `Ctrl+Shift+R` asset-only reload, A/B toggle, typical iteration loop, and file size guidance
+- Materials refactored from inline `scene.ts` private functions (~90 lines removed) to shared `materials.ts` module
+- `createCastle(scene, mats)` now accepts `SceneMaterials`; all zone builders propagate shared material instances
+- `createFallback` in `assetLoader.ts` prefers shared `sceneMaterials.teak` over creating new `StandardMaterial` instances
+- `.gitignore` — added comment section explaining GLB commit policy (committed directly, ≤ 5 MB, Git LFS fallback)
+- `BabylonScene.tsx` — `loadAssetsOptionsRef` stores `LoadAssetsOptions` for stable keyboard handler access; `showDebugOverlay` state; dev-only keyboard effect for backtick and `Ctrl+Shift+R`
 
----
-
-## [1.7.0-slice3] - 2026-02-28
-
-### Added
-- `docs/BLENDER_GUIDE.md` — complete Blender → Babylon.js export workflow
-  - GLB export settings (format, transform, geometry, materials, animation flags)
-  - Scale reference (1 unit = 1 metre; 1.8 m human-height test cube convention)
-  - Origin point convention (base-centre for all assets — floor placement just works)
-  - Triangle budget table by asset type; scene budget for Quest browser target (< 200k tris)
-  - Color palette table with hex codes and `SceneMaterials` key mapping
-  - Naming convention (`{category}-{variant}-{number}.glb`) and 6-step testing workflow
-- `docs/ASSET_SPECS.md` — first batch of 4 architectural asset specifications
-  - `pillar-ornate-01.glb` — Javanese/Malay column, h=3.5 m, 12 placements across Reception / Main Hall / Garden
-  - `doorway-arch-01.glb` — pointed / horseshoe arch with Malay/Islamic influence, w=3 m, 3 placements at zone transitions
-  - `molding-crown-01.glb` — carved teak crown molding segment, L=1 m, tiled (may stay procedural if scene tris too high)
-  - `throne-reception-01.glb` — Reception welcome centerpiece (lectern / throne / stand), h=1.5 m, 1 placement
-
-### Changed
-- `src/3d/assetManifest.ts`: added `throne-reception-01` to `assetLibrary` and `assetPlacements`
-  - Entry: `category: 'furniture'`, `fallbackType: 'box'` (1 × 1.5 × 1 m box placeholder), `materialMode: 'remap'`, `materialOverrides: { '*': { sceneMat: 'teak' } }`, `collision: 'box'`
-  - Placement: Reception centre `{ x: 0, y: 0, z: 13 }`, `castShadows: true`, `receiveShadows: true`
-
----
-
-## [1.7.0-slice2] - 2026-02-27
-
-### Added
-- `src/3d/materials.ts` — shared material factory module
-  - `createTeakMat`, `createGoldMat`, `createWallMat`, `createFloorMat`, `createStoneMat`, `createGlassMat`, `createGrassFloorMat`, `createCeilingMat` — individual named factories
-  - `SceneMaterials` type — typed bag of all shared material instances
-  - `createSceneMaterials(scene)` — convenience factory; call once and share the result
-  - Consolidates two previously identical inline ceiling materials (`receptionCeilingMat`, `mhCeilingMat`) into a single shared `ceilingMat`, halving ceiling GPU material count
-
-### Changed
-- `src/3d/assetManifest.ts`: `AssetEntry` extended with material and collision config
-  - `MaterialOverrideProps` type — per-mesh override properties (`sceneMat`, `diffuseColor`, `albedoColor`, `emissiveColor`, `metallic`, `roughness`)
-  - `materialMode?: 'keep' | 'remap' | 'hybrid'` — material strategy for loaded .glb (default: `'keep'`)
-  - `materialOverrides?: Record<string, MaterialOverrideProps>` — per-mesh overrides; use `'*'` as wildcard
-  - `collision?: 'none' | 'mesh' | 'box' | 'cylinder'` — collision strategy (default: `'none'`)
-  - `collisionSize?: { width, height, depth }` — dimensions for box/cylinder collision proxy
-- `src/3d/scene.ts`: all six private material factory functions removed (~90 lines); imports from `materials.ts`; `createCastle(scene, mats)` now accepts `SceneMaterials`; all zone builders propagate shared material instances
-- `src/3d/assetLoader.ts`: `LoadAssetsOptions` extended with `sceneMaterials?`; new private helpers:
-  - `hexToColor3(hex)` — safe hex-to-Color3 conversion with malformed-input guard
-  - `applyMaterialMode(meshes, entry, sceneMaterials)` — implements keep/remap/hybrid strategies; handles both `PBRMaterial` (Blender GLTF exports) and `StandardMaterial`
-  - `setupCollision(scene, rootMesh, entry)` — creates invisible box/cylinder proxy parented to loaded root mesh, or enables `checkCollisions` directly on mesh geometry; proxy excluded from shadow generators
-  - `createFallback` prefers shared `sceneMaterials.teak` over creating a new `StandardMaterial` instance
-- `src/3d/BabylonScene.tsx`: calls `createSceneMaterials(scene)` after scene creation; passes resulting `SceneMaterials` to both `createCastle` and `loadAssets`; single shared material instance guaranteed across procedural geometry and loaded .glb assets
-
----
-
-## [1.7.0-slice1] - 2026-02-24
-
-### Added
-- `src/3d/assetManifest.ts` — typed asset catalogue and placement system
-  - `AssetEntry` type: `id`, `glbPath`, `fallbackType` (`'box' | 'cylinder' | 'none'`), optional `fallbackDimensions`, `category`
-  - `AssetPlacement` type: `assetId`, `position`, optional `rotation` / `scale` (all in radians / scene units), `zone`, `receiveShadows`, `castShadows`, `proceduralFallbackName`
-  - `assetLibrary`: catalogue of all planned architectural assets (`pillar-ornate-01`, `doorway-frame-01`, `crown-molding-segment`, `test-cube`)
-  - `assetPlacements`: 22 placements covering all 12 current pillars (reception ×6, main hall ×4, garden ×2), 3 doorway frames, 3 crown molding segments, and 1 test placement
-  - All existing-decoration placements use `fallbackType: 'none'` — zone-function procedural geometry acts as the visual fallback; no duplicates created while real .glb files are absent
-- `src/3d/assetLoader.ts` — non-blocking GLB loader
-  - `loadAssets(scene, options)` — fire-and-forget entry point; iterates placements without blocking the render loop
-  - `@babylonjs/loaders/glTF` side-effect import registers the GLTF/GLB loader plugin (tree-shaken; `@babylonjs/loaders` v7.34.0 was already in `package.json`)
-  - On successful load: applies `position` / `rotation` / `scale` from placement config; registers root mesh with `sunShadowGen` and `indoorShadowGen` shadow casters; sets `receiveShadows` on all result meshes; disposes named procedural mesh (`proceduralFallbackName`) and its children for clean swap-out
-  - On load failure (404 / parse error): logs `console.warn` (not error); if `fallbackType: 'none'` exits silently; otherwise creates a `Box` or `Cylinder` MeshBuilder mesh with teak material at floor-anchored position; wires shadows as configured
-  - `SceneLoader.ImportMeshAsync` split: `rootUrl` = path up to last `/`, `filename` = remainder — handles all `/assets/models/*.glb` paths correctly
-- `public/assets/models/` directory with `.gitkeep` to track in git
-- `public/assets/models/test-cube.glb` — KhronosGroup Box.glb (1.7 KB, single mesh, COLLADA2GLTF origin) used to prove end-to-end pipeline; placed at reception pillar (-4, 0, 10) with `proceduralFallbackName: 'rec-pillar--4-front'` so the procedural pillar is cleanly replaced on load
-
-### Changed
-- `src/3d/BabylonScene.tsx`: `loadAssets(scene, { sunShadowGen, indoorShadowGen })` called immediately after `createLights()` returns — shadow generators available, call is fire-and-forget (no `await`) so scene reaches `onLoadProgress(100, 'ready')` without delay
+### Removed
+- Inline material creation in `scene.ts` (moved to `materials.ts`)
 
 ---
 

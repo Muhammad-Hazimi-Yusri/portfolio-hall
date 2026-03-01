@@ -5,7 +5,7 @@
 > A grand royal hall or throne room; the ceremonial heart of a palace where audiences are received and important gatherings held.
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
-[![Version](https://img.shields.io/badge/version-1.7.0--slice4-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-1.7.0-blue.svg)]()
 [![Status](https://img.shields.io/badge/status-In_Progress-yellow.svg)]()
 
 <details>
@@ -182,59 +182,14 @@ Balairung uses a **Javanese/Malay royal hall** aesthetic inspired by traditional
 - **Seated mode**: X button (left controller) applies +0.7 m rig offset so seated players see the scene at standing scale
 - **Painting height**: canvas center at 1.65 m (bottom 1.15 m, top 2.15 m) — within 1.4–1.7 m VR eye-level target
 
-### Asset Pipeline (v1.7.0-slice1)
-- **Asset manifest** (`src/3d/assetManifest.ts`) — typed catalogue of every architectural decoration placement: 12 pillars, 3 doorway frames, 3 crown molding segments across all 4 zones, with exact positions mirroring current procedural geometry
-- **`AssetEntry`**: `id`, `glbPath` (relative to `/public/`), `fallbackType: 'box' | 'cylinder' | 'none'`, optional `fallbackDimensions`, `category`
-- **`AssetPlacement`**: `assetId`, `position`/`rotation`/`scale` in scene units/radians, `zone`, shadow flags, and optional `proceduralFallbackName` for clean mesh swap-out when a GLB loads
-- **GLB loader** (`src/3d/assetLoader.ts`) — non-blocking; `loadAssets()` fires all placements without awaiting, so scene reaches ready state immediately
-  - On success: applies transform, wires to `sunShadowGen` + `indoorShadowGen`, disposes named procedural mesh
-  - On failure: `console.warn` (expected while Blender files don't exist); `fallbackType: 'none'` exits silently (existing procedural mesh stays); `'box'` / `'cylinder'` creates simple teak geometry
-- **Zero-duplicate strategy**: all current decoration placements use `fallbackType: 'none'` — zone-function geometry is the visual fallback; no phantom meshes during development
-- **Test pipeline**: KhronosGroup Box.glb (`public/assets/models/test-cube.glb`, 1.7 KB) placed at front-left reception pillar; loads and replaces the procedural pillar to prove the end-to-end pipeline
-
-### Material System & GLB Integration (v1.7.0-slice2)
-- **Shared material module** (`src/3d/materials.ts`) — all 8 scene materials extracted from `scene.ts` into named factory functions: `createTeakMat`, `createGoldMat`, `createWallMat`, `createFloorMat`, `createStoneMat`, `createGlassMat`, `createGrassFloorMat`, `createCeilingMat`
-  - `SceneMaterials` type — typed record of all shared instances
-  - `createSceneMaterials(scene)` — convenience factory; call once in `BabylonScene.tsx` and pass to both `createCastle` and `loadAssets` so procedural geometry and loaded .glb assets always share the same material objects
-  - Consolidates two previously identical inline ceiling materials into one, halving ceiling GPU material count
-- **Material strategy per asset** — `AssetEntry.materialMode` selects how Blender materials are handled after GLB load:
-  - `'keep'` (default) — use Blender PBR materials exactly as exported; best for fully textured Blender assets
-  - `'remap'` — replace all materials on loaded meshes with shared `SceneMaterials` instances; specify target via `materialOverrides['*'].sceneMat`
-  - `'hybrid'` — preserve textures/UV but adjust colour/PBR values; set `albedoColor`/`diffuseColor`/`emissiveColor`/`metallic`/`roughness` per named mesh or wildcard `'*'`
-- **Collision proxies** — `AssetEntry.collision` controls physics for loaded assets without burdening the renderer:
-  - `'none'` (default) — decorative only
-  - `'mesh'` — `checkCollisions = true` directly on GLB meshes (expensive; use sparingly)
-  - `'box'` / `'cylinder'` (recommended) — invisible low-poly proxy parented to the root mesh; `collisionSize` sets dimensions; excluded from shadow generators
-- **`hexToColor3` helper** — safe hex-to-Color3 conversion with malformed-input guard (`Color3.FromHexString` silently returns black on bad input)
-
-### Blender Export Documentation (v1.7.0-slice3)
-- **`docs/BLENDER_GUIDE.md`** — complete Blender → Babylon.js workflow reference for modeling architectural assets
-  - GLB export settings (GLB format, Selected Objects only, +Y Up, Apply Modifiers/UVs/Normals/Tangents ON, Images JPEG, Animation OFF)
-  - Scale convention: 1 Blender unit = 1 metre; 1.8 m reference-cube technique for human-scale check
-  - Origin point convention: base-centre on every asset — `position.y = 0` places the asset flush on the floor with no offset needed
-  - Triangle budget table (500–2 000 tris per pillar, 200–500 per molding segment); scene budget < 200k tris for Quest browser
-  - Color palette with hex codes and `SceneMaterials` key cross-reference for matching Babylon.js theme
-  - Naming convention (`{category}-{variant}-{number}.glb`) and 6-step end-to-end testing workflow with common pitfall notes
-- **`docs/ASSET_SPECS.md`** — first batch of 4 architectural asset specifications
-  - `pillar-ornate-01.glb` — Javanese/Malay column, h=3.5 m, base Ø0.4 m, teak body + gold capital, 12 placements
-  - `doorway-arch-01.glb` — pointed/horseshoe arch (Malay/Islamic influence), w=3 m, h=3 m, depth=0.3 m, teak frame + gold inner trim, 3 placements
-  - `molding-crown-01.glb` — carved teak crown molding segment, L=1 m × h=0.15 m, gold coloured, tiled along walls (may stay procedural if scene triangle count too high when tiled)
-  - `throne-reception-01.glb` — Reception welcome centerpiece (lectern / throne / decorative stand), h≈1.5 m, footprint 1 m × 1 m, teak + gold
-- **`src/3d/assetManifest.ts`** — `throne-reception-01` added to `assetLibrary` and `assetPlacements`
-  - `fallbackType: 'box'` renders a 1 × 1.5 × 1 m teak-coloured box placeholder at Reception centre while the .glb is not yet exported
-  - Placement: `{ x: 0, y: 0, z: 13 }`, zone `reception`, casts and receives shadows
-
-### Dev Workflow & Hot-Reload (v1.7.0-slice4)
-- **GLB MIME type** — `glbMimePlugin` in `vite.config.ts` sets `Content-Type: model/gltf-binary` on every `.glb` request in the Vite dev server; production build is unaffected (Vite copies `/public/` verbatim)
-- **Asset-only reload** (`Ctrl+Shift+R`) — disposes all tracked GLB meshes, clears load stats, and re-runs the full load cycle without a page reload; camera position, scene geometry, lighting, and POIs are preserved; faster iteration when swapping `.glb` files during Blender work
-- **Asset debug overlay** (backtick `` ` `` to toggle) — fixed top-right panel with live stats; dev builds only, eliminated from production bundle via `import.meta.env.DEV` dead-code elimination
-  - FPS counter, total triangle count (summed across all loaded assets), active mesh count
-  - Per-asset table: ⏳/✅/⚠️/❌ status, triangle count accumulated across all placements, material count, load time in ms
-  - **A/B toggle** per asset — swap between loaded GLB and procedural fallback geometry in-place for comparison without leaving the scene
-- **Load stats tracking** — `assetLoadStats: Map<string, AssetLoadStat>` module-level export in `assetLoader.ts`; populated by `loadSingleAsset`; triangle counts use `instanceof Mesh` + `getTotalIndices() / 3`; `'loaded'` status wins over `'fallback'` if any placement of an asset succeeds
-- **`reloadAllAssets(scene, options)`** — exported from `assetLoader.ts`; uses `dispose(false, false)` (recurse children, preserve shared `SceneMaterials`) to avoid leaking the scene material palette across reloads
-- **`toggleAssetFallback(scene, assetId, options)`** — exported from `assetLoader.ts`; per-asset A/B switch wired to the overlay toggle buttons
-- **Dev workflow docs** — `docs/BLENDER_GUIDE.md` extended with "Dev Iteration Workflow" section covering the overlay, `Ctrl+Shift+R`, A/B toggle, typical 6-step iteration loop, and file size guidance
+### Blender Asset Pipeline (v1.7)
+- **Hybrid architecture**: procedural room geometry forms the permanent structure; Blender `.glb` files layer in architectural decorations (pillars, doorways, molding, throne)
+- **Config-driven asset manifest** (`src/3d/assetManifest.ts`) — typed `AssetEntry` and `AssetPlacement` records define every decoration placement with exact position, scale, shadow flags, and fallback strategy
+- **Automatic fallback**: when `.glb` files are absent, `fallbackType: 'none'` keeps existing procedural geometry in place (zero phantom meshes); `'box'` / `'cylinder'` generates a simple teak placeholder
+- **Material mapping** (`materialMode: 'keep' | 'remap' | 'hybrid'`) — use Blender PBR materials as-is, remap to shared scene palette, or adjust color/PBR while preserving UV layout
+- **Shadow and collision integration** — GLB assets wire into the scene's shadow generators; invisible box/cylinder collision proxies keep physics cheap without burdening the renderer
+- **Dev hot-reload workflow** — asset-only reload (`Ctrl+Shift+R`) swaps `.glb` files without a page refresh; backtick debug overlay shows per-asset status (⏳/✅/⚠️/❌), triangle counts, load times, and A/B GLB ↔ fallback toggle; overlay is eliminated from production bundle via dead-code elimination
+- **Reference docs**: [Blender export guide](docs/BLENDER_GUIDE.md) · [Asset specifications](docs/ASSET_SPECS.md)
 
 ### VR Performance Notes (Quest Pro browser)
 
@@ -572,7 +527,7 @@ const shouldDefaultToFallback = (): boolean => {
 ## 🚀 Development Roadmap
 
 <details>
-<summary>✅ Completed Versions (v0.1.0 – v1.6.0)</summary>
+<summary>✅ Completed Versions (v0.1.0 – v1.7.0)</summary>
 
 #### v0.1.0 — Scaffold
 Vite + React + TypeScript project setup, Tailwind CSS, Babylon.js deps, GitHub Pages CI/CD.
@@ -610,59 +565,12 @@ Player-centered minimap that auto-zooms to the 3 nearest POIs (8×8 min / 30×30
 #### v1.6.0 — 2D Mode Revamp (Spatial Portfolio)
 Complete rebuild of the 2D fallback mode as a recruiter-optimized scroll portfolio. Illustrated SVG castle map navigation with scroll sync (IntersectionObserver links scroll position to active map zone). Story-driven project cards with challenge/approach/outcome narrative for 6 top projects, graceful description fallback for others. Hero section with CSS-only floating gold particles and drifting wood-texture background. Vertical experience timeline with teak & gold styling and staggered dot reveal animations. Categorized skill tag groups and hackathon cards with gold achievement lines. Mobile-first responsive design: single-column scroll with floating map button → fullscreen overlay on mobile, sticky illustrated map sidebar + scrollable content on desktop. Card hover lift, CSS grid-rows expand/collapse animation, section dividers, and alternating section backgrounds. Accessible (role=button, aria-expanded, keyboard support). Visual QA pass across mobile/tablet/desktop breakpoints.
 
-#### v1.7.0-slice1 — GLB Import Pipeline + Asset Manifest
-Asset manifest (`src/3d/assetManifest.ts`) defining typed `AssetEntry` and `AssetPlacement` records for all 22 current decorative placements (12 pillars, 3 doorway frames, 3 molding segments, 1 test). Non-blocking GLB loader (`src/3d/assetLoader.ts`) using `SceneLoader.ImportMeshAsync` with `@babylonjs/loaders/glTF` plugin. Three-strategy fallback: load GLB, generate box/cylinder with teak material, or exit silently when `fallbackType: 'none'` (existing procedural geometry stays — zero duplicates). Shadow generators threaded through `LoadAssetsOptions`. `proceduralFallbackName` field enables clean swap-out when a GLB loads. `public/assets/models/` directory with KhronosGroup Box.glb test asset proving end-to-end pipeline at reception pillar position.
-
-#### v1.7.0-slice2 — Material Mapping + Shadow Integration
-Shared material module (`src/3d/materials.ts`) with 8 named factory functions and `SceneMaterials` aggregate type. `createSceneMaterials(scene)` called once in `BabylonScene.tsx` and threaded into both `createCastle` and `loadAssets` — procedural geometry and GLB assets share identical material objects, guaranteeing palette consistency. `scene.ts` refactored: six private material factory functions removed (~90 lines) and replaced with parameter propagation. `AssetEntry` extended with `materialMode` (`'keep' | 'remap' | 'hybrid'`), `materialOverrides` (per-mesh or `'*'` wildcard, with `sceneMat` / colour / PBR fields), `collision` (`'none' | 'mesh' | 'box' | 'cylinder'`), and `collisionSize`. `assetLoader.ts` gains `applyMaterialMode` (handles both `PBRMaterial` GLTF exports and `StandardMaterial`), `setupCollision` (invisible box/cylinder proxy parented to root, excluded from shadow generators), and `hexToColor3` (safe hex-to-Color3 with malformed-input guard).
-
-#### v1.7.0-slice3 — Blender Export Guide + Asset Specs
-Documentation slice unblocking manual Blender modeling work. `docs/BLENDER_GUIDE.md`: complete export workflow covering GLB settings (GLB format, +Y Up, Apply Modifiers, JPEG images, Animation OFF), 1-unit = 1-metre scale convention with 1.8 m human-height reference cube, base-centre origin convention, triangle budget table by asset type (scene target < 200k tris for Quest browser), color palette with hex codes and `SceneMaterials` key mapping, `{category}-{variant}-{number}.glb` naming convention, 6-step testing workflow with common pitfalls. `docs/ASSET_SPECS.md`: per-asset specifications for `pillar-ornate-01.glb` (h=3.5 m, 12 placements), `doorway-arch-01.glb` (w=3 m, h=3 m, 3 placements), `molding-crown-01.glb` (L=1 m, tiled, performance caveat noted), and `throne-reception-01.glb` (h=1.5 m, 1 placement) — each with style notes, dimensions table, material colours, and manifest cross-references. `assetManifest.ts` extended with `throne-reception-01` entry (`fallbackType: 'box'`, 1 × 1.5 × 1 m placeholder, `materialMode: 'remap'`, `collision: 'box'`) and placement at Reception centre `{ x: 0, y: 0, z: 13 }`.
-
-#### v1.7.0-slice4 — Dev Hot-Reload Workflow + Debug Overlay
-Developer tooling slice making the Blender → browser iteration loop fast. `vite.config.ts`: inline `glbMimePlugin` sets `Content-Type: model/gltf-binary` in the dev server. `assetLoader.ts`: `AssetLoadStat` type + `assetLoadStats: Map<string, AssetLoadStat>` export tracking per-asset status, triangle count, material count, and load time (accumulated across all placements of the same asset; `'loaded'` beats `'fallback'`); `reloadAllAssets(scene, options)` disposes all managed roots with `dispose(false, false)` (preserves shared `SceneMaterials`) and re-runs the full load cycle; `toggleAssetFallback(scene, assetId, options)` swaps an asset between its GLB and fallback in-place. `src/3d/assetDebug.tsx` (new): dev-only `AssetDebugOverlay` React component — fixed top-right panel (teak/gold palette, monospace 11px, z-index 9999); polls `assetLoadStats` and `scene.getEngine().getFps()` every 500 ms; shows FPS, total triangles, active mesh count, and a per-asset table (⏳/✅/⚠️/❌ status, triangle count, material count, load time, A/B toggle button); confirmed absent from production bundle via Vite/Rollup dead-code elimination. `BabylonScene.tsx`: `loadAssetsOptionsRef` ref stores `LoadAssetsOptions` at scene init for stable access from keyboard handler; `showDebugOverlay` state; dev-only `useEffect` handles backtick (overlay toggle) and `Ctrl+Shift+R` (asset reload with `preventDefault`). `docs/BLENDER_GUIDE.md` extended with "Dev Iteration Workflow" section.
+#### v1.7.0 — Blender Asset Pipeline
+GLB import pipeline using Babylon.js `ImportMeshAsync` with `@babylonjs/loaders/glTF` plugin. Config-driven asset manifest (`src/3d/assetManifest.ts`) — typed `AssetEntry` and `AssetPlacement` records for all decoration placements. Three-strategy fallback system: load GLB → procedural box/cylinder with shared teak material → silent exit (existing procedural mesh stays). Shared material module (`src/3d/materials.ts`) — 8 named factory functions, `SceneMaterials` type, `createSceneMaterials(scene)` called once and threaded through all zone builders and asset loader. Material mapping modes (`keep` / `remap` / `hybrid`) and invisible collision proxies (`box` / `cylinder`) for loaded GLB assets. Dev tooling: `glbMimePlugin` in `vite.config.ts`, `assetLoadStats` export, `reloadAllAssets` (Ctrl+Shift+R), `toggleAssetFallback` A/B toggle, `AssetDebugOverlay` React component (dev-only, confirmed absent in production). Blender workflow reference: `docs/BLENDER_GUIDE.md` and `docs/ASSET_SPECS.md`.
 
 </details>
 
 ### 🔧 Upcoming
-
-#### v1.7.0 — Blender Asset Pipeline
-
-**Slice 1 (done):**
-- [x] `AssetEntry` + `AssetPlacement` typed manifest system (`src/3d/assetManifest.ts`)
-- [x] Non-blocking GLB loader with `SceneLoader.ImportMeshAsync` and `@babylonjs/loaders/glTF` registration (`src/3d/assetLoader.ts`)
-- [x] Three-strategy fallback: load GLB → simple procedural → silent (existing mesh stays)
-- [x] Shadow casting/receiving wired through placement config
-- [x] `proceduralFallbackName` field enables clean swap-out of zone-function meshes on successful load
-- [x] `public/assets/models/` directory; test GLB (KhronosGroup Box) proves pipeline end-to-end
-
-**Slice 2 (done):**
-- [x] Shared material module (`src/3d/materials.ts`) — 8 named factories, `SceneMaterials` type, `createSceneMaterials(scene)` convenience factory
-- [x] `scene.ts` refactored to accept `SceneMaterials` — private factory functions removed, single shared instance propagated through all zone builders
-- [x] `AssetEntry` extended with `materialMode` (`keep` / `remap` / `hybrid`), `materialOverrides`, `collision`, `collisionSize`
-- [x] `applyMaterialMode` in `assetLoader.ts` — handles `PBRMaterial` (Blender GLTF export) and `StandardMaterial`; remap uses `SceneMaterials` keys; hybrid adjusts colour/PBR without discarding textures
-- [x] `setupCollision` — invisible box/cylinder proxy parented to GLB root, excluded from shadow generators; `'mesh'` mode enables `checkCollisions` directly on GLB geometry
-- [x] `hexToColor3` utility — safe hex-to-Color3 with malformed-input guard
-
-**Slice 3 (done):**
-- [x] `docs/BLENDER_GUIDE.md` — Blender → Babylon.js export workflow (settings, scale, origin, budgets, palette, naming, testing)
-- [x] `docs/ASSET_SPECS.md` — first batch of 4 asset specs with dimensions, style notes, and manifest cross-references
-- [x] `throne-reception-01` manifest entry + 1 × 1.5 × 1 m box placeholder at Reception centre `{ x:0, y:0, z:13 }`
-
-**Slice 4 (done):**
-- [x] `vite.config.ts` — `glbMimePlugin` sets `Content-Type: model/gltf-binary` in dev server; build pipeline unchanged
-- [x] `AssetLoadStat` type + `assetLoadStats` map exported from `assetLoader.ts`; per-asset status, triangle count, material count, load time; multiple placements accumulate; `'loaded'` beats `'fallback'` if any placement succeeds
-- [x] `reloadAllAssets(scene, options)` — disposes all managed roots, clears stats, re-runs `loadAssets`; triggered by `Ctrl+Shift+R`
-- [x] `toggleAssetFallback(scene, assetId, options)` — in-place A/B switch between GLB and procedural fallback per asset
-- [x] `src/3d/assetDebug.tsx` — dev-only `AssetDebugOverlay` component; polls stats + engine FPS every 500 ms; confirmed absent from production bundle
-- [x] `BabylonScene.tsx` — `loadAssetsOptionsRef` + `showDebugOverlay` state; dev keyboard handler (backtick, `Ctrl+Shift+R`); conditional overlay render
-- [x] `docs/BLENDER_GUIDE.md` extended with "Dev Iteration Workflow" section
-
-**Slice 5 (upcoming — pending manual Blender work):**
-- [ ] Model and export `pillar-ornate-01.glb`; update manifest entry with `materialMode`, `collision: 'cylinder'`; set `proceduralFallbackName` on placements to swap out procedural pillars
-- [ ] Model and export `doorway-arch-01.glb`; update manifest entry (id: `doorway-frame-01`); verify arch aligns with `WALL_THICKNESS = 0.3` depth and `DOOR_WIDTH = 3` opening
-- [ ] Model and export `molding-crown-01.glb`; tile test — keep procedural if scene triangle count exceeds budget when tiled across all walls
-- [ ] Model and export `throne-reception-01.glb`; swap out box placeholder via `proceduralFallbackName` or direct replacement
 
 #### v1.8.0 — 3D Self-Portrait (Scan + Splat Avatar)
 - [ ] iPhone LiDAR self-scan (via Scaniverse/Polycam)
