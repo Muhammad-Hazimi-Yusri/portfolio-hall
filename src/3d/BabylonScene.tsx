@@ -13,7 +13,9 @@ import { setupHandTracking } from './vrInteraction'
 import { createVRFpsCounter } from './vrUI'
 import { applyVRLighting } from './lights'
 import type { LightsResult } from './lights'
-import { loadAssets } from './assetLoader'
+import { loadAssets, reloadAllAssets, toggleAssetFallback } from './assetLoader'
+import type { LoadAssetsOptions } from './assetLoader'
+import { AssetDebugOverlay } from './assetDebug'
 import { createSceneMaterials } from './materials'
 import poisData from '@/data/pois.json'
 import type { POI } from '@/types/poi'
@@ -47,6 +49,10 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress }: Babylo
   const [landscapeMode, setLandscapeMode] = useState(false)
   const landscapeModeRef = useRef(false)
   const [showControlsHint, setShowControlsHint] = useState<'portrait' | 'landscape-confirm' | null>(null)
+
+  // Asset dev tooling (refs are stable — dev keyboard handler and overlay callbacks use them)
+  const loadAssetsOptionsRef = useRef<LoadAssetsOptions>({})
+  const [showDebugOverlay, setShowDebugOverlay] = useState(false)
 
   // Navigation state
   const cameraRef = useRef(createCameraRefDefault())
@@ -83,6 +89,25 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress }: Babylo
       return () => clearTimeout(timer)
     }
   }, [showMobileControls])
+
+  // Dev-only: backtick toggles debug overlay; Ctrl+Shift+R reloads assets only
+  useEffect(() => {
+    if (!import.meta.env.DEV) return
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === '`') {
+        setShowDebugOverlay(prev => !prev)
+        return
+      }
+      // e.key === 'R' (uppercase) is correct when Shift is held
+      if (e.ctrlKey && e.shiftKey && e.key === 'R') {
+        e.preventDefault() // block browser hard-refresh in some browsers
+        const scene = sceneRef.current
+        if (scene) reloadAllAssets(scene, loadAssetsOptionsRef.current)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, []) // empty deps: refs are stable; import.meta.env.DEV is a compile-time constant
 
   // Lock portrait orientation when landscape mode is off
   useEffect(() => {
@@ -183,7 +208,13 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress }: Babylo
     lightsResult = lights
 
     // Load architectural .glb assets — non-blocking, scene renders immediately with fallbacks
-    loadAssets(scene, { sunShadowGen: lights.sunShadowGen, indoorShadowGen: lights.indoorShadowGen, sceneMaterials: mats })
+    const loadOpts: LoadAssetsOptions = {
+      sunShadowGen: lights.sunShadowGen,
+      indoorShadowGen: lights.indoorShadowGen,
+      sceneMaterials: mats,
+    }
+    loadAssetsOptionsRef.current = loadOpts
+    loadAssets(scene, loadOpts)
 
     onLoadProgress?.(90, 'textures')
 
@@ -377,6 +408,20 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress }: Babylo
             <span>Press <span className="text-hall-accent font-bold">E</span> to inspect {nearbyPOI.content.title}</span>
           )}
         </button>
+      )}
+
+      {import.meta.env.DEV && showDebugOverlay && (
+        <AssetDebugOverlay
+          scene={sceneRef.current}
+          onReload={() => {
+            const scene = sceneRef.current
+            if (scene) reloadAllAssets(scene, loadAssetsOptionsRef.current)
+          }}
+          onToggleAsset={(assetId) => {
+            const scene = sceneRef.current
+            if (scene) toggleAssetFallback(scene, assetId, loadAssetsOptionsRef.current)
+          }}
+        />
       )}
     </div>
   )

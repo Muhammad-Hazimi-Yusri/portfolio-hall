@@ -33,3 +33,8 @@ vite.config.ts.timestamp-*
 # CV generator — personal data and bundled binary
 cv-generator/references/master-cv.md
 cv-generator.skill
+
+# 3D asset policy — .glb files ARE committed (not ignored).
+# GitHub Pages needs them in the repo at /public/assets/models/.
+# Keep each file under 5 MB and commit directly.
+# If the repo grows large, set up Git LFS: git lfs track "*.glb"

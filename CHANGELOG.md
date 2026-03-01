@@ -17,6 +17,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.7.0-slice4] - 2026-02-28
+
+### Added
+- `vite.config.ts`: inline `glbMimePlugin` serves `.glb` files with `Content-Type: model/gltf-binary` in the Vite dev server; the build pipeline (`vite build` copies `/public/` verbatim) needs no changes
+- `src/3d/assetLoader.ts`:
+  - `AssetLoadStat` type export — `{ status, triangleCount, materialCount, loadTimeMs }` per assetId; `status` is `'pending' | 'loaded' | 'fallback' | 'error'`
+  - `assetLoadStats: Map<string, AssetLoadStat>` module-level export — populated by `loadSingleAsset`; multiple placements of the same asset accumulate triangle/material counts; `'loaded'` status takes priority over `'fallback'` if any placement succeeds
+  - `reloadAllAssets(scene, options)` — disposes all managed mesh roots (`dispose(false, false)` preserves shared `SceneMaterials`), clears stats, re-runs `loadAssets`; invoked by `Ctrl+Shift+R` keyboard shortcut in `BabylonScene.tsx`
+  - `toggleAssetFallback(scene, assetId, options)` — swaps a single assetId between its loaded GLB and its procedural fallback; invoked by the debug overlay A/B toggle button
+  - `createFallback` return type changed from `void` to `AbstractMesh | null` to support root tracking
+  - Triangle counting via `instanceof Mesh` guard and `getTotalIndices() / 3`; material deduplication via `material.uniqueId` set
+- `src/3d/assetDebug.tsx` (new file) — dev-only `AssetDebugOverlay` React component
+  - Fixed top-right overlay; teak/gold colour palette; monospace 11px; `z-index: 9999`
+  - Polls `assetLoadStats` and `scene.getEngine().getFps()` every 500 ms
+  - Header: live FPS, total triangle count, active mesh count, Reload All button
+  - Per-asset table: status icon (⏳/✅/⚠️/❌), triangle count, material count, load time ms, A/B toggle button
+  - Statically imported but eliminated from production by Vite/Rollup dead-code elimination (`import.meta.env.DEV` guard at all render sites)
+- `src/3d/BabylonScene.tsx`:
+  - `loadAssetsOptionsRef` ref — stores `LoadAssetsOptions` at scene init for stable access in the keyboard handler and overlay callbacks
+  - `showDebugOverlay` state — controls overlay visibility
+  - Dev-only `useEffect` keyboard handler: backtick toggles overlay, `Ctrl+Shift+R` calls `reloadAllAssets` with `preventDefault` to block browser hard-refresh
+  - `<AssetDebugOverlay>` rendered inside `import.meta.env.DEV && showDebugOverlay` guard
+
+### Changed
+- `.gitignore`: added comment section explaining GLB commit policy (files committed directly; keep under 5 MB; Git LFS as fallback if repo grows large)
+- `docs/BLENDER_GUIDE.md`: added "Dev Iteration Workflow" section covering the debug overlay, `Ctrl+Shift+R` asset-only reload, A/B toggle, typical iteration loop, and file size guidance
+
+---
+
 ## [1.7.0-slice3] - 2026-02-28
 
 ### Added

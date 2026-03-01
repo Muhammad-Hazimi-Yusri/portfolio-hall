@@ -5,7 +5,7 @@
 > A grand royal hall or throne room; the ceremonial heart of a palace where audiences are received and important gatherings held.
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
-[![Version](https://img.shields.io/badge/version-1.7.0--slice3-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-1.7.0--slice4-blue.svg)]()
 [![Status](https://img.shields.io/badge/status-In_Progress-yellow.svg)]()
 
 <details>
@@ -224,6 +224,18 @@ Balairung uses a **Javanese/Malay royal hall** aesthetic inspired by traditional
   - `fallbackType: 'box'` renders a 1 × 1.5 × 1 m teak-coloured box placeholder at Reception centre while the .glb is not yet exported
   - Placement: `{ x: 0, y: 0, z: 13 }`, zone `reception`, casts and receives shadows
 
+### Dev Workflow & Hot-Reload (v1.7.0-slice4)
+- **GLB MIME type** — `glbMimePlugin` in `vite.config.ts` sets `Content-Type: model/gltf-binary` on every `.glb` request in the Vite dev server; production build is unaffected (Vite copies `/public/` verbatim)
+- **Asset-only reload** (`Ctrl+Shift+R`) — disposes all tracked GLB meshes, clears load stats, and re-runs the full load cycle without a page reload; camera position, scene geometry, lighting, and POIs are preserved; faster iteration when swapping `.glb` files during Blender work
+- **Asset debug overlay** (backtick `` ` `` to toggle) — fixed top-right panel with live stats; dev builds only, eliminated from production bundle via `import.meta.env.DEV` dead-code elimination
+  - FPS counter, total triangle count (summed across all loaded assets), active mesh count
+  - Per-asset table: ⏳/✅/⚠️/❌ status, triangle count accumulated across all placements, material count, load time in ms
+  - **A/B toggle** per asset — swap between loaded GLB and procedural fallback geometry in-place for comparison without leaving the scene
+- **Load stats tracking** — `assetLoadStats: Map<string, AssetLoadStat>` module-level export in `assetLoader.ts`; populated by `loadSingleAsset`; triangle counts use `instanceof Mesh` + `getTotalIndices() / 3`; `'loaded'` status wins over `'fallback'` if any placement of an asset succeeds
+- **`reloadAllAssets(scene, options)`** — exported from `assetLoader.ts`; uses `dispose(false, false)` (recurse children, preserve shared `SceneMaterials`) to avoid leaking the scene material palette across reloads
+- **`toggleAssetFallback(scene, assetId, options)`** — exported from `assetLoader.ts`; per-asset A/B switch wired to the overlay toggle buttons
+- **Dev workflow docs** — `docs/BLENDER_GUIDE.md` extended with "Dev Iteration Workflow" section covering the overlay, `Ctrl+Shift+R`, A/B toggle, typical 6-step iteration loop, and file size guidance
+
 ### VR Performance Notes (Quest Pro browser)
 
 **Target: 72 fps**
@@ -293,7 +305,8 @@ portfolio-hall/
 │   │   ├── scene.ts              # Castle geometry: walls, floors, ceilings, decorative meshes
 │   │   ├── materials.ts          # Shared material factories + SceneMaterials type
 │   │   ├── assetManifest.ts      # Typed catalogue of all .glb placements + positions
-│   │   ├── assetLoader.ts        # Non-blocking GLB loader with material mapping + collision
+│   │   ├── assetLoader.ts        # Non-blocking GLB loader; stats tracking, hot-reload, A/B toggle
+│   │   ├── assetDebug.tsx        # Dev-only overlay component (tree-shaken from production)
 │   │   ├── camera.ts             # First-person camera (WASD, gyro, touch)
 │   │   ├── cameraRef.ts          # Shared camera position ref (3D → React)
 │   │   ├── flyTo.ts              # Fly-to teleport animation
@@ -503,6 +516,13 @@ iOS Safari doesn't support fullscreen API. For best landscape experience, add th
 - Close: aim at "✕" and pinch/trigger, or press B/Y button
 - Links: tapping a link button queues the URL; all queued links open in new browser tabs when you exit VR
 
+### Dev Shortcuts (desktop · dev builds only)
+
+| Key | Action |
+|-----|--------|
+| `` ` `` (backtick) | Toggle asset debug overlay (FPS, triangle counts, per-asset status + A/B toggle) |
+| `Ctrl + Shift + R` | Reload all GLB assets without page refresh (camera and scene preserved) |
+
 ### Teleportation
 - Click minimap location → fade out → fly to → fade in → face nearest POI
 - Click sidebar section → same behavior, lands at section center
@@ -599,6 +619,9 @@ Shared material module (`src/3d/materials.ts`) with 8 named factory functions an
 #### v1.7.0-slice3 — Blender Export Guide + Asset Specs
 Documentation slice unblocking manual Blender modeling work. `docs/BLENDER_GUIDE.md`: complete export workflow covering GLB settings (GLB format, +Y Up, Apply Modifiers, JPEG images, Animation OFF), 1-unit = 1-metre scale convention with 1.8 m human-height reference cube, base-centre origin convention, triangle budget table by asset type (scene target < 200k tris for Quest browser), color palette with hex codes and `SceneMaterials` key mapping, `{category}-{variant}-{number}.glb` naming convention, 6-step testing workflow with common pitfalls. `docs/ASSET_SPECS.md`: per-asset specifications for `pillar-ornate-01.glb` (h=3.5 m, 12 placements), `doorway-arch-01.glb` (w=3 m, h=3 m, 3 placements), `molding-crown-01.glb` (L=1 m, tiled, performance caveat noted), and `throne-reception-01.glb` (h=1.5 m, 1 placement) — each with style notes, dimensions table, material colours, and manifest cross-references. `assetManifest.ts` extended with `throne-reception-01` entry (`fallbackType: 'box'`, 1 × 1.5 × 1 m placeholder, `materialMode: 'remap'`, `collision: 'box'`) and placement at Reception centre `{ x: 0, y: 0, z: 13 }`.
 
+#### v1.7.0-slice4 — Dev Hot-Reload Workflow + Debug Overlay
+Developer tooling slice making the Blender → browser iteration loop fast. `vite.config.ts`: inline `glbMimePlugin` sets `Content-Type: model/gltf-binary` in the dev server. `assetLoader.ts`: `AssetLoadStat` type + `assetLoadStats: Map<string, AssetLoadStat>` export tracking per-asset status, triangle count, material count, and load time (accumulated across all placements of the same asset; `'loaded'` beats `'fallback'`); `reloadAllAssets(scene, options)` disposes all managed roots with `dispose(false, false)` (preserves shared `SceneMaterials`) and re-runs the full load cycle; `toggleAssetFallback(scene, assetId, options)` swaps an asset between its GLB and fallback in-place. `src/3d/assetDebug.tsx` (new): dev-only `AssetDebugOverlay` React component — fixed top-right panel (teak/gold palette, monospace 11px, z-index 9999); polls `assetLoadStats` and `scene.getEngine().getFps()` every 500 ms; shows FPS, total triangles, active mesh count, and a per-asset table (⏳/✅/⚠️/❌ status, triangle count, material count, load time, A/B toggle button); confirmed absent from production bundle via Vite/Rollup dead-code elimination. `BabylonScene.tsx`: `loadAssetsOptionsRef` ref stores `LoadAssetsOptions` at scene init for stable access from keyboard handler; `showDebugOverlay` state; dev-only `useEffect` handles backtick (overlay toggle) and `Ctrl+Shift+R` (asset reload with `preventDefault`). `docs/BLENDER_GUIDE.md` extended with "Dev Iteration Workflow" section.
+
 </details>
 
 ### 🔧 Upcoming
@@ -626,7 +649,16 @@ Documentation slice unblocking manual Blender modeling work. `docs/BLENDER_GUIDE
 - [x] `docs/ASSET_SPECS.md` — first batch of 4 asset specs with dimensions, style notes, and manifest cross-references
 - [x] `throne-reception-01` manifest entry + 1 × 1.5 × 1 m box placeholder at Reception centre `{ x:0, y:0, z:13 }`
 
-**Slice 4 (upcoming — pending manual Blender work):**
+**Slice 4 (done):**
+- [x] `vite.config.ts` — `glbMimePlugin` sets `Content-Type: model/gltf-binary` in dev server; build pipeline unchanged
+- [x] `AssetLoadStat` type + `assetLoadStats` map exported from `assetLoader.ts`; per-asset status, triangle count, material count, load time; multiple placements accumulate; `'loaded'` beats `'fallback'` if any placement succeeds
+- [x] `reloadAllAssets(scene, options)` — disposes all managed roots, clears stats, re-runs `loadAssets`; triggered by `Ctrl+Shift+R`
+- [x] `toggleAssetFallback(scene, assetId, options)` — in-place A/B switch between GLB and procedural fallback per asset
+- [x] `src/3d/assetDebug.tsx` — dev-only `AssetDebugOverlay` component; polls stats + engine FPS every 500 ms; confirmed absent from production bundle
+- [x] `BabylonScene.tsx` — `loadAssetsOptionsRef` + `showDebugOverlay` state; dev keyboard handler (backtick, `Ctrl+Shift+R`); conditional overlay render
+- [x] `docs/BLENDER_GUIDE.md` extended with "Dev Iteration Workflow" section
+
+**Slice 5 (upcoming — pending manual Blender work):**
 - [ ] Model and export `pillar-ornate-01.glb`; update manifest entry with `materialMode`, `collision: 'cylinder'`; set `proceduralFallbackName` on placements to swap out procedural pillars
 - [ ] Model and export `doorway-arch-01.glb`; update manifest entry (id: `doorway-frame-01`); verify arch aligns with `WALL_THICKNESS = 0.3` depth and `DOOR_WIDTH = 3` opening
 - [ ] Model and export `molding-crown-01.glb`; tile test — keep procedural if scene triangle count exceeds budget when tiled across all walls

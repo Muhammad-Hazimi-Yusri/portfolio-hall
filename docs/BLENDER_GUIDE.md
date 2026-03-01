@@ -130,3 +130,66 @@ Rules:
 - Asset invisible → GLB path typo, or `fallbackType: 'none'` with a missing file (procedural mesh still shows)
 - Materials look wrong → check `materialMode` on the entry (`'keep'` preserves Blender mats, `'remap'` uses scene theme)
 - Shadows missing → set `castShadows: true` and/or `receiveShadows: true` on the placement
+
+---
+
+## Dev Iteration Workflow
+
+These tools are only active in development (`npm run dev`). They are eliminated from the production build automatically.
+
+### Debug overlay
+
+Press **`` ` ``** (backtick) to toggle the asset debug overlay (fixed, top-right corner).
+
+The overlay shows:
+
+- **FPS** — live frame rate (target: ≥ 60 on desktop, ≥ 36 on Quest browser)
+- **Tris** — total triangle count summed across all loaded assets
+- **Active meshes** — number of meshes Babylon.js drew last frame
+- A table row per entry in `assetLibrary`:
+
+| Column | Meaning |
+|--------|---------|
+| Asset | Asset ID from the manifest |
+| Status | ⏳ pending / ✅ loaded / ⚠️ fallback / ❌ error |
+| Tris | Triangle count (accumulated across all placements) |
+| Mats | Unique material count |
+| ms | Load time in milliseconds |
+| Button | Toggle between GLB and fallback geometry (see below) |
+
+### Asset-only reload
+
+After dropping a new or updated `.glb` into `/public/assets/models/`, press:
+
+**`Ctrl + Shift + R`** — disposes all managed meshes and re-runs the full load cycle without restarting the dev server or losing camera position.
+
+This is faster than a full page reload because the Babylon.js engine, scene, lighting, camera, and POI meshes are all preserved. Only the asset meshes are replaced.
+
+> Note: a plain browser refresh also works and picks up new files — Vite serves `/public/` as static files so the updated `.glb` is available immediately on the next request.
+
+### A/B comparison toggle
+
+Each row in the debug overlay has a **→ fallback** / **→ GLB** button. Clicking it:
+
+- **→ fallback**: disposes the loaded GLB mesh and shows the procedural box/cylinder placeholder
+- **→ GLB**: disposes the placeholder and re-triggers the GLB import
+
+Use this to compare a fresh Blender export against the placeholder without leaving the scene.
+
+### Typical iteration loop
+
+1. **Model** the asset in Blender and export to `/public/assets/models/`
+2. In the browser: press `Ctrl+Shift+R` — the new file loads in place
+3. Press `` ` `` to open the debug overlay and confirm ✅ loaded + triangle count
+4. Check FPS — stay well under the scene budget (< 200 k total tris)
+5. Click **→ fallback** to compare against the placeholder size/shape
+6. Adjust in Blender, re-export, repeat from step 2
+
+### File size guidance
+
+Keep each `.glb` **under 5 MB** and commit it directly to the repo. GitHub Pages serves them as static files, so they must be present in the repository (not gitignored). If the repo grows large later, set up Git LFS with:
+
+```sh
+git lfs track "*.glb"
+git add .gitattributes
+```

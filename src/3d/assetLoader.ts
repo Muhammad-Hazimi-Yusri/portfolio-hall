@@ -2,6 +2,7 @@ import { Scene } from '@babylonjs/core/scene'
 import { Vector3 } from '@babylonjs/core/Maths/math.vector'
 import { Color3 } from '@babylonjs/core/Maths/math.color'
 import { MeshBuilder } from '@babylonjs/core/Meshes/meshBuilder'
+import { Mesh } from '@babylonjs/core/Meshes/mesh'
 import { StandardMaterial } from '@babylonjs/core/Materials/standardMaterial'
 import { PBRMaterial } from '@babylonjs/core/Materials/PBR/pbrMaterial'
 import { SceneLoader } from '@babylonjs/core/Loading/sceneLoader'
@@ -24,6 +25,32 @@ export type LoadAssetsOptions = {
   sceneMaterials?: SceneMaterials
 }
 
+export type AssetLoadStat = {
+  status: 'pending' | 'loaded' | 'fallback' | 'error'
+  /** Accumulated triangle count across all placements of this assetId. */
+  triangleCount: number
+  /** Count of unique material uniqueIds across all loaded meshes for this assetId. */
+  materialCount: number
+  /** Load duration in ms for the last resolved placement; 0 while pending. */
+  loadTimeMs: number
+}
+
+// ── Module-level state ──
+
+/**
+ * Per-asset load statistics. Populated during loadSingleAsset.
+ * Exported so assetDebug.tsx can poll it without prop drilling.
+ * Keyed by AssetEntry.id. Multiple placements of the same asset accumulate here.
+ */
+export const assetLoadStats: Map<string, AssetLoadStat> = new Map()
+
+/**
+ * Root meshes tracked per assetId (private — all callers go through
+ * reloadAllAssets or toggleAssetFallback).
+ * Multiple placements of the same asset push to the same array.
+ */
+const managedRoots: Map<string, AbstractMesh[]> = new Map()
+
 // ── Public API ──
 
 /**
@@ -35,6 +62,75 @@ export type LoadAssetsOptions = {
 export function loadAssets(scene: Scene, options: LoadAssetsOptions = {}): void {
   for (const placement of assetPlacements) {
     void loadSingleAsset(scene, placement, options)
+  }
+}
+
+/**
+ * Dispose all meshes previously loaded by loadAssets, clear stats,
+ * and re-run the full load cycle. Use this after dropping new .glb
+ * files into /public/assets/models/ during development.
+ *
+ * dispose(false, false): recurse into children but do NOT dispose
+ * materials — shared SceneMaterials instances must survive across reloads.
+ */
+export function reloadAllAssets(scene: Scene, options: LoadAssetsOptions = {}): void {
+  for (const [, roots] of managedRoots) {
+    for (const root of roots) {
+      if (!root.isDisposed()) {
+        root.dispose(false, false)
+      }
+    }
+  }
+  managedRoots.clear()
+  assetLoadStats.clear()
+  loadAssets(scene, options)
+}
+
+/**
+ * Toggle a single asset between its loaded GLB and its procedural fallback.
+ * Used by the dev overlay A/B comparison button.
+ *
+ * If status is 'loaded'  → dispose GLB meshes and create fallback geometry.
+ * If status is 'fallback' → dispose fallbacks and re-trigger GLB load.
+ * If status is 'pending' or unknown → no-op.
+ */
+export function toggleAssetFallback(
+  scene: Scene,
+  assetId: string,
+  options: LoadAssetsOptions = {},
+): void {
+  const stat = assetLoadStats.get(assetId)
+  if (!stat || stat.status === 'pending') return
+
+  const entry = assetLibrary.find(e => e.id === assetId)
+  if (!entry) return
+
+  // Dispose all currently tracked meshes for this asset
+  const roots = managedRoots.get(assetId) ?? []
+  for (const root of roots) {
+    if (!root.isDisposed()) root.dispose(false, false)
+  }
+  managedRoots.set(assetId, [])
+  assetLoadStats.set(assetId, { status: 'pending', triangleCount: 0, materialCount: 0, loadTimeMs: 0 })
+
+  const placements = assetPlacements.filter(p => p.assetId === assetId)
+
+  if (stat.status === 'loaded') {
+    // Switch to fallback — synchronous
+    for (const placement of placements) {
+      const mesh = createFallback(scene, entry, placement, options)
+      if (mesh) {
+        const r = managedRoots.get(assetId) ?? []
+        r.push(mesh)
+        managedRoots.set(assetId, r)
+      }
+    }
+    assetLoadStats.set(assetId, { status: 'fallback', triangleCount: 0, materialCount: 0, loadTimeMs: 0 })
+  } else {
+    // Switch to GLB — async; stats update as placements resolve
+    for (const placement of placements) {
+      void loadSingleAsset(scene, placement, options)
+    }
   }
 }
 
@@ -51,6 +147,13 @@ async function loadSingleAsset(
     return
   }
 
+  // Initialise stats entry to 'pending' on first encounter for this assetId
+  if (!assetLoadStats.has(entry.id)) {
+    assetLoadStats.set(entry.id, { status: 'pending', triangleCount: 0, materialCount: 0, loadTimeMs: 0 })
+  }
+
+  const startTime = performance.now()
+
   // Split full path into rootUrl + filename for SceneLoader
   const lastSlash = entry.glbPath.lastIndexOf('/')
   const rootUrl = entry.glbPath.substring(0, lastSlash + 1)
@@ -59,6 +162,7 @@ async function loadSingleAsset(
   try {
     const result = await SceneLoader.ImportMeshAsync('', rootUrl, filename, scene)
     const root = result.meshes[0]
+    const loadTimeMs = performance.now() - startTime
 
     // Apply placement transform
     root.position = new Vector3(placement.position.x, placement.position.y, placement.position.z)
@@ -97,11 +201,50 @@ async function loadSingleAsset(
     // Collision proxy setup
     setupCollision(scene, root, entry)
 
+    // Track root mesh for later disposal
+    const roots = managedRoots.get(entry.id) ?? []
+    roots.push(root)
+    managedRoots.set(entry.id, roots)
+
+    // Accumulate stats — multiple placements of the same asset add triangles/materials
+    const triCount = result.meshes.reduce(
+      (sum, m) => sum + (m instanceof Mesh ? m.getTotalIndices() / 3 : 0),
+      0,
+    )
+    const matIds = new Set(
+      result.meshes.filter(m => m.material != null).map(m => m.material!.uniqueId),
+    )
+    const prev = assetLoadStats.get(entry.id)!
+    assetLoadStats.set(entry.id, {
+      status: 'loaded',
+      triangleCount: prev.triangleCount + triCount,
+      materialCount: prev.materialCount + matIds.size,
+      loadTimeMs,
+    })
+
     console.log(`[assetLoader] Loaded ${entry.id} → zone:${placement.zone}`)
   } catch {
     // Expected during development — GLB files don't exist yet
+    const loadTimeMs = performance.now() - startTime
     console.warn(`[assetLoader] Missing ${entry.glbPath} — fallback active`)
-    createFallback(scene, entry, placement, options)
+    const fallbackMesh = createFallback(scene, entry, placement, options)
+
+    if (fallbackMesh) {
+      const roots = managedRoots.get(entry.id) ?? []
+      roots.push(fallbackMesh)
+      managedRoots.set(entry.id, roots)
+    }
+
+    // Only downgrade to 'fallback' if a previous placement hasn't already succeeded
+    const prev = assetLoadStats.get(entry.id)
+    if (!prev || prev.status !== 'loaded') {
+      assetLoadStats.set(entry.id, {
+        status: 'fallback',
+        triangleCount: prev?.triangleCount ?? 0,
+        materialCount: prev?.materialCount ?? 0,
+        loadTimeMs,
+      })
+    }
   }
 }
 
@@ -229,10 +372,10 @@ function createFallback(
   entry: AssetEntry,
   placement: AssetPlacement,
   options: LoadAssetsOptions,
-): void {
+): AbstractMesh | null {
   if (entry.fallbackType === 'none') {
     // Existing procedural geometry in scene.ts is the visual fallback — nothing to do
-    return
+    return null
   }
 
   const dims = entry.fallbackDimensions ?? { width: 0.5, height: 1.0, depth: 0.5 }
@@ -267,4 +410,6 @@ function createFallback(
   if (placement.receiveShadows) {
     mesh.receiveShadows = true
   }
+
+  return mesh
 }
