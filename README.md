@@ -5,7 +5,7 @@
 > A grand royal hall or throne room; the ceremonial heart of a palace where audiences are received and important gatherings held.
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
-[![Version](https://img.shields.io/badge/version-2.1.0-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-2.2.0-blue.svg)]()
 [![Status](https://img.shields.io/badge/status-In_Progress-yellow.svg)]()
 
 <details>
@@ -272,6 +272,7 @@ portfolio-hall/
 │   │   ├── webxr.ts              # WebXR support check, XR experience factory, VR locomotion + vignette, menu buttons, seated mode
 │   │   ├── vrInteraction.ts      # Hand tracking, pinch/trigger, hover ray casting, POI select
 │   │   ├── vrUI.ts               # VR hover label, floating inspect panel, FPS counter HUD
+│   │   ├── tourPath.ts            # Camera spline waypoints + interpolation for scroll-driven tour
 │   │   └── BabylonScene.tsx      # Main 3D React component
 │   │
 │   ├── components/
@@ -527,7 +528,7 @@ const shouldDefaultToFallback = (): boolean => {
 ## 🚀 Development Roadmap
 
 <details>
-<summary>✅ Completed Versions (v0.1.0 – v2.0.0)</summary>
+<summary>✅ Completed Versions (v0.1.0 – v2.2.0)</summary>
 
 #### v0.1.0 — Scaffold
 Vite + React + TypeScript project setup, Tailwind CSS, Babylon.js deps, GitHub Pages CI/CD.
@@ -574,6 +575,9 @@ Architecture pivot to scroll-driven guided tour as default entry point. ScrollCo
 #### v2.1.0 — Content Layer: Story Sections
 Replaced placeholder cards with real portfolio content across four story-arc sections. IntroSection with clip-path name reveal animation tied to scroll progress. Six hero projects (AVVR, DIY Stereo Camera, PetBot, EEE Roadmap, Food Wars, Portfolio Hall) with full-viewport slide-up transitions and staggered story blocks (challenge/approach/outcome). CompactCluster grid for secondary projects (Medical EMG, RoboHack, Game Jam, AI Hackathon). ImpactSection with philosophy statement, minimal vertical timeline, and skills-as-contextual-callouts. ContactSection with gold-accented CTA and links from pois.json. All animations GPU-composited (transform + opacity only), prefers-reduced-motion support, mobile-first responsive layout.
 
+#### v2.2.0 — 3D Visual Layer: Camera-on-Rail
+Babylon.js 3D canvas rendered behind the scroll-driven content layer. Camera follows a 10-waypoint spline path through the castle (gate → main hall → courtyard → garden) driven entirely by scroll progress with smoothstep interpolation. Reuses existing castle geometry, materials, POI meshes, lights, and GLB assets from v1.7.0 via a lightweight `TourCanvas` component (no user input, no VR, no interaction system). Content sections gain glass-morphism backgrounds (`backdrop-blur-sm` + semi-transparent `bg-hall-bg`) so text remains readable over the 3D scene; intro section stays fully transparent for the name-over-3D hero effect. WebGL capability gated — non-WebGL devices see content on the existing dark background. Mobile renders at half resolution (`setHardwareScalingLevel(2)`). Canvas fades in smoothly after scene loads.
+
 </details>
 
 ### 🔧 Upcoming
@@ -599,12 +603,13 @@ Architecture pivot: the site opens directly into a scroll-driven guided tour thr
 - [x] Teak & gold theming, CSS scroll-driven animations (transform + opacity only)
 - [x] Mobile-first responsive layout, prefers-reduced-motion support
 
-##### v2.2.0 — 3D Visual Layer: Camera-on-Rail
-- [ ] Babylon.js canvas behind content layer (WebGL only)
-- [ ] Camera spline path through castle zones driven by scroll progress
-- [ ] Reuses existing castle geometry, materials, GLB assets from v1.7.0
-- [ ] Per-zone lighting mood shifts
-- [ ] Reduced resolution on mobile for performance
+##### v2.2.0 — 3D Visual Layer: Camera-on-Rail ✅
+- [x] Babylon.js canvas behind content layer (WebGL only, gated by `hasWebGL()`)
+- [x] Camera spline path through castle zones driven by scroll progress (10 waypoints, smoothstep interpolation)
+- [x] Reuses existing castle geometry, materials, GLB assets from v1.7.0
+- [x] Content layer glass-morphism (semi-transparent backgrounds + backdrop-blur)
+- [x] Reduced resolution on mobile for performance (`setHardwareScalingLevel(2)`)
+- [x] Smooth canvas fade-in after scene load
 
 ##### v2.3.0 — 2D Illustrated Fallback Layer
 - [ ] Silent capability detection (no user choice)

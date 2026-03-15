@@ -10,9 +10,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- v2.2.0: 3D visual layer — camera-on-rail driven by scroll progress
+- v2.3.0: 2D illustrated fallback layer (pre-rendered screenshots, CSS parallax)
 - v3.0.0: VR hardening & enhancement
 - v3.1.0: 3D self-portrait (iPhone LiDAR scan, low-poly mesh + gaussian splat toggle)
+
+---
+
+## [2.2.0] - 2026-03-15
+
+### Added
+- `TourCanvas` component (`src/components/tour/TourCanvas.tsx`) — lightweight Babylon.js 3D canvas rendered behind the scroll-driven content layer; reuses `createEngine`, `createScene`, `createSceneMaterials`, `createCastle`, `createPOIMeshes`, `createLights`, and `loadAssets` but skips all interactive systems (no pointer lock, no keyboard/mouse/touch controls, no VR, no interaction)
+- Camera spline path (`src/3d/tourPath.ts`) — 10-waypoint `TourWaypoint[]` array tracing gate approach → main hall → courtyard → garden; `getCameraStateAtProgress(progress)` finds bracketing waypoints and interpolates position + target with smoothstep easing via `Vector3.Lerp`
+- On-rail `UniversalCamera` with `inputs.clear()` — position and target updated every frame from `scrollProgress` via `scene.onBeforeRenderObservable`
+- WebGL capability gate — `TourCanvas` only mounts when `hasWebGL()` returns true; non-WebGL devices see content on the existing dark background
+- Mobile half-resolution rendering — `engine.setHardwareScalingLevel(2)` when `isMobile()` is true
+- Canvas fade-in — starts at `opacity: 0`, transitions to `opacity: 1` over 500ms once `scene.onReadyObservable` fires
+- Glass-morphism backgrounds on content sections — `bg-hall-bg/85 backdrop-blur-sm` on `HeroProject`, `CompactCluster`, `ImpactSection`; `bg-hall-bg/70` on `ContactSection`; `IntroSection` remains fully transparent for the name-over-3D hero effect
+
+### Changed
+- `App.tsx` — added `TourCanvas` (gated by `hasWebGL()`) as first child of `ScrollController`
+- `TourContent.tsx` — outer container now has `z-10` to sit above the 3D canvas (z-0)
+- `HeroProject.tsx` — content wrapper gains `bg-hall-bg/85 backdrop-blur-sm rounded-xl p-6 md:p-8`
+- `CompactCluster.tsx` — container gains `bg-hall-bg/80 backdrop-blur-sm rounded-xl p-6`; individual cards gain `backdrop-blur-sm`
+- `ImpactSection.tsx` — content wrapper gains `bg-hall-bg/85 backdrop-blur-sm rounded-xl px-6 md:px-8`
+- `ContactSection.tsx` — content wrapper gains `bg-hall-bg/70 backdrop-blur-sm rounded-xl p-6 md:p-8`
 
 ---
 

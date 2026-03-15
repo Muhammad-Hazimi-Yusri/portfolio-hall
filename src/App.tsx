@@ -5,6 +5,8 @@ import { FallbackMode } from '@/components/FallbackMode'
 import { ScrollController } from '@/components/tour/ScrollController'
 import { ScrollProgressBar } from '@/components/tour/ScrollProgressBar'
 import { TourContent } from '@/components/tour/TourContent'
+import { TourCanvas } from '@/components/tour/TourCanvas'
+import { hasWebGL } from '@/utils/detection'
 import type { POI } from '@/types/poi'
 
 const BabylonScene = lazy(() => import('@/3d/BabylonScene').then(m => ({ default: m.BabylonScene })))
@@ -17,6 +19,7 @@ function App() {
   if (!isLegacy) {
     return (
       <ScrollController>
+        {hasWebGL() && <TourCanvas />}
         <ScrollProgressBar />
         <TourContent />
       </ScrollController>

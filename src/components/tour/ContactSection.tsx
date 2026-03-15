@@ -38,7 +38,7 @@ export function ContactSection({ scrollProgress, reducedMotion }: Props) {
       style={{ opacity: entryOpacity }}
     >
       <div
-        className="max-w-lg w-full text-center"
+        className="max-w-lg w-full text-center bg-hall-bg/70 backdrop-blur-sm rounded-xl p-6 md:p-8"
         style={{ transform: `translateY(${entryY}px)` }}
       >
         <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-['Cinzel',serif] text-hall-accent mb-6">

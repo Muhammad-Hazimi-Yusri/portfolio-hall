@@ -46,7 +46,7 @@ export function TourContent() {
   const reducedMotion = useReducedMotion()
 
   return (
-    <div className="absolute inset-0">
+    <div className="absolute inset-0 z-10">
       <IntroSection scrollProgress={scrollProgress} reducedMotion={reducedMotion} />
 
       {heroPois.map(({ poi, scrollStart, scrollEnd }) => (

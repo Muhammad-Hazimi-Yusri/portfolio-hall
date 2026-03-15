@@ -54,7 +54,7 @@ export function ImpactSection({ scrollProgress, reducedMotion }: Props) {
       className="absolute inset-0 flex items-center justify-center p-6 md:p-12 overflow-y-auto"
       style={{ opacity: sectionOpacity }}
     >
-      <div className="max-w-2xl w-full py-8">
+      <div className="max-w-2xl w-full py-8 bg-hall-bg/85 backdrop-blur-sm rounded-xl px-6 md:px-8">
         {/* Philosophy */}
         <div
           className="mb-10"
