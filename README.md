@@ -5,7 +5,7 @@
 > A grand royal hall or throne room; the ceremonial heart of a palace where audiences are received and important gatherings held.
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
-[![Version](https://img.shields.io/badge/version-1.7.0-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)]()
 [![Status](https://img.shields.io/badge/status-In_Progress-yellow.svg)]()
 
 <details>
@@ -527,7 +527,7 @@ const shouldDefaultToFallback = (): boolean => {
 ## 🚀 Development Roadmap
 
 <details>
-<summary>✅ Completed Versions (v0.1.0 – v1.7.0)</summary>
+<summary>✅ Completed Versions (v0.1.0 – v2.0.0)</summary>
 
 #### v0.1.0 — Scaffold
 Vite + React + TypeScript project setup, Tailwind CSS, Babylon.js deps, GitHub Pages CI/CD.
@@ -568,6 +568,9 @@ Complete rebuild of the 2D fallback mode as a recruiter-optimized scroll portfol
 #### v1.7.0 — Blender Asset Pipeline
 GLB import pipeline using Babylon.js `ImportMeshAsync` with `@babylonjs/loaders/glTF` plugin. Config-driven asset manifest (`src/3d/assetManifest.ts`) — typed `AssetEntry` and `AssetPlacement` records for all decoration placements. Three-strategy fallback system: load GLB → procedural box/cylinder with shared teak material → silent exit (existing procedural mesh stays). Shared material module (`src/3d/materials.ts`) — 8 named factory functions, `SceneMaterials` type, `createSceneMaterials(scene)` called once and threaded through all zone builders and asset loader. Material mapping modes (`keep` / `remap` / `hybrid`) and invisible collision proxies (`box` / `cylinder`) for loaded GLB assets. Dev tooling: `glbMimePlugin` in `vite.config.ts`, `assetLoadStats` export, `reloadAllAssets` (Ctrl+Shift+R), `toggleAssetFallback` A/B toggle, `AssetDebugOverlay` React component (dev-only, confirmed absent in production). Blender workflow reference: `docs/BLENDER_GUIDE.md` and `docs/ASSET_SPECS.md`.
 
+#### v2.0.0 — Scroll Engine + Section Registry
+Architecture pivot to scroll-driven guided tour as default entry point. ScrollController with 500vh scroll runway and fixed viewport overlay, normalized 0→1 progress tracking via requestAnimationFrame-throttled scroll handler. TourSection config registry with four story-arc sections (intro/projects/impact/contact) mapped to scroll ranges and castle zones. ScrollContext provider with `useScrollProgress()` consumer hook. Gold accent progress bar with active section label. Placeholder section cards with opacity transitions. Legacy mode preserved via `?legacy=true` query param — existing Welcome Gate, 2D fallback, and 3D modes all accessible unchanged.
+
 </details>
 
 ### 🔧 Upcoming
@@ -578,12 +581,12 @@ Architecture pivot: the site opens directly into a scroll-driven guided tour thr
 
 **Story arc:** "Who I am → What I build → Why it matters → Let's talk"
 
-##### v2.0.0 — Scroll Engine + Section Registry
-- [ ] ScrollController with normalized 0→1 progress tracking
-- [ ] TourSection config (intro/projects/impact/contact with scroll ranges)
-- [ ] Scroll progress bar (gold accent)
-- [ ] Legacy mode preserved via `?legacy=true` query param
-- [ ] Old Welcome Gate mode selection removed as default entry point
+##### v2.0.0 — Scroll Engine + Section Registry ✅
+- [x] ScrollController with normalized 0→1 progress tracking
+- [x] TourSection config (intro/projects/impact/contact with scroll ranges)
+- [x] Scroll progress bar (gold accent)
+- [x] Legacy mode preserved via `?legacy=true` query param
+- [x] Old Welcome Gate mode selection removed as default entry point
 
 ##### v2.1.0 — Content Layer: Story Sections
 - [ ] "Who I am" intro with scroll-reveal text

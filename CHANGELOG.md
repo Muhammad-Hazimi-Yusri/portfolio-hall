@@ -10,10 +10,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- v1.8.0: 3D self-portrait (iPhone LiDAR scan, low-poly mesh + gaussian splat toggle)
-- v1.9.0: Rich project displays (3D slideshows, per-project gaussian splats)
-- v2.0.0: Interactive web panels, full content polish, launch-ready
-- v3.0.0: AI integration (backlog)
+- v2.1.0: Content layer — story sections with scroll-reveal text, project cards, timeline, contact CTA
+- v2.2.0: 3D visual layer — camera-on-rail driven by scroll progress
+- v3.0.0: VR hardening & enhancement
+- v3.1.0: 3D self-portrait (iPhone LiDAR scan, low-poly mesh + gaussian splat toggle)
+
+---
+
+## [2.0.0] - 2026-03-15
+
+### Added
+- Scroll-driven tour as default entry point — architecture pivot from Welcome Gate mode selection
+- `ScrollContext` provider (`src/contexts/ScrollContext.tsx`) with `useScrollProgress()` consumer hook and memoized context value
+- `TourSection` registry (`src/data/tourSections.ts`) — four story-arc sections (intro/projects/impact/contact) with scroll ranges and castle zone mapping; `getSectionAtProgress()` lookup
+- `ScrollController` component (`src/components/tour/ScrollController.tsx`) — 500vh scroll runway with fixed viewport overlay, `requestAnimationFrame`-throttled progress calculation (0→1)
+- `ScrollProgressBar` component (`src/components/tour/ScrollProgressBar.tsx`) — fixed gold accent bar with active section label (Cinzel font)
+- `SectionPlaceholder` component (`src/components/tour/SectionPlaceholder.tsx`) — themed placeholder cards with opacity transitions, showing section label, story beat, and scroll range
+
+### Changed
+- `App.tsx` default route now opens scroll-driven tour; existing Welcome Gate, 2D fallback, and 3D modes preserved via `?legacy=true` query param
 
 ---
 

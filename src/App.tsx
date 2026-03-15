@@ -2,20 +2,38 @@ import { useState, useCallback, lazy, Suspense, useEffect } from 'react'
 import { useDeviceCapability } from '@/hooks/useDeviceCapability'
 import { LoadingScreen } from '@/components/LoadingScreen'
 import { FallbackMode } from '@/components/FallbackMode'
+import { ScrollController } from '@/components/tour/ScrollController'
+import { ScrollProgressBar } from '@/components/tour/ScrollProgressBar'
+import { SectionPlaceholder } from '@/components/tour/SectionPlaceholder'
 import type { POI } from '@/types/poi'
 
 const BabylonScene = lazy(() => import('@/3d/BabylonScene').then(m => ({ default: m.BabylonScene })))
 
 type AppMode = 'welcome' | '3d' | 'fallback'
 
+const isLegacy = new URLSearchParams(window.location.search).get('legacy') === 'true'
+
 function App() {
+  if (!isLegacy) {
+    return (
+      <ScrollController>
+        <ScrollProgressBar />
+        <SectionPlaceholder />
+      </ScrollController>
+    )
+  }
+
+  return <LegacyApp />
+}
+
+function LegacyApp() {
   const [mode, setMode] = useState<AppMode>('welcome')
   const { canUse3D, warnings, isChecking } = useDeviceCapability()
 
   return (
     <div className="w-full h-full flex items-center justify-center">
       {mode === 'welcome' && (
-        <WelcomeScreen 
+        <WelcomeScreen
           onSelectMode={setMode}
           canUse3D={canUse3D}
           warnings={warnings}
