@@ -347,7 +347,7 @@ Balairung uses a **hybrid geometry approach**:
 - **Procedural geometry** handles room structure (floors, walls, ceilings, zone boundaries) — fast, no file loading, easily tweakable
 - **Shared materials** (`src/3d/materials.ts`, v1.7.0-slice2) — one `SceneMaterials` instance created at scene init and shared across all procedural geometry and loaded .glb assets; guarantees visual consistency; single Babylon.js material object per name in the scene
 - **Blender .glb assets** (`assetLoader.ts`, v1.7.0-slice1+) layer decorative architectural elements on top — pillars, doorway frames, crown molding — without replacing the procedural rooms; each asset entry can specify `materialMode: 'keep' | 'remap' | 'hybrid'` and `collision: 'none' | 'mesh' | 'box' | 'cylinder'`; loader falls back to procedural geometry until real exports are ready
-- **Gaussian splats** (planned v1.8.0) loaded via Babylon.js native `GaussianSplattingMesh`, used for the self-portrait avatar and per-project physical displays; gracefully degrade to low-poly mesh on weak devices
+- **Gaussian splats** (planned v3.x) loaded via Babylon.js native `GaussianSplattingMesh`, used for the self-portrait avatar and per-project physical displays; gracefully degrade to low-poly mesh on weak devices
 
 ---
 
@@ -572,27 +572,82 @@ GLB import pipeline using Babylon.js `ImportMeshAsync` with `@babylonjs/loaders/
 
 ### 🔧 Upcoming
 
-#### v1.8.0 — 3D Self-Portrait (Scan + Splat Avatar)
+#### v2.x — Guided Balairung (Scroll-Driven Tour)
+
+Architecture pivot: the site opens directly into a scroll-driven guided tour through the castle. No mode selection gate. Scroll position drives camera movement through the 3D scene (WebGL) or illustrated parallax scenes (fallback). Free-roam 3D unlocks as an opt-in from within the tour.
+
+**Story arc:** "Who I am → What I build → Why it matters → Let's talk"
+
+##### v2.0.0 — Scroll Engine + Section Registry
+- [ ] ScrollController with normalized 0→1 progress tracking
+- [ ] TourSection config (intro/projects/impact/contact with scroll ranges)
+- [ ] Scroll progress bar (gold accent)
+- [ ] Legacy mode preserved via `?legacy=true` query param
+- [ ] Old Welcome Gate mode selection removed as default entry point
+
+##### v2.1.0 — Content Layer: Story Sections
+- [ ] "Who I am" intro with scroll-reveal text
+- [ ] "What I build" project cards (reusing story data from pois.json)
+- [ ] "Why it matters" experience timeline + philosophy
+- [ ] "Let's talk" contact CTA
+- [ ] Teak & gold theming, CSS scroll-triggered animations
+- [ ] Mobile-first responsive layout
+
+##### v2.2.0 — 3D Visual Layer: Camera-on-Rail
+- [ ] Babylon.js canvas behind content layer (WebGL only)
+- [ ] Camera spline path through castle zones driven by scroll progress
+- [ ] Reuses existing castle geometry, materials, GLB assets from v1.7.0
+- [ ] Per-zone lighting mood shifts
+- [ ] Reduced resolution on mobile for performance
+
+##### v2.3.0 — 2D Illustrated Fallback Layer
+- [ ] Silent capability detection (no user choice)
+- [ ] Pre-rendered screenshots from 3D scene as scroll backgrounds
+- [ ] CSS parallax depth layers per section
+- [ ] Same scroll timing and content as 3D layer
+
+##### v2.4.0 — Free-Roam Unlock + Mode Transitions
+- [ ] "Explore the hall yourself" CTA at multiple scroll points (WebGL only)
+- [ ] Smooth camera handoff: scroll-driven → first-person free-roam
+- [ ] All v1.x free-roam features preserved (WASD, joystick, minimap, sidebar, VR, POI interaction)
+- [ ] "Return to tour" button in free-roam
+- [ ] URL routing: `/` = tour, `/explore` = free-roam
+
+##### v2.5.0 — Launch Polish
+- [ ] All placeholder content replaced with real data
+- [ ] Animation timing pass
+- [ ] Performance budget (Lighthouse, bundle analysis)
+- [ ] Accessibility pass (keyboard, screen reader, reduced-motion)
+- [ ] Legacy mode routing removed
+- [ ] Old v1.6.0 2D fallback components removed
+- [ ] Full README rewrite
+
+#### v3.x — Backlog (Deferred from v1.8–v1.9)
+
+##### v3.0.0 — VR Hardening & Enhancement
+- [ ] End-to-end VR playtest on Quest (first real session)
+- [ ] Bug triage and fix pass from playtest findings
+- [ ] VR comfort tuning (vignette, snap turn, locomotion speed)
+- [ ] Performance profiling on-device (shadow maps, draw calls, frame budget)
+- [ ] VR UX polish (panel placement, hover feedback, interaction range)
+
+##### v3.1.0 — 3D Self-Portrait (Scan + Splat Avatar)
 - [ ] iPhone LiDAR self-scan (via Scaniverse/Polycam)
 - [ ] Low-poly mesh avatar (.glb) in reception area
-- [ ] Gaussian splat toggle using Babylon.js native GaussianSplattingMesh (.ply/.splat)
-- [ ] UI toggle between low-poly and splat with loading indicator
+- [ ] Gaussian splat toggle using Babylon.js native GaussianSplattingMesh
 - [ ] Graceful degradation (low-poly only on weak devices)
 
-#### v1.9.0 — Rich Project Displays
+##### v3.2.0 — Rich Project Displays
 - [ ] 3D slideshow panels for website projects (screenshot carousel on 3D plane)
 - [ ] Gaussian splat displays for physical projects on pedestals
 - [ ] Enhanced inspect modal with richer content
 
-#### v2.0.0 — Interactive Web Panels + Polish
+##### v3.3.0 — Interactive Web Panels
 - [ ] Iframe-on-3D-plane for live website project browsing (desktop only)
 - [ ] DOM overlay positioned to match 3D plane projection
 - [ ] VR fallback to slideshow mode
-- [ ] Full content population, all placeholders replaced
-- [ ] Performance optimization pass (LOD, occlusion culling)
-- [ ] Launch-ready state
 
-#### v3.0.0 — AI Integration (Backlog)
+##### v3.4.0 — AI Integration
 - [ ] Visitor type detection
 - [ ] LLM integration
 - [ ] Dynamic content prioritization
