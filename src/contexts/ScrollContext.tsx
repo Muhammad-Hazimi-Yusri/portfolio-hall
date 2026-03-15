@@ -20,6 +20,7 @@ export function ScrollProvider({
   return <ScrollContext.Provider value={value}>{children}</ScrollContext.Provider>
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useScrollProgress(): ScrollContextValue {
   const ctx = useContext(ScrollContext)
   if (!ctx) {

@@ -32,7 +32,7 @@ export function ScrollController({ children }: { children: ReactNode }) {
     >
       <div style={{ height: '500vh' }}>
         <div className="fixed inset-0 pointer-events-none">
-          <div className="pointer-events-auto w-full h-full">
+          <div className="w-full h-full">
             <ScrollProvider scrollProgress={scrollProgress} activeSection={activeSection}>
               {children}
             </ScrollProvider>

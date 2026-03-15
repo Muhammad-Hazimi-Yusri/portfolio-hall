@@ -10,10 +10,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- v2.1.0: Content layer — story sections with scroll-reveal text, project cards, timeline, contact CTA
 - v2.2.0: 3D visual layer — camera-on-rail driven by scroll progress
 - v3.0.0: VR hardening & enhancement
 - v3.1.0: 3D self-portrait (iPhone LiDAR scan, low-poly mesh + gaussian splat toggle)
+
+---
+
+## [2.1.0] - 2026-03-15
+
+### Added
+- `TourContent` orchestrator (`src/components/tour/TourContent.tsx`) — replaces `SectionPlaceholder` with real portfolio content across four story-arc sections
+- `IntroSection` (`src/components/tour/IntroSection.tsx`) — large name reveal with clip-path + translateY animation tied to scroll progress, tagline, and scroll indicator
+- `HeroProject` (`src/components/tour/HeroProject.tsx`) — full-viewport hero project card with slide-up entry/exit transitions and staggered story blocks (challenge/approach/outcome); renders 6 hero projects from pois.json
+- `CompactCluster` (`src/components/tour/CompactCluster.tsx`) — responsive 2-column grid of 4 secondary project cards (medical-emg, robohack, game-jam, ai-hackathon)
+- `ImpactSection` (`src/components/tour/ImpactSection.tsx`) — philosophy statement, minimal vertical timeline with 3 milestones, skills-as-contextual-callouts grouped by what they enabled
+- `ContactSection` (`src/components/tour/ContactSection.tsx`) — "Let's build something" CTA heading with gold-accented contact links from pois.json
+- `prefers-reduced-motion` support — transforms disabled, opacity-only transitions when user prefers reduced motion
+
+### Changed
+- `App.tsx` — replaced `SectionPlaceholder` import with `TourContent`
+
+### Removed
+- `SectionPlaceholder` component (`src/components/tour/SectionPlaceholder.tsx`) — fully replaced by `TourContent` and its child sections
 
 ---
 

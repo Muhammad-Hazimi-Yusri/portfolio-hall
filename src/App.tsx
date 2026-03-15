@@ -4,7 +4,7 @@ import { LoadingScreen } from '@/components/LoadingScreen'
 import { FallbackMode } from '@/components/FallbackMode'
 import { ScrollController } from '@/components/tour/ScrollController'
 import { ScrollProgressBar } from '@/components/tour/ScrollProgressBar'
-import { SectionPlaceholder } from '@/components/tour/SectionPlaceholder'
+import { TourContent } from '@/components/tour/TourContent'
 import type { POI } from '@/types/poi'
 
 const BabylonScene = lazy(() => import('@/3d/BabylonScene').then(m => ({ default: m.BabylonScene })))
@@ -18,7 +18,7 @@ function App() {
     return (
       <ScrollController>
         <ScrollProgressBar />
-        <SectionPlaceholder />
+        <TourContent />
       </ScrollController>
     )
   }

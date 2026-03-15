@@ -5,7 +5,7 @@
 > A grand royal hall or throne room; the ceremonial heart of a palace where audiences are received and important gatherings held.
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
-[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-2.1.0-blue.svg)]()
 [![Status](https://img.shields.io/badge/status-In_Progress-yellow.svg)]()
 
 <details>
@@ -571,6 +571,9 @@ GLB import pipeline using Babylon.js `ImportMeshAsync` with `@babylonjs/loaders/
 #### v2.0.0 — Scroll Engine + Section Registry
 Architecture pivot to scroll-driven guided tour as default entry point. ScrollController with 500vh scroll runway and fixed viewport overlay, normalized 0→1 progress tracking via requestAnimationFrame-throttled scroll handler. TourSection config registry with four story-arc sections (intro/projects/impact/contact) mapped to scroll ranges and castle zones. ScrollContext provider with `useScrollProgress()` consumer hook. Gold accent progress bar with active section label. Placeholder section cards with opacity transitions. Legacy mode preserved via `?legacy=true` query param — existing Welcome Gate, 2D fallback, and 3D modes all accessible unchanged.
 
+#### v2.1.0 — Content Layer: Story Sections
+Replaced placeholder cards with real portfolio content across four story-arc sections. IntroSection with clip-path name reveal animation tied to scroll progress. Six hero projects (AVVR, DIY Stereo Camera, PetBot, EEE Roadmap, Food Wars, Portfolio Hall) with full-viewport slide-up transitions and staggered story blocks (challenge/approach/outcome). CompactCluster grid for secondary projects (Medical EMG, RoboHack, Game Jam, AI Hackathon). ImpactSection with philosophy statement, minimal vertical timeline, and skills-as-contextual-callouts. ContactSection with gold-accented CTA and links from pois.json. All animations GPU-composited (transform + opacity only), prefers-reduced-motion support, mobile-first responsive layout.
+
 </details>
 
 ### 🔧 Upcoming
@@ -588,13 +591,13 @@ Architecture pivot: the site opens directly into a scroll-driven guided tour thr
 - [x] Legacy mode preserved via `?legacy=true` query param
 - [x] Old Welcome Gate mode selection removed as default entry point
 
-##### v2.1.0 — Content Layer: Story Sections
-- [ ] "Who I am" intro with scroll-reveal text
-- [ ] "What I build" project cards (reusing story data from pois.json)
-- [ ] "Why it matters" experience timeline + philosophy
-- [ ] "Let's talk" contact CTA
-- [ ] Teak & gold theming, CSS scroll-triggered animations
-- [ ] Mobile-first responsive layout
+##### v2.1.0 — Content Layer: Story Sections ✅
+- [x] "Who I am" intro with scroll-reveal name animation (clip-path + translateY)
+- [x] "What I build" — 6 hero projects with slide-up transitions + compact cluster grid
+- [x] "Why it matters" — philosophy statement, experience timeline, skills-as-callouts
+- [x] "Let's talk" — contact CTA with gold accent links
+- [x] Teak & gold theming, CSS scroll-driven animations (transform + opacity only)
+- [x] Mobile-first responsive layout, prefers-reduced-motion support
 
 ##### v2.2.0 — 3D Visual Layer: Camera-on-Rail
 - [ ] Babylon.js canvas behind content layer (WebGL only)
