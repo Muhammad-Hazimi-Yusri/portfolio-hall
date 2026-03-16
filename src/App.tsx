@@ -1,4 +1,4 @@
-import { useState, useCallback, lazy, Suspense, useEffect, useRef } from 'react'
+import { useState, useCallback, lazy, Suspense, useEffect } from 'react'
 import { useDeviceCapability } from '@/hooks/useDeviceCapability'
 import { LoadingScreen } from '@/components/LoadingScreen'
 import { FallbackMode } from '@/components/FallbackMode'
@@ -8,9 +8,6 @@ import { TourContent } from '@/components/tour/TourContent'
 import { TourCanvas } from '@/components/tour/TourCanvas'
 import { TourFallback } from '@/components/tour/TourFallback'
 import { CaptureMode } from '@/components/tour/CaptureMode'
-import { TransitionOverlay } from '@/components/tour/TransitionOverlay'
-import { FreeRoamWrapper } from '@/components/tour/FreeRoamWrapper'
-import { getCameraStateAtProgress } from '@/3d/tourPath'
 import { hasWebGL } from '@/utils/detection'
 import type { POI } from '@/types/poi'
 
@@ -23,101 +20,22 @@ const isLegacy = params.get('legacy') === 'true'
 const isCapture = params.get('capture') === 'true'
 const force2d = params.get('force2d') === 'true'
 
-type AppView = 'tour' | 'explore'
-const initialHash = window.location.hash.replace('#', '')
-
 function App() {
   if (isCapture) {
     return <CaptureMode />
   }
 
   if (!isLegacy) {
-    return <TourApp />
+    return (
+      <ScrollController>
+        {hasWebGL() && !force2d ? <TourCanvas /> : <TourFallback />}
+        <ScrollProgressBar />
+        <TourContent />
+      </ScrollController>
+    )
   }
 
   return <LegacyApp />
-}
-
-const TRANSITION_MS = 500
-
-function TourApp() {
-  const [appView, setAppView] = useState<AppView>(
-    initialHash === 'explore' ? 'explore' : 'tour',
-  )
-  const [overlayVisible, setOverlayVisible] = useState(false)
-  const [exploreOrigin, setExploreOrigin] = useState<{
-    position: { x: number; y: number; z: number }
-    target: { x: number; y: number; z: number }
-    scrollProgress: number
-  } | null>(null)
-  const transitioningRef = useRef(false)
-
-  // Sync hash with appView (clean URL for tour, #explore for explore)
-  useEffect(() => {
-    if (appView === 'explore') {
-      window.location.hash = '#explore'
-    } else {
-      history.replaceState(null, '', window.location.pathname + window.location.search)
-    }
-  }, [appView])
-
-  // Tour → Explore transition
-  const handleExplore = useCallback((scrollProgress: number) => {
-    if (transitioningRef.current) return
-    transitioningRef.current = true
-
-    const { position, target } = getCameraStateAtProgress(scrollProgress)
-    setExploreOrigin({
-      position: { x: position.x, y: position.y, z: position.z },
-      target: { x: target.x, y: target.y, z: target.z },
-      scrollProgress,
-    })
-    setOverlayVisible(true)
-    setTimeout(() => setAppView('explore'), TRANSITION_MS)
-  }, [])
-
-  // Called by FreeRoamWrapper when BabylonScene signals ready
-  const handleExploreReady = useCallback(() => {
-    setOverlayVisible(false)
-    transitioningRef.current = false
-  }, [])
-
-  // Explore → Tour transition
-  const handleReturnToTour = useCallback(() => {
-    if (transitioningRef.current) return
-    transitioningRef.current = true
-
-    setOverlayVisible(true)
-    setTimeout(() => {
-      setAppView('tour')
-      // Small delay for layout computation before fade-in
-      setTimeout(() => {
-        setOverlayVisible(false)
-        transitioningRef.current = false
-      }, 100)
-    }, TRANSITION_MS)
-  }, [])
-
-  return (
-    <>
-      {appView === 'tour' && (
-        <ScrollController initialScrollProgress={exploreOrigin?.scrollProgress}>
-          {hasWebGL() && !force2d ? <TourCanvas /> : <TourFallback />}
-          <ScrollProgressBar />
-          <TourContent onExplore={handleExplore} />
-        </ScrollController>
-      )}
-      {appView === 'explore' && (
-        <FreeRoamWrapper
-          initialPosition={exploreOrigin?.position ?? { x: 0, y: 1.6, z: 16 }}
-          initialTarget={exploreOrigin?.target ?? { x: 0, y: 1.6, z: 8 }}
-          onReturnToTour={handleReturnToTour}
-          onReady={handleExploreReady}
-        />
-      )}
-      <TransitionOverlay visible={overlayVisible} />
-    </>
-  )
 }
 
 function LegacyApp() {
