@@ -32,9 +32,11 @@ type BabylonSceneProps = {
   onInspect: (poi: POI) => void
   onSwitchMode?: () => void
   onLoadProgress?: (progress: number, stage: string) => void
+  initialCameraPosition?: { x: number; y: number; z: number }
+  initialCameraTarget?: { x: number; y: number; z: number }
 }
 
-export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress }: BabylonSceneProps) {
+export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress, initialCameraPosition, initialCameraTarget }: BabylonSceneProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [nearbyPOI, setNearbyPOI] = useState<POI | null>(null)
   const joystickRef = useRef({ x: 0, y: 0 })
@@ -196,7 +198,11 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress }: Babylo
     const castle = createCastle(scene, mats)
     onLoadProgress?.(40, 'scene')
 
-    const camera = createFirstPersonCamera(scene, canvas, joystickRef, lookRef, jumpRef, sprintRef, gyroRef, landscapeModeRef, cameraRef)
+    const camera = createFirstPersonCamera(
+      scene, canvas, joystickRef, lookRef, jumpRef, sprintRef,
+      gyroRef, landscapeModeRef, cameraRef,
+      initialCameraPosition, initialCameraTarget,
+    )
     babylonCameraRef.current = camera
     sceneRef.current = scene
 
