@@ -15,26 +15,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [2.4.0] - 2026-03-16
-
-### Added
-- Free-roam explore mode — WebGL users can click "Explore the hall yourself" CTAs during the guided tour to seamlessly transition into first-person free-roam with all v1.x features (WASD, joystick, minimap, sidebar, VR, POI interaction)
-- `TransitionOverlay` component — full-screen CSS fade overlay masking mount/unmount transitions between tour and explore modes
-- `ExploreHint` component — subtle (at ~40% scroll) and prominent (at ~90% scroll) CTAs, WebGL-only, with scroll-driven fade-in
-- `ReturnToTourButton` component — fixed-position button with 2s entrance delay, returns to tour at the same scroll position
-- `FreeRoamWrapper` component — explore mode container wrapping BabylonScene with InspectModal and ReturnToTourButton
-- Hash routing: `#explore` loads directly into free-roam at default castle entrance spawn
-- Camera handoff: tour scroll position maps to 3D camera position via `getCameraStateAtProgress()` for seamless visual continuity
-
-### Changed
-- `App.tsx` — new `TourApp` component with `appView` state (`'tour' | 'explore'`), transition orchestration, and hash routing; `?legacy=true` and `?capture=true` overrides preserved
-- `BabylonScene` — accepts optional `initialCameraPosition` and `initialCameraTarget` props
-- `createFirstPersonCamera` — accepts optional `initialPosition` and `initialTarget` params (falls back to castle entrance defaults)
-- `ScrollController` — accepts optional `initialScrollProgress` prop for tour resume after returning from explore mode
-- `TourContent` — accepts optional `onExplore` callback; renders `ExploreHint` CTAs at two scroll positions (WebGL-only)
-
----
-
 ## [2.3.0] - 2026-03-15
 
 ### Added
