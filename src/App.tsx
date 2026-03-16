@@ -6,6 +6,8 @@ import { ScrollController } from '@/components/tour/ScrollController'
 import { ScrollProgressBar } from '@/components/tour/ScrollProgressBar'
 import { TourContent } from '@/components/tour/TourContent'
 import { TourCanvas } from '@/components/tour/TourCanvas'
+import { TourFallback } from '@/components/tour/TourFallback'
+import { CaptureMode } from '@/components/tour/CaptureMode'
 import { hasWebGL } from '@/utils/detection'
 import type { POI } from '@/types/poi'
 
@@ -13,13 +15,20 @@ const BabylonScene = lazy(() => import('@/3d/BabylonScene').then(m => ({ default
 
 type AppMode = 'welcome' | '3d' | 'fallback'
 
-const isLegacy = new URLSearchParams(window.location.search).get('legacy') === 'true'
+const params = new URLSearchParams(window.location.search)
+const isLegacy = params.get('legacy') === 'true'
+const isCapture = params.get('capture') === 'true'
+const force2d = params.get('force2d') === 'true'
 
 function App() {
+  if (isCapture) {
+    return <CaptureMode />
+  }
+
   if (!isLegacy) {
     return (
       <ScrollController>
-        {hasWebGL() && <TourCanvas />}
+        {hasWebGL() && !force2d ? <TourCanvas /> : <TourFallback />}
         <ScrollProgressBar />
         <TourContent />
       </ScrollController>

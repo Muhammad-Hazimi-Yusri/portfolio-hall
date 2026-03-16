@@ -10,9 +10,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- v2.3.0: 2D illustrated fallback layer (pre-rendered screenshots, CSS parallax)
 - v3.0.0: VR hardening & enhancement
 - v3.1.0: 3D self-portrait (iPhone LiDAR scan, low-poly mesh + gaussian splat toggle)
+
+---
+
+## [2.3.0] - 2026-03-15
+
+### Added
+- `TourFallback` component (`src/components/tour/TourFallback.tsx`) — 2D illustrated fallback visual layer for non-WebGL devices; crossfades pre-rendered 1920×1080 screenshots per tour section with CSS parallax (`translateY` shift, max 30px), lazy image loading (current + adjacent sections only), and graceful degradation (missing images fall back to solid `bg-hall-bg` dark background with `console.warn` in dev)
+- Ambient CSS overlays on fallback layer — subtle radial-gradient vignette and faint gold top gradient to complement the castle's lighting mood
+- `CaptureMode` component (`src/components/tour/CaptureMode.tsx`) — dev-only screenshot capture tool accessed via `?capture=true`; spins up the full Babylon.js scene (same setup chain as `TourCanvas`: engine, scene, materials, castle, POI meshes, lights, assets), positions camera at each of 10 capture points using `getCameraStateAtProgress()`, captures via `canvas.toDataURL`, and provides a preview grid with individual and bulk download links
+- Capture point definitions (`src/3d/tourCaptures.ts`) — `CAPTURE_POINTS` array (10 points matching tour waypoints), `SECTION_IMAGES` record mapping section IDs to image filenames, and `captureImageUrl()` helper respecting Vite's `base` config
+- `?force2d=true` URL parameter — forces the 2D fallback layer on WebGL-capable devices for testing
+- `docs/CAPTURE_GUIDE.md` — documents the capture workflow: how to run, where to place output files (`public/tour-captures/`), when to re-capture, and how to test the fallback
+- `public/tour-captures/.gitkeep` — placeholder directory for captured screenshots
+
+### Changed
+- `App.tsx` — `hasWebGL() && <TourCanvas />` replaced with `hasWebGL() && !force2d ? <TourCanvas /> : <TourFallback />`; added `?capture=true` route returning `<CaptureMode />` before the main tour rendering; URL params parsed once at module level
+
+### Fixed
+- `tourPath.ts` — camera waypoints now follow the actual castle zone layout (reception → courtyard → main hall → courtyard → garden) instead of going linearly down the z-axis past all geometry; garden waypoints turn west into the garden room instead of continuing past the main hall into empty space
 
 ---
 

@@ -5,7 +5,7 @@
 > A grand royal hall or throne room; the ceremonial heart of a palace where audiences are received and important gatherings held.
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
-[![Version](https://img.shields.io/badge/version-2.2.0-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-2.3.0-blue.svg)]()
 [![Status](https://img.shields.io/badge/status-In_Progress-yellow.svg)]()
 
 <details>
@@ -528,7 +528,7 @@ const shouldDefaultToFallback = (): boolean => {
 ## 🚀 Development Roadmap
 
 <details>
-<summary>✅ Completed Versions (v0.1.0 – v2.2.0)</summary>
+<summary>✅ Completed Versions (v0.1.0 – v2.3.0)</summary>
 
 #### v0.1.0 — Scaffold
 Vite + React + TypeScript project setup, Tailwind CSS, Babylon.js deps, GitHub Pages CI/CD.
@@ -578,6 +578,9 @@ Replaced placeholder cards with real portfolio content across four story-arc sec
 #### v2.2.0 — 3D Visual Layer: Camera-on-Rail
 Babylon.js 3D canvas rendered behind the scroll-driven content layer. Camera follows a 10-waypoint spline path through the castle (gate → main hall → courtyard → garden) driven entirely by scroll progress with smoothstep interpolation. Reuses existing castle geometry, materials, POI meshes, lights, and GLB assets from v1.7.0 via a lightweight `TourCanvas` component (no user input, no VR, no interaction system). Content sections gain glass-morphism backgrounds (`backdrop-blur-sm` + semi-transparent `bg-hall-bg`) so text remains readable over the 3D scene; intro section stays fully transparent for the name-over-3D hero effect. WebGL capability gated — non-WebGL devices see content on the existing dark background. Mobile renders at half resolution (`setHardwareScalingLevel(2)`). Canvas fades in smoothly after scene loads.
 
+#### v2.3.0 — 2D Illustrated Fallback Layer
+Pre-rendered screenshot fallback for non-WebGL devices. Dev-only capture tool (`?capture=true`) spins up the full Babylon.js scene and captures 1920×1080 PNGs at 10 camera positions along the tour path. `TourFallback` component crossfades between capture images per section as the user scrolls, with subtle CSS parallax (`translateY` shift) and ambient overlays (radial vignette + gold top gradient). Silent capability detection — `hasWebGL()` decides between `TourCanvas` and `TourFallback` automatically; `?force2d=true` forces fallback for testing. Missing images degrade gracefully to solid dark background. Capture workflow documented in `docs/CAPTURE_GUIDE.md`.
+
 </details>
 
 ### 🔧 Upcoming
@@ -611,11 +614,13 @@ Architecture pivot: the site opens directly into a scroll-driven guided tour thr
 - [x] Reduced resolution on mobile for performance (`setHardwareScalingLevel(2)`)
 - [x] Smooth canvas fade-in after scene load
 
-##### v2.3.0 — 2D Illustrated Fallback Layer
-- [ ] Silent capability detection (no user choice)
-- [ ] Pre-rendered screenshots from 3D scene as scroll backgrounds
-- [ ] CSS parallax depth layers per section
-- [ ] Same scroll timing and content as 3D layer
+##### v2.3.0 — 2D Illustrated Fallback Layer ✅
+- [x] Silent capability detection (no user choice)
+- [x] Pre-rendered screenshots from 3D scene as scroll backgrounds
+- [x] CSS parallax depth layers per section
+- [x] Same scroll timing and content as 3D layer
+- [x] Dev-only capture tool (`?capture=true`) with preview grid and download
+- [x] `?force2d=true` override for testing fallback on WebGL devices
 
 ##### v2.4.0 — Free-Roam Unlock + Mode Transitions
 - [ ] "Explore the hall yourself" CTA at multiple scroll points (WebGL only)
