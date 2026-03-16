@@ -5,6 +5,8 @@ import { HeroProject } from './HeroProject'
 import { CompactCluster } from './CompactCluster'
 import { ImpactSection } from './ImpactSection'
 import { ContactSection } from './ContactSection'
+import { ExploreHint } from './ExploreHint'
+import { hasWebGL } from '@/utils/detection'
 import poisData from '@/data/pois.json'
 import type { POI } from '@/types/poi'
 
@@ -41,9 +43,17 @@ function useReducedMotion() {
   return reduced
 }
 
-export function TourContent() {
+type TourContentProps = {
+  onExplore?: (scrollProgress: number) => void
+}
+
+export function TourContent({ onExplore }: TourContentProps) {
   const { scrollProgress } = useScrollProgress()
   const reducedMotion = useReducedMotion()
+
+  const handleExplore = () => onExplore?.(scrollProgress)
+
+  const showExploreHints = hasWebGL() && !!onExplore
 
   return (
     <div className="absolute inset-0 z-10">
@@ -68,8 +78,32 @@ export function TourContent() {
         reducedMotion={reducedMotion}
       />
 
+      {/* Subtle explore hint — triggers at 0.40 as compact cluster fades out and EEE hero fades in */}
+      {showExploreHints && (
+        <div className="absolute inset-0 flex items-end justify-center pb-8 md:pb-12">
+          <ExploreHint
+            onExplore={handleExplore}
+            variant="subtle"
+            scrollProgress={scrollProgress}
+            triggerAt={0.40}
+          />
+        </div>
+      )}
+
       <ImpactSection scrollProgress={scrollProgress} reducedMotion={reducedMotion} />
       <ContactSection scrollProgress={scrollProgress} reducedMotion={reducedMotion} />
+
+      {/* Prominent explore CTA in the contact section area */}
+      {showExploreHints && (
+        <div className="absolute inset-0 flex items-end justify-center pb-6">
+          <ExploreHint
+            onExplore={handleExplore}
+            variant="prominent"
+            scrollProgress={scrollProgress}
+            triggerAt={0.90}
+          />
+        </div>
+      )}
     </div>
   )
 }
