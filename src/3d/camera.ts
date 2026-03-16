@@ -16,11 +16,19 @@ export function createFirstPersonCamera(
   sprintRef?: React.MutableRefObject<boolean>,
   gyroRef?: React.MutableRefObject<boolean>,
   landscapeModeRef?: React.MutableRefObject<boolean>,
-  cameraRef?: CameraRef
+  cameraRef?: CameraRef,
+  initialPosition?: { x: number; y: number; z: number },
+  initialTarget?: { x: number; y: number; z: number },
 ) {
-  const camera = new UniversalCamera('fpCam', new Vector3(0, 1.6, 16), scene)
+  const pos = initialPosition
+    ? new Vector3(initialPosition.x, initialPosition.y, initialPosition.z)
+    : new Vector3(0, 1.6, 16)
+  const tgt = initialTarget
+    ? new Vector3(initialTarget.x, initialTarget.y, initialTarget.z)
+    : new Vector3(0, 1.6, 8)
 
-  camera.setTarget(new Vector3(0, 1.6, 8))
+  const camera = new UniversalCamera('fpCam', pos, scene)
+  camera.setTarget(tgt)
   camera.attachControl(canvas, true)
 
   // Clipping planes
