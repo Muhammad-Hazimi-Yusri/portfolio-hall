@@ -5,7 +5,7 @@
 > A grand royal hall or throne room; the ceremonial heart of a palace where audiences are received and important gatherings held.
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
-[![Version](https://img.shields.io/badge/version-2.3.0-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-2.4.0-blue.svg)]()
 [![Status](https://img.shields.io/badge/status-In_Progress-yellow.svg)]()
 
 <details>
@@ -528,7 +528,7 @@ const shouldDefaultToFallback = (): boolean => {
 ## 🚀 Development Roadmap
 
 <details>
-<summary>✅ Completed Versions (v0.1.0 – v2.3.0)</summary>
+<summary>✅ Completed Versions (v0.1.0 – v2.4.0)</summary>
 
 #### v0.1.0 — Scaffold
 Vite + React + TypeScript project setup, Tailwind CSS, Babylon.js deps, GitHub Pages CI/CD.
@@ -622,12 +622,12 @@ Architecture pivot: the site opens directly into a scroll-driven guided tour thr
 - [x] Dev-only capture tool (`?capture=true`) with preview grid and download
 - [x] `?force2d=true` override for testing fallback on WebGL devices
 
-##### v2.4.0 — Free-Roam Unlock + Mode Transitions
-- [ ] "Explore the hall yourself" CTA at multiple scroll points (WebGL only)
-- [ ] Smooth camera handoff: scroll-driven → first-person free-roam
-- [ ] All v1.x free-roam features preserved (WASD, joystick, minimap, sidebar, VR, POI interaction)
-- [ ] "Return to tour" button in free-roam
-- [ ] URL routing: `/` = tour, `/explore` = free-roam
+##### v2.4.0 — Free-Roam Unlock + Mode Transitions ✅
+- [x] "Explore the hall yourself" CTA at multiple scroll points (WebGL only)
+- [x] Smooth camera handoff: scroll-driven → first-person free-roam
+- [x] All v1.x free-roam features preserved (WASD, joystick, minimap, sidebar, VR, POI interaction)
+- [x] "Return to tour" button in free-roam
+- [x] URL routing: `#explore` = free-roam, default = tour
 
 ##### v2.5.0 — Launch Polish
 - [ ] All placeholder content replaced with real data
