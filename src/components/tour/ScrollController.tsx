@@ -1,11 +1,29 @@
-import { useState, useCallback, useRef, type ReactNode } from 'react'
+import { useState, useCallback, useRef, useEffect, type ReactNode } from 'react'
 import { ScrollProvider } from '@/contexts/ScrollContext'
 import { getSectionAtProgress, type TourSection } from '@/data/tourSections'
 
-export function ScrollController({ children }: { children: ReactNode }) {
-  const [scrollProgress, setScrollProgress] = useState(0)
-  const [activeSection, setActiveSection] = useState<TourSection | null>(null)
+type ScrollControllerProps = {
+  children: ReactNode
+  initialScrollProgress?: number
+}
+
+export function ScrollController({ children, initialScrollProgress }: ScrollControllerProps) {
+  const [scrollProgress, setScrollProgress] = useState(initialScrollProgress ?? 0)
+  const [activeSection, setActiveSection] = useState<TourSection | null>(
+    initialScrollProgress !== undefined ? getSectionAtProgress(initialScrollProgress) : null,
+  )
   const rafPending = useRef(false)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
+
+  // Set initial scroll position on mount (for tour resume)
+  useEffect(() => {
+    if (initialScrollProgress !== undefined && scrollContainerRef.current) {
+      const el = scrollContainerRef.current
+      requestAnimationFrame(() => {
+        el.scrollTop = initialScrollProgress * (el.scrollHeight - el.clientHeight)
+      })
+    }
+  }, []) // only on mount
 
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     if (rafPending.current) return
@@ -27,6 +45,7 @@ export function ScrollController({ children }: { children: ReactNode }) {
 
   return (
     <div
+      ref={scrollContainerRef}
       onScroll={handleScroll}
       className="w-full h-full overflow-y-auto"
     >
