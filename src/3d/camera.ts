@@ -20,15 +20,29 @@ export function createFirstPersonCamera(
   initialPosition?: { x: number; y: number; z: number },
   initialTarget?: { x: number; y: number; z: number },
 ) {
-  const pos = initialPosition
-    ? new Vector3(initialPosition.x, initialPosition.y, initialPosition.z)
-    : new Vector3(0, 1.6, 16)
-  const tgt = initialTarget
-    ? new Vector3(initialTarget.x, initialTarget.y, initialTarget.z)
-    : new Vector3(0, 1.6, 8)
+  // Always start at castle entrance — ensures all geometry and shaders
+  // render at a content-rich position while the transition overlay is black.
+  const camera = new UniversalCamera('fpCam', new Vector3(0, 1.6, 16), scene)
+  camera.setTarget(new Vector3(0, 1.6, 8))
 
-  const camera = new UniversalCamera('fpCam', pos, scene)
-  camera.setTarget(tgt)
+  // Deferred teleport: after a few render frames, move to the requested
+  // position. The transition overlay hides this camera movement.
+  if (initialPosition || initialTarget) {
+    let frames = 0
+    const obs = scene.onAfterRenderObservable.add(() => {
+      if (++frames >= 3) {
+        if (initialPosition) {
+          camera.position.set(initialPosition.x, initialPosition.y, initialPosition.z)
+        }
+        if (initialTarget) {
+          camera.setTarget(
+            new Vector3(initialTarget.x, initialTarget.y, initialTarget.z),
+          )
+        }
+        scene.onAfterRenderObservable.remove(obs)
+      }
+    })
+  }
   camera.attachControl(canvas, true)
 
   // Clipping planes
