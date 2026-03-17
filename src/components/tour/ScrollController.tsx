@@ -23,7 +23,8 @@ export function ScrollController({ children, initialScrollProgress }: ScrollCont
         el.scrollTop = initialScrollProgress * (el.scrollHeight - el.clientHeight)
       })
     }
-  }, []) // only on mount
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally run only on mount
+  }, [])
 
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     if (rafPending.current) return

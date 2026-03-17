@@ -295,6 +295,7 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress, initialC
       scene.dispose()
       engine.dispose()
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- initialCamera props are read once on mount, not reactive
   }, [onInspect, onLoadProgress])
 
   // Counter-rotate layout to stay portrait when device is physically in landscape

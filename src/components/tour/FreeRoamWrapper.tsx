@@ -25,7 +25,7 @@ export function FreeRoamWrapper({
   const [isLoaded, setIsLoaded] = useState(false)
 
   const handleLoadProgress = useCallback(
-    (progress: number, _stage: string) => {
+    (progress: number) => {
       setLoadProgress(progress)
       if (progress >= 100) {
         setTimeout(() => {
