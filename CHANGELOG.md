@@ -13,6 +13,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - v3.0.0: VR hardening & enhancement
 - v3.1.0: 3D self-portrait (iPhone LiDAR scan, low-poly mesh + gaussian splat toggle)
 
+## [2.4.0] - 2026-03-17
+
+### Added
+- Free-roam explore mode — WebGL users can click "Explore the hall" CTAs during the guided tour to transition into first-person free-roam with all v1.x features (WASD, joystick, minimap, sidebar, VR, POI interaction)
+- `TransitionOverlay` — full-screen CSS fade overlay masking mount/unmount transitions
+- `ExploreHint` — subtle (~40% scroll) and prominent (~90% scroll) CTAs, WebGL-only
+- `ReturnToTourButton` — fixed button with 2s entrance delay, returns to tour at same scroll position
+- `FreeRoamWrapper` — explore mode container wrapping BabylonScene with InspectModal and ReturnToTourButton
+- Hash routing: `#explore` loads directly into free-roam at default castle entrance
+- Deferred camera teleport: scene renders at entrance first, then teleports to tour position behind the overlay
+
+### Changed
+- `App.tsx` — new `TourApp` component with `appView` state, transition orchestration, hash routing
+- `BabylonScene` — optional `initialCameraPosition`/`initialCameraTarget` props
+- `createFirstPersonCamera` — optional `initialPosition`/`initialTarget` with deferred teleport
+- `ScrollController` — optional `initialScrollProgress` prop for tour resume
+- `TourContent` — optional `onExplore` callback; renders ExploreHint CTAs (WebGL-only)
+
 ---
 
 ## [2.3.0] - 2026-03-15
