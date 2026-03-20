@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
 
-type Zone = 'reception' | 'main-hall' | 'courtyard' | 'garden'
+type Zone = 'arrival' | 'gallery' | 'observatory' | 'horizon'
 type SectionId = 'hero' | 'projects' | 'experience' | 'skills' | 'contact'
 
 const SECTION_TO_ZONE: Record<SectionId, Zone> = {
-  hero:       'reception',
-  projects:   'main-hall',
-  experience: 'courtyard',
-  skills:     'garden',
-  contact:    'reception',
+  hero:       'arrival',
+  projects:   'gallery',
+  experience: 'observatory',
+  skills:     'observatory',
+  contact:    'horizon',
 }
 
 const SECTION_IDS: SectionId[] = ['hero', 'projects', 'experience', 'skills', 'contact']
@@ -18,7 +18,7 @@ const THRESHOLDS = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
 export function useActiveSection(
   scrollContainerRef: React.RefObject<HTMLElement>
 ): Zone | null {
-  const [activeZone, setActiveZone] = useState<Zone | null>('reception')
+  const [activeZone, setActiveZone] = useState<Zone | null>('arrival')
   const ratiosRef = useRef<Map<string, number>>(new Map())
 
   useEffect(() => {

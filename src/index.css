@@ -28,13 +28,13 @@
     transform: translateY(0);
   }
 
-  .castle-map-zone {
+  .pathway-map-zone {
     cursor: pointer;
     transition: fill 0.3s ease, transform 0.25s ease;
     transform-box: fill-box;
     transform-origin: center;
   }
-  .castle-map-zone:hover {
+  .pathway-map-zone:hover {
     transform: scale(1.015);
   }
 

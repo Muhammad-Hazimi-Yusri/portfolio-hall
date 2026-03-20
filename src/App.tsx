@@ -110,8 +110,8 @@ function TourApp() {
       )}
       {appView === 'explore' && (
         <FreeRoamWrapper
-          initialPosition={exploreOrigin?.position ?? { x: 0, y: 1.6, z: 16 }}
-          initialTarget={exploreOrigin?.target ?? { x: 0, y: 1.6, z: 8 }}
+          initialPosition={exploreOrigin?.position ?? { x: 0, y: 1.6, z: 2 }}
+          initialTarget={exploreOrigin?.target ?? { x: 0, y: 1.6, z: 15 }}
           onReturnToTour={handleReturnToTour}
           onReady={handleExploreReady}
         />

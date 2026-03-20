@@ -90,17 +90,17 @@ Balairung uses a **Frutiger Aero modern museum** aesthetic — clean, bright, an
 - Footer with secondary "Switch to 3D Experience" CTA
 - Intersection Observer fade-in reveals per section; CSS-only particle animation in hero
 - Self-scrolling container (3D mode `overflow: hidden` on `#root` preserved)
-- **Illustrated castle map** in 256px left sidebar (desktop): fantasy RPG hand-drawn SVG plan with 4 interactive zones (Main Hall, Courtyard, Reception, Garden), decorative elements per zone, gold doorway connectors, Cinzel labels, and gold glow on the active zone
+- **Illustrated pathway map** in 256px left sidebar (desktop): horizontal SVG boardwalk plan with 4 interactive zones (Arrival, Gallery, Observatory, Horizon), decorative wave elements, sky blue accent connectors, Space Grotesk labels, and glow on the active zone
 - **Scroll sync**: `IntersectionObserver` tracks which section occupies most of the viewport and highlights the corresponding map zone in real time
 - **Zone click** smooth-scrolls to that section; **POI dot click** scrolls to the exact card and fires a gold ring pulse animation
 - **Mobile map overlay**: floating "Map" button (bottom-right) opens the full map as a full-screen backdrop-blur overlay; tapping a zone navigates and closes the overlay
-- POI world coordinates (`svgX = -poi.position.x`, `svgY = poi.position.z`) used to position map dots, matching the Minimap.tsx convention
+- POI world coordinates (`svgX = poi.position.z`, `svgY = -poi.position.x * 0.2`) used to position map dots, matching the Minimap.tsx convention
 - **Polish pass**: smooth micro-interactions and visual refinement throughout
   - Card expand: CSS `grid-rows-[0fr→1fr]` animated collapse (300ms ease-out); expand panel stays in DOM for accessibility/screen readers
   - Card hover lift (desktop only, `@media (hover: hover)`): `translateY(-2px)` + faint gold drop shadow — suppressed on touch devices to prevent sticky-hover
   - Timeline dots: scale-in with overshoot (`0 → 1.4 → 1`) triggered by parent scroll-reveal, staggered per entry
   - Hero background: drifting `wood-texture` layer behind particles (CSS-only 25s infinite pan, no JS)
-  - Castle map zone hover: `scale(1.015)` via `transform-box: fill-box` — correct SVG bounding box transform, no TSX changes
+  - Pathway map zone hover: `scale(1.015)` via `transform-box: fill-box` — correct SVG bounding box transform, no TSX changes
   - Section dividers: 1px gold gradient rule between all major sections
   - Alternating section backgrounds: Projects and Skills sections use `bg-hall-surface/20` tint for visual rhythm
   - Fade-in easing upgraded from `ease-out` to `cubic-bezier(0.4, 0, 0.2, 1)` for smoother deceleration
@@ -128,8 +128,8 @@ Balairung uses a **Frutiger Aero modern museum** aesthetic — clean, bright, an
 ### Navigation & UX (v1.2 – v1.5.1)
 - Minimap overlay (SVG synced with 3D camera position) — top-left on desktop, hidden in portrait mobile
 - Dynamic zoom: minimap auto-centers on player and zooms to show the 3 nearest POIs; min 8×8 / max 30×30 viewBox; smooth lerp transitions at 60fps
-- Full map toggle (`⊞`/`⊡`) inside minimap corner — switches between dynamic zoom and full castle view; full view shows a dashed gold rectangle marking the dynamic zoom area
-- Current zone label (Main Hall, Courtyard, Reception, Garden) displayed in minimap corner
+- Full map toggle (`⊞`/`⊡`) inside minimap corner — switches between dynamic zoom and full pathway view; full view shows a dashed rectangle marking the dynamic zoom area
+- Current zone label (Arrival, Gallery, Observatory, Horizon) displayed in minimap corner
 - Real-time player position and scaled direction arrow on minimap
 - Click minimap to teleport anywhere in the hall; click POI dot to teleport to approach position
 - GTA-style cinematic fly-to animation (rise → overhead pan → descend) with short-distance fallback
@@ -158,12 +158,12 @@ Balairung uses a **Frutiger Aero modern museum** aesthetic — clean, bright, an
 - Gallery lighting: directional light with shadows, per-painting spotlights, gold accent lights
 - Loading screen with progress bar and stage labels
 
-### Multi-Zone Castle (v1.4)
-- 4 distinct zones: Reception (entrance foyer), Courtyard (open-air hub with fountain), Main Hall (project gallery), Garden (greenhouse, skills & hackathons)
-- 20 real POIs populated from CV data across all zones
-- Procedural skybox and sun-style directional lighting with shadow casters
-- Gold doorway frames, glass-walled garden, zone-based sidebar grouping
-- Expanded minimap and floor plan reflecting multi-zone layout
+### Multi-Zone Layout (v1.4 → v2.5)
+- 4 distinct zones: Arrival (circular platform), Gallery (linear boardwalk with project paintings), Observatory (wider circular platform for experience/skills/hackathons), Horizon (narrow path to contact)
+- 19 real POIs populated from CV data across all zones
+- Open-air boardwalk over water with sky dome and distance fog
+- Zone-based sidebar grouping, horizontal strip minimap
+- Invisible collision railings at platform edges
 
 ### WebXR / VR (v1.5)
 - WebXR immersive-VR session entry via Babylon.js `WebXRDefaultExperience` (Quest browser)
@@ -279,7 +279,7 @@ portfolio-hall/
 │   │   ├── FallbackMode/         # 2D scroll-based portfolio (v1.6.0+)
 │   │   │   ├── index.ts
 │   │   │   ├── FallbackMode.tsx  # Root layout + data orchestration + map wiring
-│   │   │   ├── CastleMap.tsx     # Illustrated SVG castle map navigation
+│   │   │   ├── PathwayMap.tsx    # Illustrated SVG pathway map navigation
 │   │   │   ├── HeroSection.tsx
 │   │   │   ├── ProjectCard.tsx   # StoryCard — expandable story-driven project card
 │   │   │   ├── ProjectsGrid.tsx
@@ -287,8 +287,7 @@ portfolio-hall/
 │   │   │   ├── SkillsSection.tsx
 │   │   │   └── ContactSection.tsx
 │   │   ├── MobileControls.tsx    # Game Boy-style portrait + landscape controls
-│   │   ├── FloorPlan.tsx         # 2D SVG floor plan (legacy, superseded by CastleMap)
-│   │   ├── Minimap.tsx           # SVG minimap overlay (3D mode)
+│   │   ├── Minimap.tsx           # Horizontal strip SVG minimap overlay (3D mode)
 │   │   ├── ThreeDSidebar.tsx     # Collapsible POI sidebar (3D mode)
 │   │   ├── FadeOverlay.tsx       # Fade transition for teleport
 │   │   ├── ModeToggle.tsx        # 2D/3D mode switch button
@@ -403,33 +402,23 @@ type AppState = {
 
 ---
 
-## 🗺 Castle Layout — Balairung
+## 🗺 Museum Layout — Balairung
 
 ```
-                    ┌──────────────────┐
-                    │    MAIN HALL     │
-                    │  (project gallery │
-                    │   10 paintings)  │
-                    │   z: -22 to -8  │
-                    └───────┤  ├──────┘
-                            │  │
-    ┌────────────┐  ┌───────┘  └──────┐
-    │   GARDEN   │──│   COURTYARD     │
-    │ (greenhouse│  │   (open-air     │
-    │  skills +  │  │   hub with      │
-    │  hackathons│  │   fountain)     │
-    │  x:-20→-8) │  │   x:-8→+8      │
-    └────────────┘  └───────┤  ├──────┘
-                            │  │
-                    ┌───────┘  └──────┐
-                    │   RECEPTION     │
-                    │   (entrance     │
-                    │   foyer with    │
-                    │   about/contact)│
-                    │   ☻ spawn      │
-                    └───────┤  ├──────┘
-                            DOOR
+Z=0          Z=8                              Z=58        Z=68           Z=83-90
+  ╭───╮      ┌──────────────────────────────┐  ╭─────────╮  ┌──────────┐
+  │   │──────│         GALLERY              │──│OBSERVA- │──│ HORIZON  │
+  │ARR│      │  (10 project paintings on    │  │  TORY   │  │ (contact │
+  │   │      │   left wall, facing right)   │  │(exp/    │  │  at end) │
+  ╰───╯      │   width=10, wall at x=-5    │  │ skills/ │  │ width=4  │
+  d=8        └──────────────────────────────┘  │hackath.)│  └──────────┘
+  ☻ spawn                                     ╰─────────╯
+  (about)                                       d=14
 ```
+
+Z axis (forward) →
+Walkable X range: roughly -4.5 to +4.5 (gallery), wider at observatory
+Player Y: 1.6 (standing on platforms at Y=0)
 
 ---
 
@@ -587,7 +576,7 @@ Pre-rendered screenshot fallback for non-WebGL devices. Dev-only capture tool (`
 
 #### v2.x — Guided Balairung (Scroll-Driven Tour)
 
-Architecture pivot: the site opens directly into a scroll-driven guided tour through the castle. No mode selection gate. Scroll position drives camera movement through the 3D scene (WebGL) or illustrated parallax scenes (fallback). Free-roam 3D unlocks as an opt-in from within the tour.
+Architecture pivot: the site opens directly into a scroll-driven guided tour through the museum boardwalk. No mode selection gate. Scroll position drives camera movement through the 3D scene (WebGL) or illustrated parallax scenes (fallback). Free-roam 3D unlocks as an opt-in from within the tour.
 
 **Story arc:** "Who I am → What I build → Why it matters → Let's talk"
 
@@ -608,8 +597,8 @@ Architecture pivot: the site opens directly into a scroll-driven guided tour thr
 
 ##### v2.2.0 — 3D Visual Layer: Camera-on-Rail ✅
 - [x] Babylon.js canvas behind content layer (WebGL only, gated by `hasWebGL()`)
-- [x] Camera spline path through castle zones driven by scroll progress (10 waypoints, smoothstep interpolation)
-- [x] Reuses existing castle geometry, materials, GLB assets from v1.7.0
+- [x] Camera spline path through museum zones driven by scroll progress (13 waypoints, smoothstep interpolation)
+- [x] Reuses existing environment geometry, materials from v2.5.0
 - [x] Content layer glass-morphism (semi-transparent backgrounds + backdrop-blur)
 - [x] Reduced resolution on mobile for performance (`setHardwareScalingLevel(2)`)
 - [x] Smooth canvas fade-in after scene load
@@ -637,6 +626,13 @@ Architecture pivot: the site opens directly into a scroll-driven guided tour thr
 - [x] Glass-morphism CSS utilities (glass-panel, aero-gradient, accent-glow)
 - [x] Sky dome with gradient, distance fog, water plane with reflections
 - [x] All hardcoded colors swept to new palette across ~15 files
+- [x] Zone type rewired from castle rooms to museum zones (arrival/gallery/observatory/horizon)
+- [x] All 19 POI positions remapped to linear boardwalk layout
+- [x] Camera tour path follows Z-axis through gallery (13 waypoints)
+- [x] Minimap redesigned as horizontal strip
+- [x] PathwayMap replaces CastleMap in fallback mode
+- [x] Collision railings at platform edges
+- [x] Capture points renamed for museum zones
 
 #### v3.x — Backlog (Deferred from v1.8–v1.9)
 
@@ -649,7 +645,7 @@ Architecture pivot: the site opens directly into a scroll-driven guided tour thr
 
 ##### v3.1.0 — 3D Self-Portrait (Scan + Splat Avatar)
 - [ ] iPhone LiDAR self-scan (via Scaniverse/Polycam)
-- [ ] Low-poly mesh avatar (.glb) in reception area
+- [ ] Low-poly mesh avatar (.glb) on arrival platform
 - [ ] Gaussian splat toggle using Babylon.js native GaussianSplattingMesh
 - [ ] Graceful degradation (low-poly only on weak devices)
 

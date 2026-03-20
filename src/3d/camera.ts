@@ -22,8 +22,8 @@ export function createFirstPersonCamera(
 ) {
   // Always start at arrival platform — ensures all geometry and shaders
   // render at a content-rich position while the transition overlay is visible.
-  const camera = new UniversalCamera('fpCam', new Vector3(0, 1.6, 0), scene)
-  camera.setTarget(new Vector3(0, 1.6, 10))
+  const camera = new UniversalCamera('fpCam', new Vector3(0, 1.6, 2), scene)
+  camera.setTarget(new Vector3(0, 1.6, 15))
 
   // Deferred teleport: after a few render frames, move to the requested
   // position. The transition overlay hides this camera movement.

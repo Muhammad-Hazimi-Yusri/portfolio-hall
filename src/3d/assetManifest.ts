@@ -116,65 +116,15 @@ export const assetLibrary: AssetEntry[] = [
 ]
 
 // ── Asset Placements ──
-// Where each asset lives in the castle. Positions mirror the hardcoded values
-// in scene.ts so that real GLBs can replace procedural geometry incrementally.
+// Where each asset lives in the environment. Positions mirror the hardcoded
+// values in scene.ts so that real GLBs can replace procedural geometry.
 //
 // Zone boundaries for reference:
-//   RECEPTION  x[-5,5]  z[8,18]   h=5
-//   MAIN_HALL  x[-8,8]  z[-22,-8] h=4
-//   COURTYARD  x[-8,8]  z[-8,8]
-//   GARDEN     x[-20,-8] z[-6,6]  h=5
+//   ARRIVAL      cylinder, center (0,0), d=8
+//   GALLERY      x[-5,5] z[8,58], wall at x=-5
+//   OBSERVATORY  cylinder, center (0,68), d=14
+//   HORIZON      x[-2,2] z[75,90]
 
 export const assetPlacements: AssetPlacement[] = [
-
-  // ── Reception pillars (6) ─────────────────────────────────────────────────
-  // Two rows at z=10 (front) and z=15 (back), x columns at -4, 0, 4
-  { assetId: 'pillar-ornate-01', zone: 'reception', castShadows: true, position: { x: -4, y: 0, z: 10 } },
-  { assetId: 'pillar-ornate-01', zone: 'reception', castShadows: true, position: { x:  0, y: 0, z: 10 } },
-  { assetId: 'pillar-ornate-01', zone: 'reception', castShadows: true, position: { x:  4, y: 0, z: 10 } },
-  { assetId: 'pillar-ornate-01', zone: 'reception', castShadows: true, position: { x: -4, y: 0, z: 15 } },
-  { assetId: 'pillar-ornate-01', zone: 'reception', castShadows: true, position: { x:  0, y: 0, z: 15 } },
-  { assetId: 'pillar-ornate-01', zone: 'reception', castShadows: true, position: { x:  4, y: 0, z: 15 } },
-
-  // ── Main Hall corner pillars (4) ──────────────────────────────────────────
-  // MAIN_HALL.z1=-22 → z1+1=-21 (north row); MAIN_HALL.z2=-8 → z2-1=-9 (south row)
-  { assetId: 'pillar-ornate-01', zone: 'main-hall', castShadows: true, position: { x: -7, y: 0, z: -21 } },
-  { assetId: 'pillar-ornate-01', zone: 'main-hall', castShadows: true, position: { x:  7, y: 0, z: -21 } },
-  { assetId: 'pillar-ornate-01', zone: 'main-hall', castShadows: true, position: { x: -7, y: 0, z:  -9 } },
-  { assetId: 'pillar-ornate-01', zone: 'main-hall', castShadows: true, position: { x:  7, y: 0, z:  -9 } },
-
-  // ── Garden pillars (2) ────────────────────────────────────────────────────
-  // GARDEN.x1=-20 → x1+1=-19; z[-6,6] → z1+1=-5, z2-1=5
-  { assetId: 'pillar-ornate-01', zone: 'garden', castShadows: true, position: { x: -19, y: 0, z: -5 } },
-  { assetId: 'pillar-ornate-01', zone: 'garden', castShadows: true, position: { x: -19, y: 0, z:  5 } },
-
-  // ── Doorway frames ────────────────────────────────────────────────────────
-  // Positions are at zone boundaries; actual mesh framing is in scene.ts (createDoorwayFrame)
-  { assetId: 'doorway-frame-01', zone: 'reception', position: { x:  0, y: 0, z: 18 } },
-  { assetId: 'doorway-frame-01', zone: 'courtyard', position: { x:  0, y: 0, z: -8 } },
-  { assetId: 'doorway-frame-01', zone: 'courtyard', position: { x: -8, y: 0, z:  0 } },
-
-  // ── Main Hall crown molding (3 segments) ──────────────────────────────────
-  // MAIN_HALL h=4 → crownY=3.925; WALL_THICKNESS=0.3 → offset=0.075+0.075=0.15
-  { assetId: 'crown-molding-segment', zone: 'main-hall', position: { x:  0,     y: 3.925, z: -21.85 } },
-  { assetId: 'crown-molding-segment', zone: 'main-hall', position: { x:  7.85,  y: 3.925, z: -15    } },
-  { assetId: 'crown-molding-segment', zone: 'main-hall', position: { x: -7.85,  y: 3.925, z: -15    } },
-
-  // ── Reception centerpiece (1) ─────────────────────────────────────────────
-  // RECEPTION center: x=0, z=(8+18)/2=13; origin at base
-  { assetId: 'throne-reception-01', zone: 'reception', castShadows: true, receiveShadows: true, position: { x: 0, y: 0, z: 13 } },
-
-  // ── Test placement ────────────────────────────────────────────────────────
-  // Loads test-cube.glb at the north-west reception pillar to prove the pipeline.
-  // proceduralFallbackName causes the existing procedural pillar to be disposed
-  // when the GLB loads successfully — a clean swap instead of an overlay.
-  // Remove once pillar-ornate-01.glb is ready.
-  {
-    assetId: 'test-cube',
-    zone: 'reception',
-    position: { x: -4, y: 0, z: 10 },
-    castShadows: true,
-    receiveShadows: true,
-    proceduralFallbackName: 'rec-pillar--4-front',
-  },
+  // Boardwalk placements — to be populated when Blender assets are ready.
 ]

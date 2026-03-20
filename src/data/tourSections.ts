@@ -14,7 +14,7 @@ export const TOUR_SECTIONS: TourSection[] = [
     storyBeat: 'Who I am',
     scrollStart: 0.0,
     scrollEnd: 0.15,
-    zone: 'gate',
+    zone: 'arrival',
   },
   {
     id: 'projects',
@@ -22,7 +22,7 @@ export const TOUR_SECTIONS: TourSection[] = [
     storyBeat: 'What I build',
     scrollStart: 0.15,
     scrollEnd: 0.65,
-    zone: 'main-hall',
+    zone: 'gallery',
   },
   {
     id: 'impact',
@@ -30,7 +30,7 @@ export const TOUR_SECTIONS: TourSection[] = [
     storyBeat: 'Why it matters',
     scrollStart: 0.65,
     scrollEnd: 0.85,
-    zone: 'courtyard',
+    zone: 'observatory',
   },
   {
     id: 'contact',
@@ -38,7 +38,7 @@ export const TOUR_SECTIONS: TourSection[] = [
     storyBeat: "Let's talk",
     scrollStart: 0.85,
     scrollEnd: 1.0,
-    zone: 'garden',
+    zone: 'horizon',
   },
 ]
 

@@ -7,11 +7,11 @@ import { ProjectsGrid } from './ProjectsGrid'
 import { ExperienceTimeline } from './ExperienceTimeline'
 import { SkillsSection } from './SkillsSection'
 import { ContactSection } from './ContactSection'
-import { CastleMap } from './CastleMap'
-import type { POIMarker } from './CastleMap'
+import { PathwayMap } from './PathwayMap'
+import type { POIMarker } from './PathwayMap'
 import type { POI } from '@/types/poi'
 
-type Zone = 'reception' | 'main-hall' | 'courtyard' | 'garden'
+type Zone = 'arrival' | 'gallery' | 'observatory' | 'horizon'
 
 type Props = {
   onSwitchMode: () => void
@@ -20,10 +20,10 @@ type Props = {
 const FEATURED_IDS = ['avvr', 'portfolio-hall', 'diy-stereo-camera', 'eee-roadmap']
 
 const ZONE_SECTION_ID: Record<Zone, string> = {
-  reception:   'section-hero',
-  'main-hall': 'section-projects',
-  courtyard:   'section-experience',
-  garden:      'section-skills',
+  arrival:     'section-hero',
+  gallery:     'section-projects',
+  observatory: 'section-experience',
+  horizon:     'section-contact',
 }
 
 // POI dots that should scroll to a specific section rather than their card
@@ -40,8 +40,8 @@ export function FallbackMode({ onSwitchMode }: Props) {
   const poiMarkers = useMemo<POIMarker[]>(() =>
     pois.map((p) => ({
       id: p.id,
-      svgX: p.position.x,
-      svgY: p.position.z,
+      svgX: p.position.z,
+      svgY: -p.position.x * 0.2,
       label: p.content.title,
       zone: p.zone as Zone,
     })),
@@ -107,14 +107,14 @@ export function FallbackMode({ onSwitchMode }: Props) {
         <ModeToggle currentMode="fallback" onToggle={onSwitchMode} />
       </div>
 
-      {/* Desktop: illustrated castle map in left sidebar */}
+      {/* Desktop: illustrated pathway map in left sidebar */}
       <aside className="hidden md:block fixed left-0 top-0 bottom-0 w-64 bg-hall-surface/30 border-r border-hall-frame">
         <div className="w-full h-full p-3 flex flex-col">
           <div className="text-hall-muted/50 text-[9px] uppercase tracking-widest text-center mb-2 pt-1">
-            Castle Map
+            Pathway Map
           </div>
           <div className="flex-1 min-h-0">
-            <CastleMap
+            <PathwayMap
               activeZone={activeZone}
               pois={poiMarkers}
               onZoneClick={handleZoneClick}
@@ -122,7 +122,7 @@ export function FallbackMode({ onSwitchMode }: Props) {
             />
           </div>
           <div className="text-hall-muted/30 text-[8px] text-center pb-1">
-            Click a room to navigate
+            Click a zone to navigate
           </div>
         </div>
       </aside>
@@ -132,7 +132,7 @@ export function FallbackMode({ onSwitchMode }: Props) {
         className="md:hidden fixed bottom-4 right-4 z-50 px-4 py-2 bg-hall-surface border border-hall-accent/60 text-hall-accent text-sm rounded-lg shadow-lg"
         style={{ fontFamily: "'Space Grotesk', sans-serif" }}
         onClick={() => setMapOverlayOpen(true)}
-        aria-label="Open castle map"
+        aria-label="Open pathway map"
       >
         Map
       </button>
@@ -148,7 +148,7 @@ export function FallbackMode({ onSwitchMode }: Props) {
               className="text-hall-accent text-lg"
               style={{ fontFamily: "'Space Grotesk', sans-serif" }}
             >
-              Castle Map
+              Pathway Map
             </h2>
             <button
               className="text-hall-muted hover:text-hall-text text-2xl leading-none"
@@ -159,7 +159,7 @@ export function FallbackMode({ onSwitchMode }: Props) {
             </button>
           </div>
           <div className="flex-1 p-4" onClick={(e) => e.stopPropagation()}>
-            <CastleMap
+            <PathwayMap
               activeZone={activeZone}
               pois={poiMarkers}
               onZoneClick={handleZoneClick}

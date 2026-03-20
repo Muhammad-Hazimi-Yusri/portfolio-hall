@@ -11,60 +11,57 @@ type MinimapProps = {
   isPortrait: boolean
 }
 
-// Returns zone name for world coordinates, or '' if transitional/unknown
-function getZoneForPosition(wx: number, wz: number): string {
-  if (wx >= -8 && wx <= 8 && wz >= -22 && wz <= -8) return 'Main Hall'
-  if (wx >= -8 && wx <= 8 && wz >= -8  && wz <= 8)  return 'Courtyard'
-  if (wx >= -5 && wx <= 5 && wz >= 8   && wz <= 18) return 'Reception'
-  if (wx >= -20 && wx <= -8 && wz >= -6 && wz <= 6) return 'Garden'
+// Returns zone name for world coordinates (Z-based linear detection)
+function getZoneForPosition(_wx: number, wz: number): string {
+  if (wz < 4)  return 'Arrival'
+  if (wz < 61) return 'Gallery'
+  if (wz < 75) return 'Observatory'
+  if (wz <= 92) return 'Horizon'
   return ''
 }
 
 type VB = { x: number; y: number; w: number; h: number }
 
-// Returns the dynamic-zoom viewBox centered on player, sized to show the 3 nearest POIs
+// Returns a horizontal-strip viewBox centered on the player's Z position
 function computeDynamicVB(px: number, pz: number, pois: POI[]): VB {
-  const MIN_HALF = 4    // → 8×8 minimum viewBox
-  const MAX_HALF = 15   // → 30×30 maximum viewBox
-  const PADDING  = 1.5  // units of breathing room beyond the farthest of the 3 POIs
+  const MIN_HALF_X = 8
+  const MAX_HALF_X = 25
+  const PADDING    = 2
+  const STRIP_HALF_Y = 3 // fixed narrow height
 
-  // 3 nearest POIs by Euclidean distance
+  // 3 nearest POIs by distance (Z dominant, X compressed)
   const nearest = [...pois]
     .sort((a, b) =>
-      Math.hypot(a.position.x - px, a.position.z - pz) -
-      Math.hypot(b.position.x - px, b.position.z - pz)
+      Math.hypot(a.position.z - pz, (a.position.x - px) * 0.2) -
+      Math.hypot(b.position.z - pz, (b.position.x - px) * 0.2)
     )
     .slice(0, 3)
 
-  // Max axis distance from player to any of the 3 (same in world and SVG space due to negation symmetry)
-  let maxDX = 0, maxDZ = 0
+  let maxDZ = 0
   for (const p of nearest) {
-    maxDX = Math.max(maxDX, Math.abs(p.position.x - px))
     maxDZ = Math.max(maxDZ, Math.abs(p.position.z - pz))
   }
 
-  const halfW = Math.max(MIN_HALF, Math.min(MAX_HALF, maxDX + PADDING))
-  const halfH = Math.max(MIN_HALF, Math.min(MAX_HALF, maxDZ + PADDING))
+  const halfX = Math.max(MIN_HALF_X, Math.min(MAX_HALF_X, maxDZ + PADDING))
 
-  // Center on player in SVG space (svgX = -worldX, svgY = worldZ)
-  let vbX = -px - halfW
-  let vbY =  pz - halfH
+  // Center on player Z in SVG space (svgX = worldZ)
+  let vbX = pz - halfX
+  const vbY = -STRIP_HALF_Y
 
-  // Clamp to full-castle SVG extents so viewBox never shows empty space
-  vbX = Math.max(-22, Math.min(vbX, 22 - halfW * 2))
-  vbY = Math.max(-24, Math.min(vbY, 20 - halfH * 2))
+  // Clamp to full-strip SVG extents
+  vbX = Math.max(-5, Math.min(vbX, 95 - halfX * 2))
 
-  return { x: vbX, y: vbY, w: halfW * 2, h: halfH * 2 }
+  return { x: vbX, y: vbY, w: halfX * 2, h: STRIP_HALF_Y * 2 }
 }
 
-const FULL_VB: VB = { x: -22, y: -24, w: 44, h: 44 }
+const FULL_VB: VB = { x: -5, y: -3, w: 100, h: 6 }
 
 function vbToString(v: VB): string {
   return `${v.x.toFixed(2)} ${v.y.toFixed(2)} ${v.w.toFixed(2)} ${v.h.toFixed(2)}`
 }
 
 export function Minimap({ pois, cameraRef, onTeleport, onTeleportToPOI, isPortrait }: MinimapProps) {
-  const [playerPos, setPlayerPos]     = useState({ x: 0, z: 5 })
+  const [playerPos, setPlayerPos]     = useState({ x: 0, z: 2 })
   const [playerRot, setPlayerRot]     = useState(0)
   const [collapsed, setCollapsed]     = useState(false)
   const [fullMap, setFullMap]         = useState(false)
@@ -132,9 +129,9 @@ export function Minimap({ pois, cameraRef, onTeleport, onTeleportToPOI, isPortra
     const ctm = svg.getScreenCTM()
     if (!ctm) return
     const svgPt = pt.matrixTransform(ctm.inverse())
-    // Negate X back to world coords (SVG X is negated for left-handed correction)
-    const clampedX = Math.max(-20, Math.min(8,  -svgPt.x))
-    const clampedZ = Math.max(-22, Math.min(18,  svgPt.y))
+    // SVG X = world Z, SVG Y = -world X * 0.2
+    const clampedZ = Math.max(-2, Math.min(90, svgPt.x))
+    const clampedX = Math.max(-5, Math.min(5, -svgPt.y / 0.2))
     onTeleport(clampedX, clampedZ)
   }
 
@@ -149,26 +146,26 @@ export function Minimap({ pois, cameraRef, onTeleport, onTeleportToPOI, isPortra
   }
 
   // Player direction indicator
-  // Babylon: rotation.y=0 → +z (south), PI → -z (north); SVG (negated X): rotate(0) → north
-  const rotDeg = -180 + (playerRot * 180) / Math.PI
+  // Babylon: rotation.y=0 → +z (forward). SVG X = world Z, so facing +Z = SVG +X = 0°.
+  const rotDeg = -90 + (playerRot * 180) / Math.PI
 
-  // Player SVG position
-  const mapX = -playerPos.x
+  // Player SVG position: Z → SVG X, X → SVG Y (compressed)
+  const mapX = playerPos.z
+  const mapY = -playerPos.x * 0.2
 
   // Arrow size scales with viewBox width so it stays visually proportional
   const vbParts = viewBoxStr.split(' ').map(Number)
-  const vbW = vbParts[2] ?? 44
-  const vbH = vbParts[3] ?? 44
-  const arrowScale = Math.max(0.25, Math.min(1.0, vbW / 44))
+  const vbW = vbParts[2] ?? 100
+  const arrowScale = Math.max(0.15, Math.min(0.6, vbW / 100))
 
   // Visible POIs: filter to current viewBox bounds in dynamic mode; show all in full map
   const vbMinX = vbParts[0], vbMinY = vbParts[1]
-  const vbMaxX = vbMinX + vbW, vbMaxY = vbMinY + vbH
+  const vbMaxX = vbMinX + vbW, vbMaxY = vbMinY + (vbParts[3] ?? 6)
   const visiblePois = fullMap
     ? pois
     : pois.filter(p => {
-        const sx = -p.position.x, sz = p.position.z
-        return sx >= vbMinX && sx <= vbMaxX && sz >= vbMinY && sz <= vbMaxY
+        const sx = p.position.z, sy = -p.position.x * 0.2
+        return sx >= vbMinX && sx <= vbMaxX && sy >= vbMinY && sy <= vbMaxY
       })
 
   // In full map mode, show a dashed rect representing where the dynamic zoom is
@@ -177,7 +174,7 @@ export function Minimap({ pois, cameraRef, onTeleport, onTeleportToPOI, isPortra
   const showMobile = isMobile()
   const hidden = showMobile && isPortrait
 
-  const containerSize = showMobile ? 'w-56 h-56' : 'w-80 h-80'
+  const containerSize = showMobile ? 'w-48 h-16' : 'w-64 h-20'
 
   if (hidden) return null
 
@@ -194,30 +191,53 @@ export function Minimap({ pois, cameraRef, onTeleport, onTeleportToPOI, isPortra
             onTouchEnd={handleTouch}
             onClick={handleClick}
           >
-            {/* Zone outlines (SVG X negated vs world X) */}
-            {/* Courtyard */}
-            <rect x="-8" y="-8" width="16" height="16"
-              fill="rgba(60,80,50,0.15)" stroke="currentColor" strokeWidth="0.2" className="text-hall-muted/50" />
-            {/* Reception */}
-            <rect x="-5" y="8" width="10" height="10"
-              fill="rgba(90,65,45,0.15)" stroke="currentColor" strokeWidth="0.2" className="text-hall-muted/50" />
-            {/* Main Hall */}
-            <rect x="-8" y="-22" width="16" height="14"
-              fill="rgba(40,30,22,0.2)" stroke="currentColor" strokeWidth="0.2" className="text-hall-muted/50" />
-            {/* Garden */}
-            <rect x="8" y="-6" width="12" height="12"
-              fill="rgba(50,80,45,0.15)" stroke="currentColor" strokeWidth="0.2" className="text-hall-muted/50" />
+            {/* Water background */}
+            <rect x="-5" y="-3" width="100" height="6"
+              fill="rgba(56,189,248,0.08)" rx="1" />
 
-            {/* Doorway connectors */}
-            <line x1="-1.5" y1="18"  x2="1.5"  y2="18"  stroke="#38BDF8" strokeWidth="0.3" />
-            <line x1="-1.5" y1="-8"  x2="1.5"  y2="-8"  stroke="#38BDF8" strokeWidth="0.3" />
-            <line x1="8"    y1="-1.5" x2="8"   y2="1.5"  stroke="#38BDF8" strokeWidth="0.3" />
+            {/* Arrival platform */}
+            <circle cx="0" cy="0" r="2"
+              fill="rgba(226,232,240,0.4)" stroke="currentColor" strokeWidth="0.06" className="text-hall-muted/40" />
 
-            {/* Dynamic-zoom viewport indicator (dashed gold rect) shown only in full map mode */}
+            {/* Gallery walkway */}
+            <rect x="8" y="-1" width="50" height="2"
+              fill="rgba(226,232,240,0.4)" stroke="currentColor" strokeWidth="0.06" className="text-hall-muted/40" />
+
+            {/* Observatory platform */}
+            <circle cx="68" cy="0" r="3.5"
+              fill="rgba(226,232,240,0.4)" stroke="currentColor" strokeWidth="0.06" className="text-hall-muted/40" />
+
+            {/* Horizon path */}
+            <rect x="75" y="-0.5" width="15" height="1"
+              fill="rgba(226,232,240,0.35)" stroke="currentColor" strokeWidth="0.06" className="text-hall-muted/40" />
+
+            {/* Zone labels (only in full map) */}
+            {fullMap && (
+              <>
+                <text x="0" y="2.5" textAnchor="middle"
+                  className="fill-hall-muted/50 pointer-events-none" style={{ fontSize: '1px' }}>
+                  Arrival
+                </text>
+                <text x="33" y="2.5" textAnchor="middle"
+                  className="fill-hall-muted/50 pointer-events-none" style={{ fontSize: '1px' }}>
+                  Gallery
+                </text>
+                <text x="68" y="2.5" textAnchor="middle"
+                  className="fill-hall-muted/50 pointer-events-none" style={{ fontSize: '1px' }}>
+                  Observatory
+                </text>
+                <text x="82.5" y="2.5" textAnchor="middle"
+                  className="fill-hall-muted/50 pointer-events-none" style={{ fontSize: '1px' }}>
+                  Horizon
+                </text>
+              </>
+            )}
+
+            {/* Dynamic-zoom viewport indicator (dashed rect, full map only) */}
             {dynVB && (
               <rect
                 x={dynVB.x} y={dynVB.y} width={dynVB.w} height={dynVB.h}
-                fill="none" stroke="#38BDF8" strokeWidth="0.3"
+                fill="none" stroke="#38BDF8" strokeWidth="0.1"
                 strokeDasharray="1 0.5" opacity="0.7"
               />
             )}
@@ -231,17 +251,17 @@ export function Minimap({ pois, cameraRef, onTeleport, onTeleportToPOI, isPortra
                 className="cursor-pointer"
               >
                 <circle
-                  cx={-poi.position.x}
-                  cy={poi.position.z}
-                  r={fullMap ? 0.4 : 0.3}
+                  cx={poi.position.z}
+                  cy={-poi.position.x * 0.2}
+                  r={fullMap ? 0.4 : 0.25}
                   className="fill-hall-muted/60"
                 />
                 {fullMap && (
                   <text
-                    x={-poi.position.x}
-                    y={poi.position.z + 1.0}
+                    x={poi.position.z}
+                    y={-poi.position.x * 0.2 + 0.8}
                     textAnchor="middle"
-                    className="fill-hall-muted text-[0.6px] pointer-events-none"
+                    className="fill-hall-muted pointer-events-none" style={{ fontSize: '0.5px' }}
                   >
                     {poi.content.title}
                   </text>
@@ -250,7 +270,7 @@ export function Minimap({ pois, cameraRef, onTeleport, onTeleportToPOI, isPortra
             ))}
 
             {/* Player indicator (arrow scales with zoom) */}
-            <g transform={`translate(${mapX}, ${playerPos.z}) rotate(${rotDeg})`}>
+            <g transform={`translate(${mapX}, ${mapY}) rotate(${rotDeg})`}>
               <polygon
                 points={`0,${-0.6 * arrowScale} ${-0.4 * arrowScale},${0.4 * arrowScale} ${0.4 * arrowScale},${0.4 * arrowScale}`}
                 className="fill-hall-accent"
@@ -271,7 +291,7 @@ export function Minimap({ pois, cameraRef, onTeleport, onTeleportToPOI, isPortra
             onClick={(e) => { e.stopPropagation(); setFullMap(f => !f) }}
             onTouchEnd={(e) => { e.preventDefault(); e.stopPropagation(); setFullMap(f => !f) }}
           >
-            {fullMap ? '⊡' : '⊞'}
+            {fullMap ? '\u22A1' : '\u229E'}
           </button>
         </div>
       )}

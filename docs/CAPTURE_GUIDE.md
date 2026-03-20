@@ -20,16 +20,16 @@ Move the downloaded PNGs into:
 
 ```
 public/tour-captures/
-├── tour-gate-approach.png
-├── tour-gate-enter.png
-├── tour-hall-entry.png
-├── tour-hall-mid-left.png
-├── tour-hall-mid-right.png
-├── tour-hall-deep.png
-├── tour-courtyard-entry.png
-├── tour-courtyard-mid.png
-├── tour-garden-entry.png
-└── tour-garden-settle.png
+├── tour-arrival-distant.png
+├── tour-arrival-close.png
+├── tour-gallery-entrance.png
+├── tour-gallery-early.png
+├── tour-gallery-mid.png
+├── tour-gallery-deep.png
+├── tour-observatory-approach.png
+├── tour-observatory-center.png
+├── tour-horizon-start.png
+└── tour-horizon-end.png
 ```
 
 Then commit the images.
@@ -37,7 +37,7 @@ Then commit the images.
 ## When to Re-capture
 
 Re-run the capture tool whenever you change:
-- Castle geometry (`src/3d/scene.ts`)
+- Environment geometry (`src/3d/scene.ts`)
 - Lighting setup (`src/3d/lights.ts`)
 - Materials (`src/3d/materials.ts`)
 - Camera path waypoints (`src/3d/tourPath.ts`)
@@ -59,13 +59,13 @@ Defined in `src/3d/tourCaptures.ts`. Each point maps to a scroll progress value 
 
 | ID | Progress | Section |
 |----|----------|---------|
-| gate-approach | 0.00 | Intro |
-| gate-enter | 0.12 | Intro |
-| hall-entry | 0.15 | Projects |
-| hall-mid-left | 0.30 | Projects |
-| hall-mid-right | 0.45 | Projects |
-| hall-deep | 0.55 | Projects |
-| courtyard-entry | 0.65 | Impact |
-| courtyard-mid | 0.75 | Impact |
-| garden-entry | 0.85 | Contact |
-| garden-settle | 1.00 | Contact |
+| arrival-distant | 0.00 | Intro |
+| arrival-close | 0.10 | Intro |
+| gallery-entrance | 0.15 | Projects |
+| gallery-early | 0.25 | Projects |
+| gallery-mid | 0.40 | Projects |
+| gallery-deep | 0.55 | Projects |
+| observatory-approach | 0.65 | Impact |
+| observatory-center | 0.75 | Impact |
+| horizon-start | 0.85 | Contact |
+| horizon-end | 1.00 | Contact |

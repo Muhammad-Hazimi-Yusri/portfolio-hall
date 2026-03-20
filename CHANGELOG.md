@@ -24,6 +24,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Distance fog (linear, 60–100 units) for ethereal horizon fade
 - New museum boardwalk 3D environment: Arrival platform → Gallery walkway → Observatory platform → Horizon path
 - `@babylonjs/materials` dependency for WaterMaterial
+- Linear pathway minimap (horizontal strip replacing square castle minimap)
+- `PathwayMap` component for fallback mode (horizontal SVG boardwalk plan)
+- Invisible collision railings at gallery right edge, horizon sides, and horizon end wall
+- Z-based `getZoneForPosition()` for linear zone detection
 
 ### Changed
 - Entire color palette from Teak & Gold to Aero Glass across ~15 files
@@ -31,13 +35,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 3D environment from enclosed castle rooms to open-air linear boardwalk over water
 - Lighting reduced from 20+ lights to 3 (hemispheric + directional sun + point fill) — fixes shader uniform block overflow
 - Typography headings from Cinzel to Space Grotesk
-- Camera start position from castle reception (Z=16) to arrival platform (Z=0)
+- Camera start position from castle reception (Z=16) to arrival platform (Z=2)
 - VR panel styling from brown/gold to dark slate/sky blue (dark backgrounds preserved for eye comfort)
 - Mobile controls from wood-texture console to glass-panel styling
 - ThreeDSidebar from wood-texture to glass-panel
 - Teleportation ring colors from gold to sky blue
 - All SVG map/minimap strokes from gold to sky blue
 - FallbackMode components from gold-trim to ring-hall-frame borders
+- Zone type from castle rooms (`reception`/`main-hall`/`courtyard`/`garden`) to museum zones (`arrival`/`gallery`/`observatory`/`horizon`)
+- All 19 POI positions remapped to linear boardwalk layout (10 project paintings on gallery wall, 7 observatory POIs, 1 arrival, 1 horizon)
+- Camera tour path: 13 waypoints walking forward along Z-axis through gallery, looking left at paintings
+- Minimap redesigned as horizontal strip (w-64 h-20) with Z→SVG-X coordinate mapping
+- Capture points renamed for museum zones (arrival-distant, gallery-entrance, etc.)
+- Default camera spawn moved to arrival platform (0, 1.6, 2) facing gallery
+- `#explore` hash spawn moved to arrival platform
+- Asset placements cleared (procedural geometry is the environment now)
 
 ### Removed
 - Cinzel font
@@ -48,6 +60,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Per-painting SpotLights and per-POI accent PointLights
 - Crown molding, decorative pillars, doorway frames, baseboards
 - Indoor directional light and its shadow generator
+- Castle zone references throughout codebase
+- `CastleMap` component (replaced by `PathwayMap`)
+- `FloorPlan` component (unused legacy, deleted)
+- `.castle-map-zone` CSS class (renamed to `.pathway-map-zone`)
 
 ### Fixed
 - "GL_MAX_VERTEX_UNIFORM_BUFFERS exceeded" shader error caused by 20+ dynamic lights

@@ -11,10 +11,10 @@ type ThreeDSidebarProps = {
 }
 
 const ZONES: { key: Zone; label: string }[] = [
-  { key: 'reception', label: 'Reception' },
-  { key: 'courtyard', label: 'Courtyard' },
-  { key: 'main-hall', label: 'Main Hall' },
-  { key: 'garden', label: 'Garden' },
+  { key: 'arrival', label: 'Arrival' },
+  { key: 'gallery', label: 'Gallery' },
+  { key: 'observatory', label: 'Observatory' },
+  { key: 'horizon', label: 'Horizon' },
 ]
 
 export function ThreeDSidebar({ pois, isOpen, onToggle, onTeleportToPOI, isPortrait }: ThreeDSidebarProps) {

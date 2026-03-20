@@ -150,6 +150,48 @@ export function createEnvironment(scene: Scene, mats: SceneMaterials): Environme
   galleryWall.material = mats.wall
   galleryWall.checkCollisions = true
 
+  // ── Collision Railings (invisible) ──
+
+  // Gallery right-side railing
+  const galleryRailRight = MeshBuilder.CreateBox(
+    'galleryRailRight',
+    { width: WALL_THICKNESS, height: WALL_HEIGHT, depth: 50 },
+    scene,
+  )
+  galleryRailRight.position = new Vector3(5, WALL_HEIGHT / 2, 33)
+  galleryRailRight.isVisible = false
+  galleryRailRight.checkCollisions = true
+
+  // Horizon left railing
+  const horizonRailLeft = MeshBuilder.CreateBox(
+    'horizonRailLeft',
+    { width: WALL_THICKNESS, height: WALL_HEIGHT, depth: 15 },
+    scene,
+  )
+  horizonRailLeft.position = new Vector3(-2, WALL_HEIGHT / 2, 82.5)
+  horizonRailLeft.isVisible = false
+  horizonRailLeft.checkCollisions = true
+
+  // Horizon right railing
+  const horizonRailRight = MeshBuilder.CreateBox(
+    'horizonRailRight',
+    { width: WALL_THICKNESS, height: WALL_HEIGHT, depth: 15 },
+    scene,
+  )
+  horizonRailRight.position = new Vector3(2, WALL_HEIGHT / 2, 82.5)
+  horizonRailRight.isVisible = false
+  horizonRailRight.checkCollisions = true
+
+  // Horizon end wall
+  const horizonEnd = MeshBuilder.CreateBox(
+    'horizonEnd',
+    { width: 4, height: WALL_HEIGHT, depth: WALL_THICKNESS },
+    scene,
+  )
+  horizonEnd.position = new Vector3(0, WALL_HEIGHT / 2, 90)
+  horizonEnd.isVisible = false
+  horizonEnd.checkCollisions = true
+
   // ── Sky Dome ──
 
   const skyDome = createSkyDome(scene)
@@ -168,6 +210,6 @@ export function createEnvironment(scene: Scene, mats: SceneMaterials): Environme
 
   return {
     grounds,
-    allWalls: [galleryWall],
+    allWalls: [galleryWall, galleryRailRight, horizonRailLeft, horizonRailRight, horizonEnd],
   }
 }

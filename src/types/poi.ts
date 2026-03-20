@@ -2,7 +2,7 @@ export type POIType = 'painting' | 'display-case' | 'pedestal' | 'custom'
 
 export type POISection = 'projects' | 'about' | 'skills' | 'contact' | 'experience' | 'hackathons'
 
-export type Zone = 'reception' | 'main-hall' | 'courtyard' | 'garden'
+export type Zone = 'arrival' | 'gallery' | 'observatory' | 'horizon'
 
 export type POILink = {
   label: string
