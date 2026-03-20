@@ -63,7 +63,7 @@ export function ImpactSection({ scrollProgress, reducedMotion }: Props) {
             transform: `translateY(${philoY}px)`,
           }}
         >
-          <h2 className="text-2xl md:text-3xl font-bold font-['Cinzel',serif] text-hall-accent mb-4">
+          <h2 className="text-2xl md:text-3xl font-bold font-['Space_Grotesk',sans-serif] text-hall-accent mb-4">
             Why It Matters
           </h2>
           {/* TODO: Final copy */}

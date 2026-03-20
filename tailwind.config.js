@@ -9,14 +9,14 @@ export default {
       // Theme tokens - will be defined based on final name/theme
       colors: {
         hall: {
-          bg: '#1C1410',
-          surface: '#2A1F18',
-          frame: '#3D2B1E',
-          'frame-light': '#5C4033',
-          accent: '#C9A84C',
-          'accent-warm': '#B8432F',
-          text: '#E8DFD0',
-          muted: '#9C8B7A',
+          bg: '#F5F7FA',
+          surface: '#FFFFFF',
+          frame: '#E2E8F0',
+          'frame-light': '#F1F5F9',
+          accent: '#38BDF8',
+          'accent-warm': '#818CF8',
+          text: '#1E293B',
+          muted: '#64748B',
         }
       }
     },

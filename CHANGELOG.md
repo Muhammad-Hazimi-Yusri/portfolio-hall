@@ -13,6 +13,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - v3.0.0: VR hardening & enhancement
 - v3.1.0: 3D self-portrait (iPhone LiDAR scan, low-poly mesh + gaussian splat toggle)
 
+## [2.5.0] - 2026-03-18
+
+### Added
+- Aero Glass color system — 8 semantic tokens (bg, surface, frame, frame-light, accent, accent-warm, text, muted) in a bright cool-white/sky-blue palette
+- Glass-morphism CSS utilities: `.glass-panel`, `.glass-panel-dark`, `.aero-gradient`, `.accent-glow`
+- Space Grotesk + Plus Jakarta Sans font imports (headings); Inter retained for body text
+- Water plane with WaterMaterial reflections (fallback to StandardMaterial)
+- Sky dome with dynamic gradient texture (blue → white at horizon)
+- Distance fog (linear, 60–100 units) for ethereal horizon fade
+- New museum boardwalk 3D environment: Arrival platform → Gallery walkway → Observatory platform → Horizon path
+- `@babylonjs/materials` dependency for WaterMaterial
+
+### Changed
+- Entire color palette from Teak & Gold to Aero Glass across ~15 files
+- All 3D materials to bright museum aesthetic (white floors, clean walls, sky blue accents)
+- 3D environment from enclosed castle rooms to open-air linear boardwalk over water
+- Lighting reduced from 20+ lights to 3 (hemispheric + directional sun + point fill) — fixes shader uniform block overflow
+- Typography headings from Cinzel to Space Grotesk
+- Camera start position from castle reception (Z=16) to arrival platform (Z=0)
+- VR panel styling from brown/gold to dark slate/sky blue (dark backgrounds preserved for eye comfort)
+- Mobile controls from wood-texture console to glass-panel styling
+- ThreeDSidebar from wood-texture to glass-panel
+- Teleportation ring colors from gold to sky blue
+- All SVG map/minimap strokes from gold to sky blue
+- FallbackMode components from gold-trim to ring-hall-frame borders
+
+### Removed
+- Cinzel font
+- `.wood-texture` CSS class
+- `.gold-trim` CSS class
+- `.hero-bg-layer` and `heroBgDrift` keyframes
+- Castle room geometry (Reception, Main Hall, Courtyard, Garden, pillars, fountain, skybox)
+- Per-painting SpotLights and per-POI accent PointLights
+- Crown molding, decorative pillars, doorway frames, baseboards
+- Indoor directional light and its shadow generator
+
+### Fixed
+- "GL_MAX_VERTEX_UNIFORM_BUFFERS exceeded" shader error caused by 20+ dynamic lights
+
+---
+
 ## [2.4.0] - 2026-03-17
 
 ### Added

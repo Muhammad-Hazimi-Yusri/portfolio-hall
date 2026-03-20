@@ -5,7 +5,7 @@
 > A grand royal hall or throne room; the ceremonial heart of a palace where audiences are received and important gatherings held.
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
-[![Version](https://img.shields.io/badge/version-2.4.0-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-2.5.0-blue.svg)]()
 [![Status](https://img.shields.io/badge/status-In_Progress-yellow.svg)]()
 
 <details>
@@ -59,12 +59,12 @@ Balairung | 3D Portfolio Hall is an interactive portfolio website designed as a 
 
 ## 🎨 Theme
 
-Balairung uses a **Javanese/Malay royal hall** aesthetic inspired by traditional Southeast Asian palace architecture:
+Balairung uses a **Frutiger Aero modern museum** aesthetic — clean, bright, and optimistic:
 
-- **Color palette**: "Teak & Gold" — deep wood tones, royal gold accents, batik red highlights, parchment text
-- **Typography**: Cinzel (serif) for headings and titles, Inter (sans-serif) for body text
-- **UI texture**: CSS wood-grain patterns on console frames and panels, gold trim borders
-- **Mobile controls**: Portrait Game Boy-style frame reimagined as a carved teak console with gold gilding
+- **Color palette**: "Aero Glass" — cool whites, sky blue accents, indigo-violet secondary, slate text on light backgrounds
+- **Typography**: Space Grotesk (headings), Inter (body text)
+- **UI texture**: Glass-morphism panels with backdrop blur, subtle borders, soft shadows
+- **3D environment**: Open-air boardwalk museum over reflective water, bright sky, linear pathway layout with fog at the horizon
 
 ---
 
@@ -257,7 +257,7 @@ portfolio-hall/
 │   │
 │   ├── 3d/
 │   │   ├── engine.ts             # Babylon.js engine + scene factory
-│   │   ├── scene.ts              # Castle geometry: walls, floors, ceilings, decorative meshes
+│   │   ├── scene.ts              # Environment geometry: boardwalk, water, sky, walls
 │   │   ├── materials.ts          # Shared material factories + SceneMaterials type
 │   │   ├── assetManifest.ts      # Typed catalogue of all .glb placements + positions
 │   │   ├── assetLoader.ts        # Non-blocking GLB loader; stats tracking, hot-reload, A/B toggle
@@ -629,14 +629,14 @@ Architecture pivot: the site opens directly into a scroll-driven guided tour thr
 - [x] "Return to tour" button in free-roam
 - [x] URL routing: `/` = tour, `#explore` = free-roam
 
-##### v2.5.0 — Launch Polish
-- [ ] All placeholder content replaced with real data
-- [ ] Animation timing pass
-- [ ] Performance budget (Lighthouse, bundle analysis)
-- [ ] Accessibility pass (keyboard, screen reader, reduced-motion)
-- [ ] Legacy mode routing removed
-- [ ] Old v1.6.0 2D fallback components removed
-- [ ] Full README rewrite
+##### v2.5.0 — Aero Glass Theme + New 3D Environment ✅
+- [x] Frutiger Aero "Aero Glass" color system replacing Teak & Gold
+- [x] New 3D environment: open-air boardwalk museum over reflective water
+- [x] Lighting reduced from 20+ to 3 (fixes shader uniform overflow)
+- [x] Space Grotesk + Plus Jakarta Sans typography replacing Cinzel
+- [x] Glass-morphism CSS utilities (glass-panel, aero-gradient, accent-glow)
+- [x] Sky dome with gradient, distance fog, water plane with reflections
+- [x] All hardcoded colors swept to new palette across ~15 files
 
 #### v3.x — Backlog (Deferred from v1.8–v1.9)
 

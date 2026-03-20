@@ -35,17 +35,17 @@ export function createHoverLabel(
   const tex = new DynamicTexture(`hoverLabelTex-${text}`, { width: 512, height: 117 }, scene)
   const ctx = tex.getContext() as unknown as CanvasRenderingContext2D
 
-  // Dark teak background with slight rounding-implied contrast
-  ctx.fillStyle = 'rgba(18, 10, 5, 0.88)'
+  // Dark slate background for VR readability
+  ctx.fillStyle = 'rgba(30, 41, 59, 0.88)'
   ctx.fillRect(0, 0, 512, 117)
 
-  // Gold border
-  ctx.strokeStyle = '#CA9933'
+  // Sky blue border
+  ctx.strokeStyle = '#38BDF8'
   ctx.lineWidth = 4
   ctx.strokeRect(3, 3, 506, 111)
 
   // Title text
-  ctx.fillStyle = '#CA9933'
+  ctx.fillStyle = '#38BDF8'
   ctx.font = 'bold 36px serif'
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
@@ -119,8 +119,8 @@ export function showVRPanel(
   borderMesh.isPickable = false
 
   const borderMat = new StandardMaterial('vrPanelBorderMat', scene)
-  borderMat.diffuseColor  = new Color3(0.79, 0.66, 0.30)  // gold
-  borderMat.emissiveColor = new Color3(0.30, 0.25, 0.10)
+  borderMat.diffuseColor  = new Color3(0.22, 0.74, 0.97)  // sky blue
+  borderMat.emissiveColor = new Color3(0.05, 0.15, 0.25)
   borderMat.backFaceCulling = false
   borderMesh.material = borderMat
   disposables.push(() => { borderMesh.dispose(); borderMat.dispose() })
@@ -218,9 +218,9 @@ export function createVRFpsCounter(
 
     const fps = Math.round(scene.getEngine().getFps())
     const ctx = tex.getContext() as unknown as CanvasRenderingContext2D
-    ctx.fillStyle = 'rgba(10, 5, 0, 0.78)'
+    ctx.fillStyle = 'rgba(30, 41, 59, 0.78)'
     ctx.fillRect(0, 0, 256, 80)
-    ctx.fillStyle = fps >= 72 ? '#90EE90' : fps >= 60 ? '#FFD700' : '#FF6B6B'
+    ctx.fillStyle = fps >= 72 ? '#90EE90' : fps >= 60 ? '#38BDF8' : '#FF6B6B'
     ctx.font = 'bold 44px monospace'
     ctx.textAlign = 'left'
     ctx.textBaseline = 'middle'
@@ -253,11 +253,11 @@ function _renderContent(tex: DynamicTexture, poi: POI): void {
   const H = TEX_H
 
   // Background
-  ctx.fillStyle = '#130C07'
+  ctx.fillStyle = '#1E293B'
   ctx.fillRect(0, 0, W, H)
 
   // Title
-  ctx.fillStyle = '#CA9933'
+  ctx.fillStyle = '#38BDF8'
   ctx.font = 'bold 52px serif'
   ctx.textAlign = 'left'
   ctx.textBaseline = 'top'
@@ -265,7 +265,7 @@ function _renderContent(tex: DynamicTexture, poi: POI): void {
   ctx.fillText(poi.content.title, 40, 30, titleMaxW)
 
   // Divider
-  ctx.strokeStyle = 'rgba(202,153,51,0.4)'
+  ctx.strokeStyle = 'rgba(56,189,248,0.4)'
   ctx.lineWidth = 2
   ctx.beginPath()
   ctx.moveTo(40, 110)
@@ -273,7 +273,7 @@ function _renderContent(tex: DynamicTexture, poi: POI): void {
   ctx.stroke()
 
   // Description (word-wrapped)
-  ctx.fillStyle = '#F0E0C8'
+  ctx.fillStyle = '#FFFFFF'
   ctx.font = '26px sans-serif'
   const descLines = _wrapText(ctx, poi.content.description, W - 80)
   let descY = 128
@@ -293,16 +293,16 @@ function _renderContent(tex: DynamicTexture, poi: POI): void {
       const tw = ctx.measureText(tag).width + 24
       if (tagX + tw > W - 40) break  // single row only
       // Pill background
-      ctx.fillStyle = 'rgba(60, 30, 10, 0.9)'
+      ctx.fillStyle = 'rgba(30, 41, 59, 0.9)'
       _roundRect(ctx, tagX, tagY, tw, 30, 6)
       ctx.fill()
       // Pill border
-      ctx.strokeStyle = '#CA9933'
+      ctx.strokeStyle = '#38BDF8'
       ctx.lineWidth = 1.5
       _roundRect(ctx, tagX, tagY, tw, 30, 6)
       ctx.stroke()
       // Tag text
-      ctx.fillStyle = '#CA9933'
+      ctx.fillStyle = '#38BDF8'
       ctx.textAlign = 'center'
       ctx.fillText(tag, tagX + tw / 2, tagY + 15)
       ctx.textAlign = 'left'
@@ -312,14 +312,14 @@ function _renderContent(tex: DynamicTexture, poi: POI): void {
 
   // "Links:" header (only when links exist)
   if (poi.content.links && poi.content.links.length > 0) {
-    ctx.fillStyle = 'rgba(202,153,51,0.5)'
+    ctx.strokeStyle = 'rgba(56,189,248,0.5)'
     ctx.lineWidth = 1
     ctx.beginPath()
     ctx.moveTo(40, 484)
     ctx.lineTo(W - 40, 484)
     ctx.stroke()
 
-    ctx.fillStyle = '#CA9933'
+    ctx.fillStyle = '#38BDF8'
     ctx.font = 'bold 22px sans-serif'
     ctx.fillText('Links  ▶', 40, 496)
   }
@@ -343,15 +343,15 @@ function _makeButton(
   const tex = new DynamicTexture(`${name}Tex`, { width: tw, height: th }, scene)
   const ctx = tex.getContext() as unknown as CanvasRenderingContext2D
 
-  // Gold button background
-  ctx.fillStyle = '#7A5C1A'
+  // Button background
+  ctx.fillStyle = '#1E40AF'
   ctx.fillRect(0, 0, tw, th)
-  ctx.strokeStyle = '#CA9933'
+  ctx.strokeStyle = '#38BDF8'
   ctx.lineWidth = 4
   ctx.strokeRect(3, 3, tw - 6, th - 6)
 
   // Button label
-  ctx.fillStyle = '#F5E6D0'
+  ctx.fillStyle = '#FFFFFF'
   ctx.font = `bold ${Math.round(th * 0.42)}px sans-serif`
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'

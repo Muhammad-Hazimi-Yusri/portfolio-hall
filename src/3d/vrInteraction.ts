@@ -72,7 +72,7 @@ export function setupHandTracking(
 
   // ── POI interaction state (only when poiOptions provided) ──────────────────
   const hl = poiOptions ? new HighlightLayer('vrHoverHL', scene) : null
-  const goldColor = new Color3(0.79, 0.62, 0.18)  // #CA9933
+  const goldColor = new Color3(0.22, 0.74, 0.97)  // #38BDF8 sky blue
 
   // Flat set of all POI group + child meshes, for fast pick-filter
   const poiMeshList = new Set<AbstractMesh>()
@@ -110,7 +110,7 @@ export function setupHandTracking(
     scene,
   )
   const discMat = new StandardMaterial('handGazeDiscMat', scene)
-  discMat.emissiveColor = new Color3(0.792, 0.6, 0.2)   // #CA9933 — matches the controller ring
+  discMat.emissiveColor = new Color3(0.22, 0.74, 0.97)   // #38BDF8 — matches the controller ring
   discMat.alpha = 0.75
   discMat.disableLighting = true
   discMat.backFaceCulling = false

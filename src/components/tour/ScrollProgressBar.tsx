@@ -10,7 +10,7 @@ export function ScrollProgressBar() {
         style={{ width: `${scrollProgress * 100}%` }}
       />
       <span
-        className="absolute right-3 top-1.5 text-xs font-['Cinzel',serif] text-hall-accent transition-opacity duration-300"
+        className="absolute right-3 top-1.5 text-xs font-['Space_Grotesk',sans-serif] text-hall-accent transition-opacity duration-300"
         style={{ opacity: activeSection ? 1 : 0 }}
       >
         {activeSection?.label}

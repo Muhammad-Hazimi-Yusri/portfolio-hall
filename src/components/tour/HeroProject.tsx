@@ -51,7 +51,7 @@ export function HeroProject({ poi, scrollStart, scrollEnd, scrollProgress, reduc
       }}
     >
       <div className="max-w-2xl w-full bg-hall-bg/85 backdrop-blur-sm rounded-xl p-6 md:p-8">
-        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-['Cinzel',serif] text-hall-accent mb-2">
+        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-['Space_Grotesk',sans-serif] text-hall-accent mb-2">
           {content.title}
         </h2>
 

@@ -4,18 +4,18 @@
 
 @layer base {
   h1, h2, h3 {
-    font-family: 'Cinzel', serif;
+    font-family: 'Space Grotesk', sans-serif;
   }
 }
 
 @layer utilities {
   .fallback-scroll {
     scrollbar-width: thin;
-    scrollbar-color: #C9A84C #2A1F18;
+    scrollbar-color: #38BDF8 #E2E8F0;
   }
   .fallback-scroll::-webkit-scrollbar { width: 6px; }
-  .fallback-scroll::-webkit-scrollbar-track { background: #2A1F18; }
-  .fallback-scroll::-webkit-scrollbar-thumb { background: #C9A84C; border-radius: 3px; }
+  .fallback-scroll::-webkit-scrollbar-track { background: #E2E8F0; }
+  .fallback-scroll::-webkit-scrollbar-thumb { background: #38BDF8; border-radius: 3px; }
 
   .fade-in-section {
     opacity: 0;
@@ -39,24 +39,14 @@
   }
 
   @keyframes poiHighlightPulse {
-    0%   { box-shadow: 0 0 0 0px rgba(201, 168, 76, 0.7); }
-    40%  { box-shadow: 0 0 0 8px rgba(201, 168, 76, 0.2); }
-    70%  { box-shadow: 0 0 0 14px rgba(201, 168, 76, 0.05); }
-    100% { box-shadow: 0 0 0 18px rgba(201, 168, 76, 0); }
+    0%   { box-shadow: 0 0 0 0px rgba(56, 189, 248, 0.7); }
+    40%  { box-shadow: 0 0 0 8px rgba(56, 189, 248, 0.2); }
+    70%  { box-shadow: 0 0 0 14px rgba(56, 189, 248, 0.05); }
+    100% { box-shadow: 0 0 0 18px rgba(56, 189, 248, 0); }
   }
   .poi-highlight-pulse {
     animation: poiHighlightPulse 0.9s ease-out forwards;
   }
-}
-
-/* Hero background drift — CSS-only pseudo-parallax */
-@keyframes heroBgDrift {
-  0%   { background-position: 0% 0%; }
-  100% { background-position: 8% 4%; }
-}
-.hero-bg-layer {
-  animation: heroBgDrift 25s ease-in-out infinite alternate;
-  background-size: 120% 120%;
 }
 
 /* Timeline dot scale-in reveal, triggered by parent .is-visible */
@@ -80,18 +70,18 @@
   }
   .card-lift:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(201, 168, 76, 0.12);
+    box-shadow: 0 8px 24px rgba(56, 189, 248, 0.12);
   }
 }
 
-/* Gold section divider */
+/* Section divider */
 .section-divider {
   height: 1px;
   background: linear-gradient(
     to right,
     transparent,
-    rgba(201, 168, 76, 0.25) 30%,
-    rgba(201, 168, 76, 0.25) 70%,
+    rgba(56, 189, 248, 0.2) 30%,
+    rgba(56, 189, 248, 0.2) 70%,
     transparent
   );
 }
@@ -109,35 +99,28 @@
   animation: particleFloat var(--duration, 5s) ease-in-out infinite;
 }
 
-@layer components {
-  .wood-texture {
-    background:
-      repeating-linear-gradient(
-        90deg,
-        transparent,
-        transparent 2px,
-        rgba(0,0,0,0.03) 2px,
-        rgba(0,0,0,0.03) 4px
-      ),
-      repeating-linear-gradient(
-        180deg,
-        transparent,
-        transparent 8px,
-        rgba(0,0,0,0.02) 8px,
-        rgba(0,0,0,0.02) 10px
-      ),
-      linear-gradient(
-        180deg,
-        var(--wood-base, #3D2B1E),
-        color-mix(in srgb, var(--wood-base, #3D2B1E), black 10%) 50%,
-        var(--wood-base, #3D2B1E)
-      );
-  }
+/* Glass morphism panels */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
 
-  .gold-trim {
-    border: 1px solid #C9A84C;
-    box-shadow: inset 0 0 0 1px rgba(201, 168, 76, 0.15);
-  }
+.glass-panel-dark {
+  background: rgba(30, 41, 59, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.aero-gradient {
+  background: linear-gradient(135deg, #38BDF8 0%, #818CF8 100%);
+}
+
+.accent-glow {
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.15),
+              0 0 60px rgba(56, 189, 248, 0.05);
 }
 
 :root {

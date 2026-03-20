@@ -130,7 +130,7 @@ export function FallbackMode({ onSwitchMode }: Props) {
       {/* Mobile: floating map button */}
       <button
         className="md:hidden fixed bottom-4 right-4 z-50 px-4 py-2 bg-hall-surface border border-hall-accent/60 text-hall-accent text-sm rounded-lg shadow-lg"
-        style={{ fontFamily: "'Cinzel', serif" }}
+        style={{ fontFamily: "'Space Grotesk', sans-serif" }}
         onClick={() => setMapOverlayOpen(true)}
         aria-label="Open castle map"
       >
@@ -146,7 +146,7 @@ export function FallbackMode({ onSwitchMode }: Props) {
           <div className="flex items-center justify-between px-4 py-3 border-b border-hall-frame">
             <h2
               className="text-hall-accent text-lg"
-              style={{ fontFamily: "'Cinzel', serif" }}
+              style={{ fontFamily: "'Space Grotesk', sans-serif" }}
             >
               Castle Map
             </h2>

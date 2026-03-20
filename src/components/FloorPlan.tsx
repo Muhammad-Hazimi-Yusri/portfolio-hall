@@ -34,9 +34,9 @@ export function FloorPlan({ pois, selectedSection, onSelectPOI }: FloorPlanProps
       <text x="14" y="1" textAnchor="middle" className="fill-hall-muted/40 text-[1.2px] pointer-events-none">Garden</text>
 
       {/* Doorway connectors */}
-      <line x1="-1.5" y1="18" x2="1.5" y2="18" stroke="#C9A84C" strokeWidth="0.3" />
-      <line x1="-1.5" y1="-8" x2="1.5" y2="-8" stroke="#C9A84C" strokeWidth="0.3" />
-      <line x1="8" y1="-1.5" x2="8" y2="1.5" stroke="#C9A84C" strokeWidth="0.3" />
+      <line x1="-1.5" y1="18" x2="1.5" y2="18" stroke="#38BDF8" strokeWidth="0.3" />
+      <line x1="-1.5" y1="-8" x2="1.5" y2="-8" stroke="#38BDF8" strokeWidth="0.3" />
+      <line x1="8" y1="-1.5" x2="8" y2="1.5" stroke="#38BDF8" strokeWidth="0.3" />
 
       {/* POI markers */}
       {filteredPOIs.map((poi) => (

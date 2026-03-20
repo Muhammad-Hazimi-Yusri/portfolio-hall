@@ -10,29 +10,28 @@ import type { POI } from '@/types/poi'
 
 // Shared materials (created once per scene)
 function createSharedMaterials(scene: Scene) {
-  // Gold frame for paintings
+  // Frame for paintings (light gray)
   const frame = new StandardMaterial('frameMat', scene)
-  frame.diffuseColor = new Color3(0.79, 0.66, 0.30) // hall-accent gold
-  frame.specularColor = new Color3(0.9, 0.8, 0.5)
-  frame.specularPower = 64
-  frame.emissiveColor = new Color3(0.06, 0.05, 0.02)
+  frame.diffuseColor = new Color3(0.92, 0.93, 0.95)
+  frame.specularColor = new Color3(0.3, 0.3, 0.3)
+  frame.specularPower = 96
 
-  // Dark teak for bases/platforms
+  // Structural gray for bases/platforms
   const teak = new StandardMaterial('teakMat', scene)
-  teak.diffuseColor = new Color3(0.24, 0.17, 0.12) // hall-frame
-  teak.specularColor = new Color3(0.08, 0.06, 0.04)
+  teak.diffuseColor = new Color3(0.85, 0.87, 0.90)
+  teak.specularColor = new Color3(0.2, 0.2, 0.2)
 
-  // Light teak for pedestal bodies
+  // Panel white for pedestal bodies
   const teakLight = new StandardMaterial('teakLightMat', scene)
-  teakLight.diffuseColor = new Color3(0.36, 0.25, 0.20) // hall-frame-light
-  teakLight.specularColor = new Color3(0.1, 0.08, 0.06)
+  teakLight.diffuseColor = new Color3(0.95, 0.96, 0.97)
+  teakLight.specularColor = new Color3(0.15, 0.15, 0.15)
 
-  // Glass for display cases
+  // Glass for display cases (frosted, cool tint)
   const glass = new StandardMaterial('glassMat', scene)
-  glass.diffuseColor = new Color3(0.8, 0.9, 1.0)
-  glass.specularColor = new Color3(1, 1, 1)
-  glass.specularPower = 128
-  glass.alpha = 0.25
+  glass.diffuseColor = new Color3(0.9, 0.95, 1.0)
+  glass.specularColor = new Color3(0.6, 0.6, 0.6)
+  glass.specularPower = 256
+  glass.alpha = 0.2
   glass.backFaceCulling = false
 
   return { frame, teak, teakLight, glass }
@@ -102,12 +101,12 @@ function createPaintingMesh(poi: POI, scene: Scene, mats: ReturnType<typeof crea
 }
 
 const FALLBACK_COLORS = [
-  '#C9A84C', // gold
-  '#3D2B1E', // teak
-  '#8B2E2E', // batik red
-  '#2E5E3E', // forest green
-  '#3A4E6E', // slate blue
-  '#5E2E3E', // burgundy
+  '#38BDF8', // sky blue
+  '#818CF8', // indigo-violet
+  '#34D399', // emerald
+  '#F472B6', // pink
+  '#60A5FA', // blue
+  '#A78BFA', // purple
 ]
 
 function hashTitle(title: string): number {

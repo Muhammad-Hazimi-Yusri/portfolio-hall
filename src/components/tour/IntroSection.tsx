@@ -30,7 +30,7 @@ export function IntroSection({ scrollProgress, reducedMotion }: Props) {
       style={{ opacity: sectionOpacity }}
     >
       <h1
-        className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold font-['Cinzel',serif] text-hall-accent text-center leading-tight"
+        className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold font-['Space_Grotesk',sans-serif] text-hall-accent text-center leading-tight"
         style={
           reducedMotion
             ? { opacity: revealProgress }

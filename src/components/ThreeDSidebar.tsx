@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import type { POI, Zone } from '@/types/poi'
 import { isMobile } from '@/utils/detection'
 
@@ -38,10 +38,9 @@ export function ThreeDSidebar({ pois, isOpen, onToggle, onTeleportToPOI, isPortr
 
       {/* Sidebar panel — right side */}
       <div
-        className={`absolute top-0 right-0 h-full w-56 z-30 wood-texture backdrop-blur-sm border-l border-hall-accent/30 transition-transform duration-200 overflow-y-auto ${
+        className={`absolute top-0 right-0 h-full w-56 z-30 glass-panel backdrop-blur-sm border-l border-hall-accent/30 transition-transform duration-200 overflow-y-auto ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
-        style={{ '--wood-base': '#2A1F18' } as React.CSSProperties}
       >
         <div className="p-4">
           <h3 className="text-sm font-bold text-hall-muted mb-3 uppercase tracking-wider">

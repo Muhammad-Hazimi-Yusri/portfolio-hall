@@ -76,8 +76,8 @@ export function setupVRLocomotion(
       xrInput: xr.input,
       floorMeshes: grounds,  // only ground planes are valid targets
       defaultTargetMeshOptions: {
-        teleportationFillColor: '#CA9933',   // teak & gold theme — gold ring
-        teleportationBorderColor: '#A07720',
+        teleportationFillColor: '#38BDF8',   // aero glass theme — sky blue ring
+        teleportationBorderColor: '#2563EB',
       },
     },
   ) as WebXRMotionControllerTeleportation

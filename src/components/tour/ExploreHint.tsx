@@ -20,7 +20,7 @@ export function ExploreHint({ onExplore, variant, scrollProgress, triggerAt }: E
         onClick={onExplore}
         aria-label="Switch to free-roam 3D exploration mode"
         className="pointer-events-auto mt-4 text-hall-accent/80 hover:text-hall-accent
-                   transition-colors text-sm font-['Cinzel',serif] flex items-center gap-1.5"
+                   transition-colors text-sm font-['Space_Grotesk',sans-serif] flex items-center gap-1.5"
         style={{ opacity }}
       >
         <span className="text-base">↗</span>
@@ -37,7 +37,7 @@ export function ExploreHint({ onExplore, variant, scrollProgress, triggerAt }: E
       className="pointer-events-auto mt-6 px-6 py-3 rounded-lg
                  border border-hall-accent/40 bg-hall-surface/60 backdrop-blur-sm
                  text-hall-accent hover:bg-hall-accent/10 hover:border-hall-accent/60
-                 transition-all font-['Cinzel',serif] font-semibold text-base"
+                 transition-all font-['Space_Grotesk',sans-serif] font-semibold text-base"
       style={{ opacity }}
     >
       ↗ Explore the hall in 3D

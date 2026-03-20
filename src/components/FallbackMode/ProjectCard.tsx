@@ -33,8 +33,8 @@ export function StoryCard({ poi, variant, isSelected, onSelect, delay }: StoryCa
       id={`poi-${poi.id}`}
       className={`fade-in-section bg-hall-surface rounded-lg card-lift transition-shadow duration-200 ${
         isSelected
-          ? 'ring-1 ring-hall-accent shadow-[0_0_12px_rgba(201,168,76,0.2)]'
-          : 'gold-trim'
+          ? 'ring-1 ring-hall-accent shadow-[0_0_12px_rgba(56,189,248,0.2)]'
+          : 'ring-1 ring-hall-frame'
       }`}
       style={{ transitionDelay: `${delay}ms` }}
     >
@@ -49,7 +49,7 @@ export function StoryCard({ poi, variant, isSelected, onSelect, delay }: StoryCa
       >
         {/* Thumbnail area */}
         <div className={`${thumbHeight} bg-hall-frame flex items-center justify-center relative overflow-hidden`}>
-          <span className="text-hall-muted/30 text-4xl font-bold font-['Cinzel',serif] select-none">
+          <span className="text-hall-muted/30 text-4xl font-bold font-['Space_Grotesk',sans-serif] select-none">
             {title.charAt(0)}
           </span>
           <span
@@ -62,7 +62,7 @@ export function StoryCard({ poi, variant, isSelected, onSelect, delay }: StoryCa
 
         {/* Card content */}
         <div className="p-4">
-          <h3 className="text-hall-accent font-semibold font-['Cinzel',serif] leading-snug mb-1">
+          <h3 className="text-hall-accent font-semibold font-['Space_Grotesk',sans-serif] leading-snug mb-1">
             {title}
           </h3>
           <p className="text-hall-muted text-sm leading-snug mb-3">{hookText}</p>

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { createEngine, createScene } from './engine'
-import { createCastle } from './scene'
+import { createEnvironment } from './scene'
 import { createLights } from './lights'
 import { createFirstPersonCamera } from './camera'
 import { setupPointerLock } from './pointerLock'
@@ -195,7 +195,7 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress, initialC
     onLoadProgress?.(15, 'scene')
 
     const mats = createSceneMaterials(scene)
-    const castle = createCastle(scene, mats)
+    const castle = createEnvironment(scene, mats)
     onLoadProgress?.(40, 'scene')
 
     const camera = createFirstPersonCamera(

@@ -7,50 +7,51 @@ import { DynamicTexture } from '@babylonjs/core/Materials/Textures/dynamicTextur
 
 export function createTeakMat(scene: Scene): StandardMaterial {
   const mat = new StandardMaterial('teakMat', scene)
-  mat.diffuseColor = new Color3(0.36, 0.25, 0.20)
-  mat.specularColor = new Color3(0.1, 0.08, 0.06)
+  mat.diffuseColor = new Color3(0.85, 0.87, 0.90)
+  mat.specularColor = new Color3(0.2, 0.2, 0.2)
+  mat.specularPower = 64
   return mat
 }
 
 export function createGoldMat(scene: Scene): StandardMaterial {
   const mat = new StandardMaterial('goldMat', scene)
-  mat.diffuseColor = new Color3(0.79, 0.66, 0.30)
-  mat.specularColor = new Color3(0.4, 0.35, 0.15)
+  mat.diffuseColor = new Color3(0.22, 0.74, 0.97)
+  mat.specularColor = new Color3(0.5, 0.5, 0.5)
   mat.specularPower = 64
-  mat.emissiveColor = new Color3(0.04, 0.03, 0.01)
+  mat.emissiveColor = new Color3(0.05, 0.12, 0.15)
   return mat
 }
 
 export function createWallMat(scene: Scene): StandardMaterial {
   const mat = new StandardMaterial('wallMat', scene)
-  mat.diffuseColor = new Color3(0.24, 0.17, 0.12)
-  mat.specularColor = new Color3(0.06, 0.04, 0.03)
-  mat.specularPower = 16
+  mat.diffuseColor = new Color3(0.96, 0.97, 0.98)
+  mat.specularColor = new Color3(0.1, 0.1, 0.1)
+  mat.specularPower = 32
   return mat
 }
 
 export function createFloorMat(scene: Scene): StandardMaterial {
   const mat = new StandardMaterial('floorMat', scene)
-  mat.diffuseColor = new Color3(0.16, 0.12, 0.09)
-  mat.specularColor = new Color3(0.08, 0.06, 0.04)
-  mat.specularPower = 32
+  mat.diffuseColor = new Color3(0.92, 0.93, 0.95)
+  mat.specularColor = new Color3(0.4, 0.4, 0.4)
+  mat.specularPower = 128
 
   const bump = new DynamicTexture('floorBump', { width: 512, height: 512 }, scene)
   const ctx = bump.getContext()
-  ctx.fillStyle = '#2A1F18'
+  ctx.fillStyle = '#E8ECF0'
   ctx.fillRect(0, 0, 512, 512)
   for (let i = 0; i < 512; i += 64) {
-    ctx.fillStyle = 'rgba(0,0,0,0.15)'
+    ctx.fillStyle = 'rgba(0,0,0,0.04)'
     ctx.fillRect(0, i, 512, 2)
     for (let j = 0; j < 512; j += 8) {
-      ctx.fillStyle = `rgba(${Math.random() > 0.5 ? '255,255,255' : '0,0,0'},0.03)`
+      ctx.fillStyle = `rgba(${Math.random() > 0.5 ? '255,255,255' : '0,0,0'},0.02)`
       ctx.fillRect(j, i + 3, 8, 60)
     }
   }
   bump.update()
   bump.uScale = 4
   bump.vScale = 3.5
-  bump.level = 0.3
+  bump.level = 0.15
   mat.bumpTexture = bump
 
   return mat
@@ -58,17 +59,17 @@ export function createFloorMat(scene: Scene): StandardMaterial {
 
 export function createStoneMat(scene: Scene): StandardMaterial {
   const mat = new StandardMaterial('stoneMat', scene)
-  mat.diffuseColor = new Color3(0.35, 0.30, 0.25)
-  mat.specularColor = new Color3(0.05, 0.04, 0.04)
-  mat.specularPower = 8
+  mat.diffuseColor = new Color3(0.88, 0.90, 0.92)
+  mat.specularColor = new Color3(0.15, 0.15, 0.15)
+  mat.specularPower = 32
 
   const bump = new DynamicTexture('stoneBump', { width: 512, height: 512 }, scene)
   const ctx = bump.getContext()
-  ctx.fillStyle = '#4A3F35'
+  ctx.fillStyle = '#D8DEE4'
   ctx.fillRect(0, 0, 512, 512)
   for (let y = 0; y < 512; y += 64) {
     for (let x = 0; x < 512; x += 64) {
-      ctx.fillStyle = 'rgba(0,0,0,0.08)'
+      ctx.fillStyle = 'rgba(0,0,0,0.04)'
       ctx.fillRect(x, y, 64, 2)
       ctx.fillRect(x, y, 2, 64)
     }
@@ -76,7 +77,7 @@ export function createStoneMat(scene: Scene): StandardMaterial {
   bump.update()
   bump.uScale = 4
   bump.vScale = 4
-  bump.level = 0.2
+  bump.level = 0.15
   mat.bumpTexture = bump
 
   return mat
@@ -84,26 +85,27 @@ export function createStoneMat(scene: Scene): StandardMaterial {
 
 export function createGlassMat(scene: Scene): StandardMaterial {
   const mat = new StandardMaterial('glassMat', scene)
-  mat.diffuseColor = new Color3(0.7, 0.85, 0.95)
-  mat.specularColor = new Color3(1, 1, 1)
-  mat.specularPower = 128
-  mat.alpha = 0.3
+  mat.diffuseColor = new Color3(0.9, 0.95, 1.0)
+  mat.specularColor = new Color3(0.6, 0.6, 0.6)
+  mat.specularPower = 256
+  mat.alpha = 0.2
   mat.backFaceCulling = false
   return mat
 }
 
 export function createGrassFloorMat(scene: Scene): StandardMaterial {
   const mat = new StandardMaterial('grassFloorMat', scene)
-  mat.diffuseColor = new Color3(0.15, 0.20, 0.12)
-  mat.specularColor = new Color3(0.03, 0.04, 0.03)
-  mat.specularPower = 8
+  mat.diffuseColor = new Color3(0.88, 0.92, 0.86)
+  mat.specularColor = new Color3(0.1, 0.12, 0.1)
+  mat.specularPower = 16
   return mat
 }
 
 export function createCeilingMat(scene: Scene): StandardMaterial {
   const mat = new StandardMaterial('ceilingMat', scene)
-  mat.diffuseColor = new Color3(0.28, 0.22, 0.16)
-  mat.specularColor = new Color3(0.03, 0.02, 0.02)
+  mat.diffuseColor = new Color3(1.0, 1.0, 1.0)
+  mat.specularColor = new Color3(0.05, 0.05, 0.05)
+  mat.emissiveColor = new Color3(0.05, 0.05, 0.05)
   return mat
 }
 
@@ -124,8 +126,8 @@ export type SceneMaterials = {
 
 /**
  * Create one instance of every scene material. Call once from BabylonScene.tsx
- * and pass the result to both createCastle() and loadAssets() so all geometry
- * and loaded .glb assets share the same material objects.
+ * and pass the result to both createEnvironment() and loadAssets() so all
+ * geometry and loaded .glb assets share the same material objects.
  */
 export function createSceneMaterials(scene: Scene): SceneMaterials {
   return {

@@ -41,7 +41,7 @@ export function ContactSection({ scrollProgress, reducedMotion }: Props) {
         className="max-w-lg w-full text-center bg-hall-bg/70 backdrop-blur-sm rounded-xl p-6 md:p-8"
         style={{ transform: `translateY(${entryY}px)` }}
       >
-        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-['Cinzel',serif] text-hall-accent mb-6">
+        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-['Space_Grotesk',sans-serif] text-hall-accent mb-6">
           Let&apos;s build something
         </h2>
 
@@ -64,7 +64,7 @@ export function ContactSection({ scrollProgress, reducedMotion }: Props) {
               href={link.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-hall-accent hover:text-hall-accent/80 transition-colors pointer-events-auto text-lg font-semibold font-['Cinzel',serif]"
+              className="text-hall-accent hover:text-hall-accent/80 transition-colors pointer-events-auto text-lg font-semibold font-['Space_Grotesk',sans-serif]"
             >
               {link.label}
             </a>

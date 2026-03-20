@@ -51,7 +51,7 @@ export function ExperienceTimeline({ pois }: Props) {
                   style={{ animationDelay: `${i * 100 + 200}ms` }}
                 />
 
-                <div id={`poi-${poi.id}`} className="bg-hall-surface rounded-lg p-4 md:p-5 gold-trim">
+                <div id={`poi-${poi.id}`} className="bg-hall-surface rounded-lg p-4 md:p-5 ring-1 ring-hall-frame">
                   <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-1 mb-3">
                     <div>
                       <h3 className="text-hall-text font-semibold">{meta?.role ?? poi.content.title}</h3>

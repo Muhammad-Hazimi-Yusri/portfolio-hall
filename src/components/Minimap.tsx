@@ -209,15 +209,15 @@ export function Minimap({ pois, cameraRef, onTeleport, onTeleportToPOI, isPortra
               fill="rgba(50,80,45,0.15)" stroke="currentColor" strokeWidth="0.2" className="text-hall-muted/50" />
 
             {/* Doorway connectors */}
-            <line x1="-1.5" y1="18"  x2="1.5"  y2="18"  stroke="#C9A84C" strokeWidth="0.3" />
-            <line x1="-1.5" y1="-8"  x2="1.5"  y2="-8"  stroke="#C9A84C" strokeWidth="0.3" />
-            <line x1="8"    y1="-1.5" x2="8"   y2="1.5"  stroke="#C9A84C" strokeWidth="0.3" />
+            <line x1="-1.5" y1="18"  x2="1.5"  y2="18"  stroke="#38BDF8" strokeWidth="0.3" />
+            <line x1="-1.5" y1="-8"  x2="1.5"  y2="-8"  stroke="#38BDF8" strokeWidth="0.3" />
+            <line x1="8"    y1="-1.5" x2="8"   y2="1.5"  stroke="#38BDF8" strokeWidth="0.3" />
 
             {/* Dynamic-zoom viewport indicator (dashed gold rect) shown only in full map mode */}
             {dynVB && (
               <rect
                 x={dynVB.x} y={dynVB.y} width={dynVB.w} height={dynVB.h}
-                fill="none" stroke="#C9A84C" strokeWidth="0.3"
+                fill="none" stroke="#38BDF8" strokeWidth="0.3"
                 strokeDasharray="1 0.5" opacity="0.7"
               />
             )}

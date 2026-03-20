@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { createEngine, createScene } from '@/3d/engine'
-import { createCastle } from '@/3d/scene'
+import { createEnvironment } from '@/3d/scene'
 import { createSceneMaterials } from '@/3d/materials'
 import { createPOIMeshes } from '@/3d/pois'
 import { createLights } from '@/3d/lights'
@@ -45,7 +45,7 @@ export function CaptureMode() {
     const engine = createEngine(canvas)
     const scene = createScene(engine)
     const mats = createSceneMaterials(scene)
-    const castle = createCastle(scene, mats)
+    const castle = createEnvironment(scene, mats)
     const poiMeshes = createPOIMeshes(scene, poisData.pois as POI[])
     const lights = createLights(scene, castle, poiMeshes)
 
@@ -144,7 +144,7 @@ export function CaptureMode() {
     <div className="w-full h-full bg-hall-bg text-hall-text flex flex-col">
       {/* Control panel */}
       <div className="flex items-center gap-4 p-4 bg-hall-surface border-b border-hall-frame">
-        <h1 className="text-lg font-bold text-hall-accent font-['Cinzel',serif]">
+        <h1 className="text-lg font-bold text-hall-accent font-['Space_Grotesk',sans-serif]">
           Capture Mode
         </h1>
 

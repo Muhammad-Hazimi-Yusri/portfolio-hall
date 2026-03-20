@@ -23,7 +23,7 @@ export function HeroSection({ aboutPOI, onSwitchMode }: Props) {
     <section id="section-hero" data-section-id="hero" className="min-h-screen flex flex-col items-center justify-center relative px-6 py-20 overflow-hidden">
       {/* Drifting wood texture — CSS-only pseudo-parallax */}
       <div
-        className="absolute inset-0 pointer-events-none wood-texture hero-bg-layer opacity-30"
+        className="absolute inset-0 pointer-events-none aero-gradient opacity-10"
         aria-hidden="true"
       />
 
@@ -59,7 +59,7 @@ export function HeroSection({ aboutPOI, onSwitchMode }: Props) {
         </p>
         <button
           onClick={onSwitchMode}
-          className="px-8 py-3 bg-hall-accent text-hall-bg font-semibold rounded-lg hover:bg-hall-accent/90 transition-colors font-['Cinzel',serif] text-sm md:text-base"
+          className="px-8 py-3 bg-hall-accent text-hall-bg font-semibold rounded-lg hover:bg-hall-accent/90 transition-colors font-['Space_Grotesk',sans-serif] text-sm md:text-base"
         >
           Explore in 3D
         </button>

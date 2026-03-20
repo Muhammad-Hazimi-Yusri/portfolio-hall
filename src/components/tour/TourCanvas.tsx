@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { createEngine, createScene } from '@/3d/engine'
-import { createCastle } from '@/3d/scene'
+import { createEnvironment } from '@/3d/scene'
 import { createSceneMaterials } from '@/3d/materials'
 import { createPOIMeshes } from '@/3d/pois'
 import { createLights } from '@/3d/lights'
@@ -33,7 +33,7 @@ export function TourCanvas() {
 
     const scene = createScene(engine)
     const mats = createSceneMaterials(scene)
-    const castle = createCastle(scene, mats)
+    const castle = createEnvironment(scene, mats)
     const poiMeshes = createPOIMeshes(scene, poisData.pois as POI[])
     const lights = createLights(scene, castle, poiMeshes)
 

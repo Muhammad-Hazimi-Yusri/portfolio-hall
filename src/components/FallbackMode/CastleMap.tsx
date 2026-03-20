@@ -34,10 +34,10 @@ const ZONES: ZoneDef[] = [
   { id: 'garden',     x: -20, y: -6,  w: 12, h: 12, label: 'Garden',     subtitle: 'Skills',      labelX: -14, labelY: -1.5  },
 ]
 
-const ACTIVE_FILL   = 'rgba(201,168,76,0.15)'
-const INACTIVE_FILL = 'rgba(60,43,30,0.2)'
-const STROKE        = '#9C8B7A'
-const GOLD          = '#C9A84C'
+const ACTIVE_FILL   = 'rgba(56,189,248,0.15)'
+const INACTIVE_FILL = 'rgba(226,232,240,0.3)'
+const STROKE        = '#64748B'
+const GOLD          = '#38BDF8'
 
 // Octagonal fountain polygon at Courtyard center (0, 0)
 function fountainPoints(cx: number, cy: number, r: number): string {
@@ -56,7 +56,7 @@ export function CastleMap({ activeZone, pois, onZoneClick, onPOIClick }: Props) 
       className="w-full h-full"
       preserveAspectRatio="xMidYMid meet"
       aria-label="Castle map navigation"
-      style={{ fontFamily: "'Cinzel', serif" }}
+      style={{ fontFamily: "'Space Grotesk', sans-serif" }}
     >
       <defs>
         {/* Glow filter for active zone */}

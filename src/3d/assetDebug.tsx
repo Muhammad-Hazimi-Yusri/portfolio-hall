@@ -45,14 +45,14 @@ const S: Record<string, CSSProperties> = {
     top: 8,
     right: 8,
     zIndex: 9999,
-    background: 'rgba(10, 8, 6, 0.92)',
-    color: '#e8dfd0',
+    background: 'rgba(30, 41, 59, 0.92)',
+    color: '#E2E8F0',
     fontFamily: 'monospace',
     fontSize: 11,
     lineHeight: 1.4,
     padding: '8px 10px',
     borderRadius: 4,
-    border: '1px solid #c9a84c',
+    border: '1px solid #38BDF8',
     minWidth: 340,
     maxWidth: 440,
     userSelect: 'none',
@@ -64,11 +64,11 @@ const S: Record<string, CSSProperties> = {
     alignItems: 'center',
     marginBottom: 6,
     paddingBottom: 5,
-    borderBottom: '1px solid #3d2b1e',
+    borderBottom: '1px solid #475569',
     gap: 8,
   },
   title: {
-    color: '#c9a84c',
+    color: '#38BDF8',
     fontWeight: 'bold',
     letterSpacing: '0.05em',
   },
@@ -76,7 +76,7 @@ const S: Record<string, CSSProperties> = {
     display: 'flex',
     gap: 14,
     marginBottom: 6,
-    color: '#c9a84c',
+    color: '#38BDF8',
     fontSize: 10,
   },
   table: {
@@ -86,18 +86,18 @@ const S: Record<string, CSSProperties> = {
   },
   th: {
     textAlign: 'left' as const,
-    color: '#8a7050',
+    color: '#94A3B8',
     fontWeight: 'normal',
     paddingBottom: 3,
-    borderBottom: '1px solid #3d2b1e',
+    borderBottom: '1px solid #475569',
     whiteSpace: 'nowrap' as const,
   },
   thRight: {
     textAlign: 'right' as const,
-    color: '#8a7050',
+    color: '#94A3B8',
     fontWeight: 'normal',
     paddingBottom: 3,
-    borderBottom: '1px solid #3d2b1e',
+    borderBottom: '1px solid #475569',
     paddingLeft: 8,
   },
   td: {
@@ -109,16 +109,16 @@ const S: Record<string, CSSProperties> = {
     padding: '2px 0 2px 8px',
     textAlign: 'right' as const,
     verticalAlign: 'middle' as const,
-    color: '#a89060',
+    color: '#94A3B8',
   },
   tdAction: {
     padding: '2px 0 2px 8px',
     verticalAlign: 'middle' as const,
   },
   reloadBtn: {
-    background: '#3d2b1e',
-    border: '1px solid #c9a84c',
-    color: '#c9a84c',
+    background: '#1E3A5F',
+    border: '1px solid #38BDF8',
+    color: '#38BDF8',
     borderRadius: 2,
     cursor: 'pointer',
     fontSize: 10,
@@ -127,8 +127,8 @@ const S: Record<string, CSSProperties> = {
   },
   toggleBtn: {
     background: 'transparent',
-    border: '1px solid #5a4030',
-    color: '#a89060',
+    border: '1px solid #64748B',
+    color: '#94A3B8',
     borderRadius: 2,
     cursor: 'pointer',
     fontSize: 9,
@@ -137,8 +137,8 @@ const S: Record<string, CSSProperties> = {
   },
   toggleBtnDisabled: {
     background: 'transparent',
-    border: '1px solid #3d2b1e',
-    color: '#4a3828',
+    border: '1px solid #475569',
+    color: '#475569',
     borderRadius: 2,
     cursor: 'default',
     fontSize: 9,
@@ -148,8 +148,8 @@ const S: Record<string, CSSProperties> = {
   hint: {
     marginTop: 5,
     paddingTop: 4,
-    borderTop: '1px solid #3d2b1e',
-    color: '#4a3828',
+    borderTop: '1px solid #475569',
+    color: '#64748B',
     fontSize: 9,
   },
 }
@@ -219,7 +219,7 @@ export function AssetDebugOverlay({ scene, onReload, onToggleAsset }: Props) {
                 <td style={S.td}>
                   <span title={entry.id}>{displayId}</span>
                 </td>
-                <td style={{ ...S.td, paddingLeft: 8, color: stat?.status === 'loaded' ? '#6ab04c' : stat?.status === 'error' ? '#e55' : '#c9a84c' }}>
+                <td style={{ ...S.td, paddingLeft: 8, color: stat?.status === 'loaded' ? '#6ab04c' : stat?.status === 'error' ? '#e55' : '#38BDF8' }}>
                   {statusLabel(stat)}
                 </td>
                 <td style={S.tdRight}>

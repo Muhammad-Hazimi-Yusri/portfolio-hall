@@ -26,9 +26,9 @@ function DetailContent({ poi, onClose }: { poi: POI; onClose: () => void }) {
   const hasStory = Boolean(challenge)
 
   return (
-    <div className="mt-3 bg-hall-surface rounded-lg gold-trim p-5 md:p-6 space-y-4">
+    <div className="mt-3 bg-hall-surface rounded-lg ring-1 ring-hall-frame p-5 md:p-6 space-y-4">
       <div className="flex items-start justify-between gap-4">
-        <h3 className="text-hall-accent font-semibold font-['Cinzel',serif] text-lg">
+        <h3 className="text-hall-accent font-semibold font-['Space_Grotesk',sans-serif] text-lg">
           {title}
         </h3>
         <button

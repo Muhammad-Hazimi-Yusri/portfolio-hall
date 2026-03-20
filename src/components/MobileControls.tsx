@@ -235,12 +235,12 @@ function TopScreen({ pois, playerPos, playerRot, onTeleportToPOI, onTeleport, on
   }, [teleportFromPoint])
 
   return (
-    <div className="relative wood-texture" style={{ height: '20%', '--wood-base': '#3D2B1E' } as React.CSSProperties}>
+    <div className="relative glass-panel-dark" style={{ height: '20%' } as React.CSSProperties}>
       {/* Screen content — inset bezel */}
       <div className="relative h-full flex mx-2 my-1 rounded-t-md border-2 border-hall-accent/50 overflow-hidden"
         style={{
-          boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.8), 0 1px 0 rgba(201,168,76,0.15)',
-          background: '#0A0806',
+          boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.3), 0 1px 0 rgba(56,189,248,0.15)',
+          background: '#1E293B',
         }}
       >
         {/* Scanline overlay */}
@@ -257,9 +257,9 @@ function TopScreen({ pois, playerPos, playerRot, onTeleportToPOI, onTeleport, on
             onClick={handleMapClick}
           >
             {/* Hall outline */}
-            <rect x="-8" y="-7" width="16" height="14" fill="none" stroke="#5C4033" strokeWidth="0.3" />
+            <rect x="-8" y="-7" width="16" height="14" fill="none" stroke="#64748B" strokeWidth="0.3" />
             {/* Door */}
-            <rect x="-1" y="6.9" width="2" height="0.3" fill="#C9A84C" opacity="0.4" />
+            <rect x="-1" y="6.9" width="2" height="0.3" fill="#38BDF8" opacity="0.4" />
             {/* POI markers with labels — click goes to approach position */}
             {pois.map((poi) => (
               <g key={poi.id} onTouchEnd={(e) => { e.preventDefault(); e.stopPropagation(); onTeleportToPOI(poi) }} onClick={(e) => { e.stopPropagation(); onTeleportToPOI(poi) }} className="cursor-pointer">
@@ -267,14 +267,14 @@ function TopScreen({ pois, playerPos, playerRot, onTeleportToPOI, onTeleport, on
                   cx={-poi.position.x}
                   cy={poi.position.z}
                   r="0.4"
-                  fill="#9C8B7A"
+                  fill="#64748B"
                   opacity="0.8"
                 />
                 <text
                   x={-poi.position.x}
                   y={poi.position.z + 1.0}
                   textAnchor="middle"
-                  fill="#9C8B7A"
+                  fill="#64748B"
                   fontSize="0.7"
                   className="pointer-events-none"
                 >
@@ -284,7 +284,7 @@ function TopScreen({ pois, playerPos, playerRot, onTeleportToPOI, onTeleport, on
             ))}
             {/* Player indicator */}
             <g transform={`translate(${mapX}, ${playerPos.z}) rotate(${rotDeg})`}>
-              <polygon points="0,-0.7 -0.5,0.5 0.5,0.5" fill="#C9A84C" />
+              <polygon points="0,-0.7 -0.5,0.5 0.5,0.5" fill="#38BDF8" />
             </g>
           </svg>
         </div>
@@ -411,7 +411,7 @@ export function MobileControls({
     const manager = nipplejs.create({
       zone: joystickRef.current,
       mode: 'dynamic',
-      color: '#C9A84C',
+      color: '#38BDF8',
       size: 120,
     })
 
@@ -530,7 +530,7 @@ export function MobileControls({
         <div
           ref={lookRef}
           className="touch-none border-x-[8px] border-hall-frame"
-          style={{ height: `${lookHeight}%`, boxShadow: 'inset 0 4px 12px rgba(20,10,5,0.6), inset 0 -4px 12px rgba(20,10,5,0.4), inset 4px 0 12px rgba(20,10,5,0.4), inset -4px 0 12px rgba(20,10,5,0.4)' }}
+          style={{ height: `${lookHeight}%`, boxShadow: 'inset 0 4px 12px rgba(30,41,59,0.3), inset 0 -4px 12px rgba(30,41,59,0.2), inset 4px 0 12px rgba(30,41,59,0.2), inset -4px 0 12px rgba(30,41,59,0.2)' }}
         />
 
         {/* Bottom controls - GameBoy style */}
@@ -538,8 +538,8 @@ export function MobileControls({
           className="flex flex-col justify-center touch-none border-t-2 border-hall-accent"
           style={{
             height: `${CONTROL_PANEL_HEIGHT * 100}%`,
-            background: 'linear-gradient(to bottom, #4A3628, #3D2B1E 30%, #352418)',
-            boxShadow: 'inset 0 1px 0 rgba(201,168,76,0.15)',
+            background: 'linear-gradient(to bottom, #334155, #1E293B 30%, #0F172A)',
+            boxShadow: 'inset 0 1px 0 rgba(56,189,248,0.15)',
           }}
         >
           {/* Top row: D-pad + A/B buttons */}

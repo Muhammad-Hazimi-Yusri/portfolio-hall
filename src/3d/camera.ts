@@ -20,10 +20,10 @@ export function createFirstPersonCamera(
   initialPosition?: { x: number; y: number; z: number },
   initialTarget?: { x: number; y: number; z: number },
 ) {
-  // Always start at castle entrance — ensures all geometry and shaders
-  // render at a content-rich position while the transition overlay is black.
-  const camera = new UniversalCamera('fpCam', new Vector3(0, 1.6, 16), scene)
-  camera.setTarget(new Vector3(0, 1.6, 8))
+  // Always start at arrival platform — ensures all geometry and shaders
+  // render at a content-rich position while the transition overlay is visible.
+  const camera = new UniversalCamera('fpCam', new Vector3(0, 1.6, 0), scene)
+  camera.setTarget(new Vector3(0, 1.6, 10))
 
   // Deferred teleport: after a few render frames, move to the requested
   // position. The transition overlay hides this camera movement.

@@ -171,7 +171,7 @@ function WelcomeScreen({ onSelectMode, canUse3D, warnings, isChecking }: Welcome
       <div className="space-y-4">
         <button
           onClick={() => onSelectMode('fallback')}
-          className="w-full py-4 md:py-5 px-6 bg-hall-accent text-hall-bg rounded-lg font-semibold md:text-lg hover:bg-hall-accent/90 transition-colors font-['Cinzel',serif]"
+          className="w-full py-4 md:py-5 px-6 bg-hall-accent text-hall-bg rounded-lg font-semibold md:text-lg hover:bg-hall-accent/90 transition-colors font-['Space_Grotesk',sans-serif]"
         >
           Enter Simple Mode
         </button>
@@ -179,7 +179,7 @@ function WelcomeScreen({ onSelectMode, canUse3D, warnings, isChecking }: Welcome
         <button
           onClick={() => onSelectMode('3d')}
           disabled={!canUse3D || isChecking}
-          className="w-full py-4 md:py-5 px-6 bg-transparent text-hall-accent rounded-lg border border-hall-accent hover:bg-hall-accent/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-['Cinzel',serif]"
+          className="w-full py-4 md:py-5 px-6 bg-transparent text-hall-accent rounded-lg border border-hall-accent hover:bg-hall-accent/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-['Space_Grotesk',sans-serif]"
         >
           <span className="block font-semibold">
             {isChecking ? 'Checking device...' : 'Try Interactive 3D'}
