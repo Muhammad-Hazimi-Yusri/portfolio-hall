@@ -25,7 +25,7 @@ import type { WebXRDefaultExperience } from '@babylonjs/core/XR/webXRDefaultExpe
 import { WebXRState } from '@babylonjs/core/XR/webXRTypes'
 import { isMobile } from '@/utils/detection'
 import { MobileControls } from '@/components/MobileControls'
-import { Minimap } from '@/components/Minimap'
+import { ProgressStrip } from '@/components/ProgressStrip'
 import { ThreeDSidebar } from '@/components/ThreeDSidebar'
 
 type BabylonSceneProps = {
@@ -316,7 +316,7 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress, initialC
         marginLeft: '-50vh',
       } : undefined}
     >
-      <canvas ref={canvasRef} className="w-full h-full outline-none" />
+      <canvas ref={canvasRef} aria-hidden="true" className="w-full h-full outline-none" />
 
       {isVRSupported && (
         <button
@@ -328,7 +328,7 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress, initialC
       )}
 
       {!isInVR && (
-        <Minimap
+        <ProgressStrip
           pois={poisData.pois as POI[]}
           cameraRef={cameraRef}
           onTeleport={handleTeleport}

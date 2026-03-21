@@ -26,6 +26,7 @@ export function IntroSection({ scrollProgress, reducedMotion }: Props) {
 
   return (
     <div
+      role="banner"
       className="absolute inset-0 flex flex-col items-center justify-center px-6"
       style={{ opacity: sectionOpacity }}
     >
@@ -33,10 +34,11 @@ export function IntroSection({ scrollProgress, reducedMotion }: Props) {
         className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold font-['Space_Grotesk',sans-serif] text-hall-accent text-center leading-tight"
         style={
           reducedMotion
-            ? { opacity: revealProgress }
+            ? { opacity: revealProgress, textShadow: '0 1px 8px rgba(255,255,255,0.8)' }
             : {
                 clipPath: `inset(${clipTop}% 0 0 0)`,
                 transform: `translateY(${(1 - revealProgress) * 20}px)`,
+                textShadow: '0 1px 8px rgba(255,255,255,0.8)',
               }
         }
       >

@@ -36,7 +36,7 @@ export function CompactCluster({ pois, scrollStart, scrollEnd, scrollProgress, r
         transform: `translateY(${translateY}px)`,
       }}
     >
-      <div className="max-w-2xl w-full bg-hall-bg/80 backdrop-blur-sm rounded-xl p-6">
+      <div className="max-w-2xl w-full glass-panel shadow-sm rounded-xl p-6">
         <h2 className="text-xl md:text-2xl font-bold font-['Space_Grotesk',sans-serif] text-hall-accent mb-6 text-center">
           More Projects
         </h2>

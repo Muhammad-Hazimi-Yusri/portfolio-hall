@@ -13,6 +13,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - v3.0.0: VR hardening & enhancement
 - v3.1.0: 3D self-portrait (iPhone LiDAR scan, low-poly mesh + gaussian splat toggle)
 
+## [2.6.0] - 2026-03-21
+
+### Added
+- ProgressStrip navigation component — thin horizontal bar at viewport bottom showing player position along the linear path, with POI dots and zone labels
+- `accent-dark` color token (#0284C7) for readable accent-colored text
+- `glass-panel` contrast on all tour content panels (HeroProject, CompactCluster, ImpactSection, ContactSection)
+- `focus-visible` styles — sky blue outline for keyboard navigation
+- ARIA landmarks on tour sections (`role="banner"`, `aria-label`, `role="contentinfo"`)
+- `aria-hidden="true"` on 3D canvas elements (decorative)
+- `prefers-reduced-motion` CSS media query — disables animations for users who prefer reduced motion
+- Text shadow on intro name for legibility over bright 3D scene
+
+### Changed
+- Space Grotesk locked as heading font; Plus Jakarta Sans removed from Google Fonts link
+- Tour content panels use `glass-panel` class for better readability over 3D scene
+- Progress bar fill has shadow for visibility on light background
+- Philosophy statement (ImpactSection) finalized with real copy
+- Contact closing line updated to reflect current career goals
+- Meta descriptions updated to reflect museum/boardwalk theme (removed castle references)
+- README fully rewritten for v2.x architecture
+
+### Removed
+- Minimap component (replaced by ProgressStrip)
+- Legacy mode routing (`?legacy=true`) — all users get the guided tour
+- WelcomeScreen component (was inlined in App.tsx)
+- FallbackMode components (old v1.6.0 scroll portfolio)
+- ModeToggle component
+- `useActiveSection` hook (FallbackMode-only)
+- `useDeviceCapability` hook (legacy welcome screen-only)
+- Plus Jakarta Sans font import
+
+### Fixed
+- Text contrast on light theme — tour panels now use glass-morphism for clear separation from 3D
+- Progress bar visibility — added shadow and track background
+- Scroll progress bar section label contrast
+
 ## [2.5.0] - 2026-03-18
 
 ### Added

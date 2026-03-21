@@ -14,6 +14,7 @@ export default {
           frame: '#E2E8F0',
           'frame-light': '#F1F5F9',
           accent: '#38BDF8',
+          'accent-dark': '#0284C7',
           'accent-warm': '#818CF8',
           text: '#1E293B',
           muted: '#64748B',

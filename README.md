@@ -1,408 +1,142 @@
-# 🏰 Balairung | 3D Portfolio Hall
+# Balairung | 3D Portfolio Hall
 
 > **Balairung** /bə-ˈlaɪ-ruŋ/ — *noun, Malay*
-> 
+>
 > A grand royal hall or throne room; the ceremonial heart of a palace where audiences are received and important gatherings held.
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
-[![Version](https://img.shields.io/badge/version-2.5.0-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-2.6.0-blue.svg)]()
 [![Status](https://img.shields.io/badge/status-In_Progress-yellow.svg)]()
 
 <details>
-<summary>📑 Table of Contents</summary>
+<summary>Table of Contents</summary>
 
-- [Overview](#-overview)
-- [Live Demo](#-live-demo)
-- [Project Goals](#-project-goals)
-- [Theme](#-theme)
-- [Features](#-features)
-- [Tech Stack](#-tech-stack)
-- [Architecture](#-architecture)
-- [Data Structures](#-data-structures)
-- [Hall Layout](#-hall-layout--balairung)
-- [Controls](#-controls)
-- [Mode Detection & Fallback](#-mode-detection--fallback)
-- [Development Roadmap](#-development-roadmap)
-- [Testing Strategy](#-testing-strategy)
-- [Deployment](#-deployment)
-- [Getting Started](#-getting-started)
-- [License](#-license)
-- [Changelog](#-changelog)
-- [Contact](#-contact)
+- [Overview](#overview)
+- [Live Demo](#live-demo)
+- [Project Goals](#project-goals)
+- [Theme](#theme)
+- [Architecture](#architecture)
+- [Hall Layout](#museum-layout)
+- [Controls](#controls)
+- [Development Roadmap](#development-roadmap)
+- [Getting Started](#getting-started)
+- [License](#license)
+- [Changelog](#changelog)
+- [Contact](#contact)
 
 </details>
 
 ---
 
-## 📖 Overview
+## Overview
 
-Balairung | 3D Portfolio Hall is an interactive portfolio website designed as a virtual museum hall. Visitors can explore projects displayed as paintings on walls and artifacts in display cases — either through first-person 3D navigation or a simplified 2D floor plan interface.
+Balairung is an interactive portfolio website built as a scroll-driven guided tour through a 3D open-air boardwalk museum. Visitors scroll to follow a camera path through the museum, reading about projects, experience, and skills as content panels overlay the 3D scene. At any point, they can unlock free-roam mode to explore the museum in first-person 3D with full WASD/VR controls.
 
-**Author:** Muhammad Hazimi Yusri  
-**Repository:** Public  
-**Hosting:** GitHub Pages (with Cloudflare domain)
+**Author:** Muhammad Hazimi Yusri
+**Repository:** Public
+**Hosting:** GitHub Pages
 
-## 🌐 Live Demo
+## Live Demo
 
 **[View Live → muhammad-hazimi-yusri.github.io/portfolio-hall](https://muhammad-hazimi-yusri.github.io/portfolio-hall/)**
 
 ---
 
-## 🎯 Project Goals
+## Project Goals
 
 1. **Showcase work** in an engaging, memorable format
-2. **Accessible by default** — fallback mode works everywhere
-3. **Progressive enhancement** — 3D as opt-in experience
+2. **Accessible by default** — content-first scroll experience works everywhere
+3. **Progressive enhancement** — 3D as visual layer, free-roam as opt-in
 4. **Future-ready** — architecture supports VR and AI features
 
 ---
 
-## 🎨 Theme
+## Theme
 
 Balairung uses a **Frutiger Aero modern museum** aesthetic — clean, bright, and optimistic:
 
-- **Color palette**: "Aero Glass" — cool whites, sky blue accents, indigo-violet secondary, slate text on light backgrounds
+- **Color palette**: "Aero Glass" — cool whites (#F5F7FA), sky blue accents (#38BDF8), indigo-violet secondary (#818CF8), slate text on light backgrounds
 - **Typography**: Space Grotesk (headings), Inter (body text)
 - **UI texture**: Glass-morphism panels with backdrop blur, subtle borders, soft shadows
-- **3D environment**: Open-air boardwalk museum over reflective water, bright sky, linear pathway layout with fog at the horizon
+- **3D environment**: Open-air boardwalk museum over reflective water, bright sky dome, linear pathway with fog at the horizon
 
 ---
 
-## ✨ Features
+## Architecture
 
-### Foundation (v0.x)
-- Welcome gate with device capability detection and mode selection
-- Responsive mobile-first layout
+### How It Works
 
-### 2D Portfolio Mode (v1.6.0)
-- Scroll-based portfolio layout replacing the old SVG floor plan placeholder
-- Hero section: full-viewport with Cinzel gold title, tagline, CSS-only floating gold particle animation, "Explore in 3D" CTA, scroll indicator
-- **Story-driven project cards** (`StoryCard`): each card answers "why does this project exist?" rather than listing bullet points
-  - Collapsed state: Cinzel gold title, 1-line story hook (or first 80 chars of description as fallback), up to 3 primary tech tags, type icon badge (🖼 painting / 🔮 display-case / 🏛 pedestal)
-  - Expanded panel (click to toggle, one open at a time): 3-part narrative — *The Challenge*, *The Approach*, *The Outcome* — when story fields are populated; falls back to full description otherwise
-  - Native `<details>/<summary>` Technical Details section: full tech stack tags + links
-  - Accessible: `role="button"`, `aria-expanded`, keyboard (`Enter`/`Space`) toggle
-  - Top 6 projects have full story content; all remaining POIs have graceful fallback
-- Experience timeline: vertical teak & gold timeline with role, org, dates, and tech tags
-- Skills: categorised tag groups (Languages, Frameworks, DevOps, Hardware) with highlight cross-reference
-- Hackathons: compact cards with story hook achievement line (e.g. "🏆 7th place internationally…") shown in gold above description
-- Contact: link cards for GitHub, LinkedIn, Email, GitLab, Website with gold accent styling
-- Footer with secondary "Switch to 3D Experience" CTA
-- Intersection Observer fade-in reveals per section; CSS-only particle animation in hero
-- Self-scrolling container (3D mode `overflow: hidden` on `#root` preserved)
-- **Illustrated pathway map** in 256px left sidebar (desktop): horizontal SVG boardwalk plan with 4 interactive zones (Arrival, Gallery, Observatory, Horizon), decorative wave elements, sky blue accent connectors, Space Grotesk labels, and glow on the active zone
-- **Scroll sync**: `IntersectionObserver` tracks which section occupies most of the viewport and highlights the corresponding map zone in real time
-- **Zone click** smooth-scrolls to that section; **POI dot click** scrolls to the exact card and fires a gold ring pulse animation
-- **Mobile map overlay**: floating "Map" button (bottom-right) opens the full map as a full-screen backdrop-blur overlay; tapping a zone navigates and closes the overlay
-- POI world coordinates (`svgX = poi.position.z`, `svgY = -poi.position.x * 0.2`) used to position map dots, matching the Minimap.tsx convention
-- **Polish pass**: smooth micro-interactions and visual refinement throughout
-  - Card expand: CSS `grid-rows-[0fr→1fr]` animated collapse (300ms ease-out); expand panel stays in DOM for accessibility/screen readers
-  - Card hover lift (desktop only, `@media (hover: hover)`): `translateY(-2px)` + faint gold drop shadow — suppressed on touch devices to prevent sticky-hover
-  - Timeline dots: scale-in with overshoot (`0 → 1.4 → 1`) triggered by parent scroll-reveal, staggered per entry
-  - Hero background: drifting `wood-texture` layer behind particles (CSS-only 25s infinite pan, no JS)
-  - Pathway map zone hover: `scale(1.015)` via `transform-box: fill-box` — correct SVG bounding box transform, no TSX changes
-  - Section dividers: 1px gold gradient rule between all major sections
-  - Alternating section backgrounds: Projects and Skills sections use `bg-hall-surface/20` tint for visual rhythm
-  - Fade-in easing upgraded from `ease-out` to `cubic-bezier(0.4, 0, 0.2, 1)` for smoother deceleration
-  - Cinzel weight 600 loaded (was 400/700 only) — fixes `font-semibold` rendering across card titles and section headers
+The site has three rendering layers that work together:
 
-### 3D Experience (v1.0)
-- Babylon.js 3D hall with procedural geometry
-- First-person camera with WASD, sprint, jump, pointer lock
-- POI placeholder meshes (paintings, display cases, pedestals)
-- Collision detection (walls + POIs)
-- Proximity-based interaction (E key) with inspect modal
-- Lazy-loaded Babylon.js with tree-shaking and loading screen
+```
+┌──────────────────────────────────────────────────────┐
+│                     App.tsx                           │
+│                                                      │
+│  ┌─────────────────────────────────────────────────┐ │
+│  │              ScrollController                    │ │
+│  │                                                  │ │
+│  │  ┌────────────┐  ┌────────────┐  ┌────────────┐ │ │
+│  │  │ TourCanvas │  │ Progress   │  │ TourContent│ │ │
+│  │  │ (3D layer) │  │ Bar        │  │ (content)  │ │ │
+│  │  └────────────┘  └────────────┘  └────────────┘ │ │
+│  │       or                                         │ │
+│  │  ┌──────────────┐                                │ │
+│  │  │ TourFallback │ (2D screenshots, no WebGL)     │ │
+│  │  └──────────────┘                                │ │
+│  └─────────────────────────────────────────────────┘ │
+│                                                      │
+│  ┌─────────────────────────────────────────────────┐ │
+│  │           FreeRoamWrapper (explore mode)         │ │
+│  │  ┌──────────────┐  ┌───────────────┐            │ │
+│  │  │ BabylonScene │  │ ProgressStrip │            │ │
+│  │  │ (full 3D)    │  │ (nav bar)     │            │ │
+│  │  └──────────────┘  └───────────────┘            │ │
+│  └─────────────────────────────────────────────────┘ │
+│                                                      │
+│          pois.json (single source of truth)           │
+└──────────────────────────────────────────────────────┘
+```
 
-### Mobile Controls (v1.1)
-- Dynamic joystick (nipplejs) with multitouch support
-- Touch-drag camera rotation
-- Portrait mode with Game Boy-style D-pad and A/B buttons
-- Landscape mode with joystick + touch look
-- Optional gyroscope camera control
-- Manual landscape mode toggle with gyro axis remapping
-- Fullscreen support (Android) with iOS PWA prompt
-- Controls hint popups (first load + landscape toggle)
-- Controls info on welcome screen per device type
+**Tour mode** (default): User scrolls through a 500vh container. Scroll progress (0→1) drives:
+- Camera position along a 13-waypoint spline path through the museum
+- Content panel visibility (intro → hero projects → compact cluster → impact → contact)
 
-### Navigation & UX (v1.2 – v1.5.1)
-- Minimap overlay (SVG synced with 3D camera position) — top-left on desktop, hidden in portrait mobile
-- Dynamic zoom: minimap auto-centers on player and zooms to show the 3 nearest POIs; min 8×8 / max 30×30 viewBox; smooth lerp transitions at 60fps
-- Full map toggle (`⊞`/`⊡`) inside minimap corner — switches between dynamic zoom and full pathway view; full view shows a dashed rectangle marking the dynamic zoom area
-- Current zone label (Arrival, Gallery, Observatory, Horizon) displayed in minimap corner
-- Real-time player position and scaled direction arrow on minimap
-- Click minimap to teleport anywhere in the hall; click POI dot to teleport to approach position
-- GTA-style cinematic fly-to animation (rise → overhead pan → descend) with short-distance fallback
-- Collapsible sidebar with POI navigation grouped by section (auto-collapses on pointer lock)
-- Sidebar teleportation (click POI name → fly to approach position facing the POI)
-- "Exit 3D" button consistently placed top-right across desktop, landscape, and portrait modes
-- Game Boy 3DS-style portrait layout: teak & gold console frame, top screen (minimap + nav), look zone with inset shadows, D-pad + A/B controller panel
-- Floaty jump physics with satisfying hang time
-- Mobile movement speed tuned to match desktop parity
+**Free-roam mode** (opt-in): User clicks "Explore the hall yourself" to unlock first-person 3D navigation with all v1.x features (WASD, joystick, minimap, sidebar, VR, POI interaction).
 
-### Visual Polish (v1.3)
-- Javanese/Malay royal hall "Teak & Gold" theme with 8 semantic color tokens
-- Cinzel serif font for headings via Google Fonts, Inter for body text
-- CSS `.wood-texture` class with layered gradient wood grain effect
-- CSS `.gold-trim` class for reusable gold border styling
-- Welcome screen: gold Cinzel title, gold primary/outline buttons, decorative separator
-- Game Boy console frame: carved teak wood with gold trim, batik red A button, wood B button
-- Fallback sidebar and POI cards: wood-textured background, gold-trimmed cards
-- 3D sidebar: wood-textured panel with gold accent border
-- Minimap SVG: warm wood/gold color palette replacing green/magenta
-- 3D hall: ceiling, doorway, baseboards, gold crown molding, corner pillars
-- Floor with procedural wood grain bump texture
-- Painting frames with gold beveled geometry and thumbnail textures
-- Display cases with glass transparency and teak base
-- Pedestals with 3-tier structure and gold top platform
-- Gallery lighting: directional light with shadows, per-painting spotlights, gold accent lights
-- Loading screen with progress bar and stage labels
+**Fallback**: Non-WebGL devices see pre-rendered screenshots instead of the 3D canvas. Same content, same scroll timing.
 
-### Multi-Zone Layout (v1.4 → v2.5)
-- 4 distinct zones: Arrival (circular platform), Gallery (linear boardwalk with project paintings), Observatory (wider circular platform for experience/skills/hackathons), Horizon (narrow path to contact)
-- 19 real POIs populated from CV data across all zones
-- Open-air boardwalk over water with sky dome and distance fog
-- Zone-based sidebar grouping, horizontal strip minimap
-- Invisible collision railings at platform edges
+### Key Files
 
-### WebXR / VR (v1.5)
-- WebXR immersive-VR session entry via Babylon.js `WebXRDefaultExperience` (Quest browser)
-- "Enter VR" / "Exit VR" button (teak & gold) — only visible on XR-capable devices
-- `local-floor` reference space; head tracking; all DOM overlays hidden in VR
-- **Left thumbstick**: smooth walk with head-relative orientation and wall/POI collision
-- **Right thumbstick forward**: parabolic teleport arc with gold landing ring; floor-meshes-only targeting
-- **Right thumbstick L/R**: 45° snap turn with 300 ms vignette flash for comfort
-- **Hand tracking**: default Babylon.js hand meshes; right pinch = select; gaze disc + left pinch = teleport; graceful controller ↔ hand switching
-- **POI hover highlight**: controller aim ray and hand index-finger ray cast against POI meshes each frame; `HighlightLayer` applies gold glow to hovered mesh; floating billboard label shows POI title above the mesh; 10 m distance limit prevents accidental far picks
-- **VR inspect panel** (`src/3d/vrUI.ts`): trigger/pinch while pointing at a highlighted POI opens a 1.4 × 0.9 m floating teak-and-gold panel 1.5 m in front of the player at chest height; panel shows title, description, word-wrapped text, tag pills, and link buttons; no DOM involved — pure Babylon.js geometry + `DynamicTexture`
-- **Panel interaction**: controller trigger or right-hand pinch selects close button ("✕") or link buttons; link URLs are queued and opened in new browser tabs when the VR session ends; B/Y controller button closes the panel instantly
-- **Parallel systems**: VR panel and desktop DOM modal are fully independent — switching mode is seamless
-- **Locomotion vignette**: persistent dark overlay (max 0.4 alpha) fades in while smooth-walking, fades out at rest — reduces peripheral-vision motion sickness without blocking the scene
-- **FPS counter HUD**: 0.22 × 0.07 m plane parented to XR camera (top-left FOV); green ≥ 72 fps / gold ≥ 60 fps / red < 60 fps; toggle with Y button (left controller)
-- **Seated mode**: X button (left controller) applies +0.7 m rig offset so seated players see the scene at standing scale
-- **Painting height**: canvas center at 1.65 m (bottom 1.15 m, top 2.15 m) — within 1.4–1.7 m VR eye-level target
+| Area | File | Purpose |
+|------|------|---------|
+| Entry | `src/App.tsx` | Route between tour/explore/capture modes |
+| Data | `src/data/pois.json` | All POI content (16 entries) |
+| Tour | `src/components/tour/TourContent.tsx` | Content overlay orchestrator |
+| Tour | `src/components/tour/TourCanvas.tsx` | On-rail Babylon.js camera |
+| Tour | `src/components/tour/ScrollController.tsx` | 500vh scroll container + context |
+| Tour | `src/3d/tourPath.ts` | Camera spline waypoints + smoothstep interpolation |
+| 3D | `src/3d/BabylonScene.tsx` | Full free-roam 3D component |
+| 3D | `src/3d/scene.ts` | Environment geometry (boardwalk, water, sky) |
+| 3D | `src/3d/materials.ts` | Shared material factory (8 materials) |
+| 3D | `src/3d/assetManifest.ts` | GLB asset placements |
+| Nav | `src/components/ProgressStrip.tsx` | Linear progress bar for free-roam |
+| Utils | `src/utils/detection.ts` | WebGL, mobile, reduced-motion checks |
 
-### Blender Asset Pipeline (v1.7)
-- **Hybrid architecture**: procedural room geometry forms the permanent structure; Blender `.glb` files layer in architectural decorations (pillars, doorways, molding, throne)
-- **Config-driven asset manifest** (`src/3d/assetManifest.ts`) — typed `AssetEntry` and `AssetPlacement` records define every decoration placement with exact position, scale, shadow flags, and fallback strategy
-- **Automatic fallback**: when `.glb` files are absent, `fallbackType: 'none'` keeps existing procedural geometry in place (zero phantom meshes); `'box'` / `'cylinder'` generates a simple teak placeholder
-- **Material mapping** (`materialMode: 'keep' | 'remap' | 'hybrid'`) — use Blender PBR materials as-is, remap to shared scene palette, or adjust color/PBR while preserving UV layout
-- **Shadow and collision integration** — GLB assets wire into the scene's shadow generators; invisible box/cylinder collision proxies keep physics cheap without burdening the renderer
-- **Dev hot-reload workflow** — asset-only reload (`Ctrl+Shift+R`) swaps `.glb` files without a page refresh; backtick debug overlay shows per-asset status (⏳/✅/⚠️/❌), triangle counts, load times, and A/B GLB ↔ fallback toggle; overlay is eliminated from production bundle via dead-code elimination
-- **Reference docs**: [Blender export guide](docs/BLENDER_GUIDE.md) · [Asset specifications](docs/ASSET_SPECS.md)
+### Tech Stack
 
-### VR Performance Notes (Quest Pro browser)
-
-**Target: 72 fps**
-
-Lighting optimisations applied automatically on VR session entry (`applyVRLighting`):
-- Shadow blur scale halved (2 → 1) on both directional shadow generators — reduces blur GPU cost without recreating shadow maps
-- All painting `SpotLight`s disabled; ambient intensity raised from 0.30 to 0.55 to compensate
-- Restored automatically on session exit
-
-**If 72 fps is still not achieved** — next steps for future slices:
-- Dispose and recreate `ShadowGenerator` with 1024/512 px maps on VR entry (vs 2048/1024 currently)
-- Add exponential fog (`scene.fogMode = Scene.FOGMODE_EXP`, density ~0.015) to cull distant draw calls
-- Disable `useBlurExponentialShadowMap` entirely in VR and use standard PCF shadows
-
-**Quick control reference (Quest Pro):**
-
-| Action | Input |
-|---|---|
-| Walk | Left thumbstick |
-| Snap turn (45°) | Right thumbstick L/R |
-| Teleport | Right thumbstick forward → release |
-| Select / pinch POI | Right hand pinch or controller trigger |
-| Gaze teleport | Left hand pinch |
-| Close panel | B (right) / Y (left) controller button |
-| Toggle FPS counter | Left controller Y button |
-| Toggle seated mode | Left controller X button |
+| Layer | Technology |
+|-------|------------|
+| 3D Engine | Babylon.js 7.x |
+| UI | React 18, TypeScript |
+| Build | Vite |
+| Styling | Tailwind CSS |
+| Mobile Controls | Nipple.js |
+| VR | Babylon.js WebXR |
+| Hosting | GitHub Pages |
 
 ---
 
-## 🛠 Tech Stack
-
-| Layer | Technology | Rationale |
-|-------|------------|-----------|
-| **3D Engine** | Babylon.js | Native WebXR, good mobile perf, built-in inspector |
-| **UI Framework** | React 18+ | Component reuse, ecosystem |
-| **Build Tool** | Vite | Fast HMR, good Babylon.js support |
-| **Language** | TypeScript | Type safety for complex 3D logic |
-| **Styling** | Tailwind CSS | Rapid UI development |
-| **Hosting** | GitHub Pages | Free, CI/CD via Actions |
-| **Mobile Controls** | Nipple.js | Virtual joystick library |
-| **3D Scanning** | Scaniverse / Polycam | iPhone LiDAR capture, gaussian splat + mesh export |
-| **VR** | Babylon.js WebXR | Native Quest browser support |
-| **Asset pipeline** | `@babylonjs/loaders` + manifest | Lazy non-blocking GLB loading; procedural fallbacks until Blender assets are ready |
-
----
-
-## 🏗 Architecture
-
-### Directory Structure
-
-```
-portfolio-hall/
-├── public/
-│   ├── assets/
-│   │   └── models/               # Blender .glb exports (v1.7.0+)
-│   │       ├── .gitkeep
-│   │       └── test-cube.glb     # Pipeline verification mesh (temporary)
-│   └── thumbnails/               # POI preview images
-│       └── .gitkeep
-│
-├── src/
-│   ├── data/
-│   │   └── pois.json             # All POI content data
-│   │
-│   ├── 3d/
-│   │   ├── engine.ts             # Babylon.js engine + scene factory
-│   │   ├── scene.ts              # Environment geometry: boardwalk, water, sky, walls
-│   │   ├── materials.ts          # Shared material factories + SceneMaterials type
-│   │   ├── assetManifest.ts      # Typed catalogue of all .glb placements + positions
-│   │   ├── assetLoader.ts        # Non-blocking GLB loader; stats tracking, hot-reload, A/B toggle
-│   │   ├── assetDebug.tsx        # Dev-only overlay component (tree-shaken from production)
-│   │   ├── camera.ts             # First-person camera (WASD, gyro, touch)
-│   │   ├── cameraRef.ts          # Shared camera position ref (3D → React)
-│   │   ├── flyTo.ts              # Fly-to teleport animation
-│   │   ├── lights.ts             # Ambient + directional lighting + shadow generators
-│   │   ├── pois.ts               # POI mesh creation (paintings, display cases, pedestals)
-│   │   ├── interaction.ts        # Proximity detection + E key handler
-│   │   ├── pointerLock.ts        # Pointer lock management
-│   │   ├── webxr.ts              # WebXR support check, XR experience factory, VR locomotion + vignette, menu buttons, seated mode
-│   │   ├── vrInteraction.ts      # Hand tracking, pinch/trigger, hover ray casting, POI select
-│   │   ├── vrUI.ts               # VR hover label, floating inspect panel, FPS counter HUD
-│   │   ├── tourPath.ts            # Camera spline waypoints + interpolation for scroll-driven tour
-│   │   └── BabylonScene.tsx      # Main 3D React component
-│   │
-│   ├── components/
-│   │   ├── FallbackMode/         # 2D scroll-based portfolio (v1.6.0+)
-│   │   │   ├── index.ts
-│   │   │   ├── FallbackMode.tsx  # Root layout + data orchestration + map wiring
-│   │   │   ├── PathwayMap.tsx    # Illustrated SVG pathway map navigation
-│   │   │   ├── HeroSection.tsx
-│   │   │   ├── ProjectCard.tsx   # StoryCard — expandable story-driven project card
-│   │   │   ├── ProjectsGrid.tsx
-│   │   │   ├── ExperienceTimeline.tsx
-│   │   │   ├── SkillsSection.tsx
-│   │   │   └── ContactSection.tsx
-│   │   ├── MobileControls.tsx    # Game Boy-style portrait + landscape controls
-│   │   ├── Minimap.tsx           # Horizontal strip SVG minimap overlay (3D mode)
-│   │   ├── ThreeDSidebar.tsx     # Collapsible POI sidebar (3D mode)
-│   │   ├── FadeOverlay.tsx       # Fade transition for teleport
-│   │   ├── ModeToggle.tsx        # 2D/3D mode switch button
-│   │   └── LoadingScreen.tsx     # Loading spinner
-│   │
-│   ├── hooks/
-│   │   ├── useDeviceCapability.ts
-│   │   ├── useFadeIn.ts          # IntersectionObserver scroll-reveal hook (one-shot)
-│   │   ├── useActiveSection.ts   # IntersectionObserver scroll-sync → active zone
-│   │   └── usePOIs.ts
-│   │
-│   ├── types/
-│   │   └── poi.ts                # POI type definitions
-│   │
-│   ├── utils/
-│   │   └── detection.ts          # WebGL, RAM, motion pref checks
-│   │
-│   ├── App.tsx                   # Root (WelcomeScreen, FallbackMode, ThreeDMode)
-│   └── main.tsx
-│
-├── docs/
-│   ├── BLENDER_GUIDE.md          # Blender → Babylon.js export workflow
-│   └── ASSET_SPECS.md            # First batch of 4 architectural asset specs
-│
-├── index.html
-├── package.json
-├── tsconfig.json
-├── tailwind.config.js
-├── vite.config.ts
-├── CHANGELOG.md
-├── LICENSE
-└── README.md
-```
-
-### Data Flow
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                        App.tsx                              │
-│  ┌───────────┐    ┌────────────┐      ┌─────────────┐       │
-│  │  Welcome  │──▶│  Fallback  │◀──▶│    3D       │       │
-│  │  Screen   │    │  Mode      │      │   Mode      │       │
-│  └───────────┘    └──────┬─────┘      └──────┬──────┘       │
-│                          │                   │              │
-│                          ▼                   ▼              │
-│                     ┌─────────────────────────────┐         │
-│                     │      pois.json              │         │
-│                     │   (single source of truth)  │         │
-│                     └─────────────────────────────┘         │
-└─────────────────────────────────────────────────────────────┘
-```
-
-### Asset Strategy
-
-Balairung uses a **hybrid geometry approach**:
-
-- **Procedural geometry** handles room structure (floors, walls, ceilings, zone boundaries) — fast, no file loading, easily tweakable
-- **Shared materials** (`src/3d/materials.ts`, v1.7.0-slice2) — one `SceneMaterials` instance created at scene init and shared across all procedural geometry and loaded .glb assets; guarantees visual consistency; single Babylon.js material object per name in the scene
-- **Blender .glb assets** (`assetLoader.ts`, v1.7.0-slice1+) layer decorative architectural elements on top — pillars, doorway frames, crown molding — without replacing the procedural rooms; each asset entry can specify `materialMode: 'keep' | 'remap' | 'hybrid'` and `collision: 'none' | 'mesh' | 'box' | 'cylinder'`; loader falls back to procedural geometry until real exports are ready
-- **Gaussian splats** (planned v3.x) loaded via Babylon.js native `GaussianSplattingMesh`, used for the self-portrait avatar and per-project physical displays; gracefully degrade to low-poly mesh on weak devices
-
----
-
-## 📐 Data Structures
-
-### POI (Point of Interest)
-
-```typescript
-type POI = {
-  id: string
-  type: 'painting' | 'display-case' | 'pedestal' | 'custom'
-  section: 'projects' | 'about' | 'skills' | 'contact'
-  position: { x: number; z: number }
-  rotation: number  // degrees, facing direction
-  
-  content: {
-    title: string
-    thumbnail: string       // path to image
-    description: string
-    storyHook?: string      // 1-line hook shown in collapsed card state
-    challenge?: string      // "The Challenge" paragraph (expanded view)
-    approach?: string       // "The Approach" paragraph (expanded view)
-    outcome?: string        // "The Outcome" paragraph (expanded view)
-    links?: Array<{
-      label: string
-      url: string
-    }>
-    tags?: string[]
-  }
-  
-  // Future extensibility
-  custom?: {
-    meshUrl?: string                        // custom .glb
-    interactionType?: 'default' | 'video' | 'iframe' | 'custom-script'
-    interactionConfig?: Record<string, unknown>
-  }
-}
-```
-
-### App State
-
-```typescript
-type AppState = {
-  mode: '3d' | 'fallback'
-  inspecting: string | null       // POI id being viewed
-  playerPosition: { x: number; z: number }
-  playerRotation: number
-  visitedPOIs: string[]           // tracking (optional)
-  sidebarOpen: boolean
-}
-```
-
----
-
-## 🗺 Museum Layout — Balairung
+## Museum Layout
 
 ```
 Z=0          Z=8                              Z=58        Z=68           Z=83-90
@@ -412,291 +146,125 @@ Z=0          Z=8                              Z=58        Z=68           Z=83-90
   │   │      │   left wall, facing right)   │  │(exp/    │  │  at end) │
   ╰───╯      │   width=10, wall at x=-5    │  │ skills/ │  │ width=4  │
   d=8        └──────────────────────────────┘  │hackath.)│  └──────────┘
-  ☻ spawn                                     ╰─────────╯
+  spawn                                        ╰─────────╯
   (about)                                       d=14
 ```
 
-Z axis (forward) →
-Walkable X range: roughly -4.5 to +4.5 (gallery), wider at observatory
-Player Y: 1.6 (standing on platforms at Y=0)
+| Zone | Z range | Purpose | Tour scroll range |
+|------|---------|---------|-------------------|
+| Arrival | 0–4 | Intro, spawn point | 0.00–0.15 |
+| Gallery | 8–58 | 6 hero + 4 compact projects | 0.15–0.65 |
+| Observatory | 58–75 | Experience, skills, hackathons | 0.65–0.85 |
+| Horizon | 75–90 | Contact, vanishing point | 0.85–1.00 |
 
 ---
 
-## 🎮 Controls
+## Controls
 
+### Tour Mode (scroll)
+| Action | Input |
+|--------|-------|
+| Navigate | Scroll (mouse wheel, trackpad, touch drag) |
+| Unlock free-roam | Click "Explore the hall yourself" CTA |
+
+### Free-Roam Mode
 | Platform | Movement | Camera | Interact |
 |----------|----------|--------|----------|
-| Desktop | WASD / Arrow keys | Mouse (pointer lock) | E key or Left click |
+| Desktop | WASD / Arrow keys | Mouse (pointer lock) | E key |
 | Mobile (portrait) | D-pad | Touch drag or Gyro | A button |
-| Mobile (landscape) | Virtual joystick | Touch drag or Gyro | Tap on POI |
-| VR – Controllers (v1.5.0+) | Left stick: walk · Right fwd: teleport arc · Right L/R: 45° snap turn | Headset tracking | Trigger: inspect/select · B (R) / Y (L): close panel · Y (L): FPS counter toggle · X (L): seated mode toggle |
-| VR – Hand Tracking (v1.5.0+) | Gaze + left pinch to teleport | Headset tracking | Right pinch: inspect / confirm link / close panel |
+| Mobile (landscape) | Virtual joystick | Touch drag or Gyro | Tap POI |
+| VR Controllers | Left stick: walk, Right fwd: teleport, Right L/R: snap turn | Headset | Trigger |
+| VR Hands | Gaze + left pinch: teleport | Headset | Right pinch |
 
-### Gyro & Landscape Mode
-When gyro is enabled, a **Landscape** toggle appears. This manually switches the control layout and gyro axis mapping — no auto-detection needed. Portrait uses beta/alpha; landscape uses gamma/alpha. Toggling recalibrates the gyro automatically.
+### URL Parameters
+| Parameter | Effect |
+|-----------|--------|
+| `#explore` | Open directly in free-roam mode |
+| `?capture=true` | Dev-only screenshot capture tool |
+| `?force2d=true` | Force 2D fallback (testing) |
 
-### iOS Note
-iOS Safari doesn't support fullscreen API. For best landscape experience, add the site to your home screen (PWA mode).
-
-### VR Controls (Quest / WebXR)
-- **Left thumbstick** — smooth walk (head-relative, collisions active); dark vignette fades in at screen edges while moving
-- **Right thumbstick forward** — show parabolic arc; release to teleport (floor meshes only)
-- **Right thumbstick left/right** — 45° snap turn with 300 ms vignette flash
-- **Trigger** — inspect the highlighted POI; or click a link / close button while panel is open
-- **B button** (right) / **Y button** (left) — close the open inspect panel
-- **Y button** (left, `button[4]`) — toggle FPS counter HUD (top-left of view); green ≥ 72 fps, gold ≥ 60, red < 60. Also closes panel if one is open.
-- **X button** (left, `button[3]`) — toggle seated mode (+0.7 m floor offset so seated players see scene at standing scale)
-- **Aim controller at POI** — gold HighlightLayer glow + title label appear; point within 10 m to be eligible
-
-**Hand Tracking mode** (set controllers aside — detected automatically)
-- **Both hands** — rendered with natural Babylon.js joint meshes
-- **Right hand pinch** (thumb + index) — inspect highlighted POI, click link button, or close panel
-- **Left hand pinch** — teleport to the gold gaze disc on the floor
-- **Point right index finger at POI** — same hover highlight + label as controllers
-- Switch back to controllers at any time; hand visuals hide gracefully
-
-**VR Inspect Panel**
-- Opens 1.5 m in front of you at chest height, facing you
-- Shows: title (gold), description, tag pills, link buttons
-- Close: aim at "✕" and pinch/trigger, or press B/Y button
-- Links: tapping a link button queues the URL; all queued links open in new browser tabs when you exit VR
-
-### Dev Shortcuts (desktop · dev builds only)
-
+### Dev Shortcuts (dev builds only)
 | Key | Action |
 |-----|--------|
-| `` ` `` (backtick) | Toggle asset debug overlay (FPS, triangle counts, per-asset status + A/B toggle) |
-| `Ctrl + Shift + R` | Reload all GLB assets without page refresh (camera and scene preserved) |
-
-### Teleportation
-- Click minimap location → fade out → fly to → fade in → face nearest POI
-- Click sidebar section → same behavior, lands at section center
+| `` ` `` (backtick) | Toggle asset debug overlay |
+| `Ctrl+Shift+R` | Reload GLB assets without page refresh |
 
 ---
 
-## 🚦 Mode Detection & Fallback
-
-```typescript
-const shouldDefaultToFallback = (): boolean => {
-  return (
-    !hasWebGL() ||
-    !hasWebGL2() ||
-    (isMobile() && getDeviceRAM() < 4) ||
-    prefersReducedMotion() ||
-    isSlowConnection()
-  )
-}
-```
-
-### Mode Selection UX
-
-```
-┌─────────────────────────────────────────────────────────┐
-│                                                         │
-│              Welcome to Balairung                       │
-│                                                         │
-│   ┌─────────────────────────────────────────────────┐   │
-│   │                                                 │   │
-│   │          [ Enter Simple Mode ]                  │   │ ← Primary CTA
-│   │                                                 │   │
-│   └─────────────────────────────────────────────────┘   │
-│                                                         │
-│   ┌─────────────────────────────────────────────────┐   │
-│   │  [ Try Interactive 3D ]                         │   │
-│   │                                                 │   │
-│   │  ⚠️  Requires modern browser                    │   │
-│   │  📦 ~XX MB download                             │   │
-│   │  💡 Best on desktop                             │   │
-│   └─────────────────────────────────────────────────┘   │
-│                                                         │
-└─────────────────────────────────────────────────────────┘
-```
-
----
-
-## 🚀 Development Roadmap
+## Development Roadmap
 
 <details>
-<summary>✅ Completed Versions (v0.1.0 – v2.3.0)</summary>
+<summary>Completed Versions (v0.1.0 – v2.6.0)</summary>
 
-#### v0.1.0 — Scaffold
-Vite + React + TypeScript project setup, Tailwind CSS, Babylon.js deps, GitHub Pages CI/CD.
+#### v0.1.0 – v0.3.0 — Foundation
+Project scaffold, welcome gate, SVG floor plan fallback mode.
 
-#### v0.2.0 — Welcome Gate
-Device capability detection, mode selection with warnings, state management.
+#### v1.0.0 – v1.1.6 — 3D Core + Mobile
+Babylon.js procedural hall, first-person camera, WASD/sprint/jump, POI interaction, virtual joystick, portrait D-pad, gyroscope controls.
 
-#### v0.3.0 — Fallback Mode
-SVG floor plan, sidebar navigation, POI data loading, inspect modal, section filtering, responsive layout.
+#### v1.2.0 – v1.5.1 — Navigation & VR
+Minimap with dynamic zoom, cinematic fly-to teleport, collapsible sidebar, WebXR immersive-VR (Quest browser), hand tracking, VR inspect panels, locomotion comfort features.
 
-#### v1.0.0 – v1.0.3 — 3D Core + Performance
-Babylon.js procedural hall, first-person camera, WASD + sprint + jump, POI placeholders, collision detection, interaction system, lazy loading with tree-shaking.
-
-#### v1.1.0 – v1.1.6 — Mobile Controls + Gyroscope
-Virtual joystick (nipplejs), touch-drag camera, portrait D-pad + A/B buttons, landscape joystick layout, optional gyro camera, manual landscape toggle with axis remapping, fullscreen support, controls hints.
-
-#### v1.2.0 – v1.2.1 — Navigation & UX
-Minimap overlay with player tracking and POI labels, click-to-teleport (approach position for POIs), cinematic fly-to camera animation (rise → pan → descend), collapsible 3D sidebar with auto-collapse on pointer lock, "Exit 3D" button across all modes, Game Boy 3DS-style portrait controls, floaty jump physics, mobile speed parity.
-
-#### v1.3.0 — Visual Polish (Theme)
-Javanese/Malay royal hall "Teak & Gold" theme: color palette, Cinzel typography, CSS wood-grain textures, gold trim borders, themed welcome screen, themed Game Boy console frame, themed sidebar and fallback mode.
-
-#### v1.3.1 — Visual Polish (3D)
-Enhanced 3D hall with ceiling, doorway, baseboards, gold crown molding, corner pillars, procedural wood grain floor. Gold painting frames with thumbnail textures, glass display cases, 3-tier pedestals. Gallery lighting with directional shadows, per-painting spotlights, gold accent lights. Loading screen with progress bar.
-
-#### v1.4.0 — Multi-Zone Castle & Content Population
-Multi-zone castle layout (Reception, Courtyard, Main Hall, Garden). 19 real POIs from CV data. Procedural skybox, sun lighting, gold doorway frames, glass-walled garden. Zone-based sidebar, expanded minimap/floorplan. SEO meta tags. Unique placeholder thumbnails. Hotfixed lighting, painting placement, and minimap bounds.
-
-#### v1.5.0 — WebXR / VR
-Full WebXR immersive-VR support via Babylon.js `WebXRDefaultExperience`. "Enter VR"/"Exit VR" button (teak & gold) hidden on non-XR devices. Features: session entry with `local-floor` reference space; controller locomotion (left-stick walk, right-stick parabolic teleport, 45° snap turn + vignette); hand tracking (pinch select + gaze-disc teleport, graceful controller ↔ hand switch); VR POI hover highlight (HighlightLayer gold glow, billboard label, 10 m cap) + floating teak-and-gold inspect panel with link-queueing; performance/comfort pass (shadow blur halved, spotlights disabled in VR, locomotion vignette, FPS counter HUD, seated mode, painting canvas lowered to 1.65 m).
-
-#### v1.5.1 — Minimap Dynamic Zoom
-Player-centered minimap that auto-zooms to the 3 nearest POIs (8×8 min / 30×30 max viewBox). Smooth 60fps lerp transitions. Full map toggle (`⊞`/`⊡`) inside the minimap corner — full view shows a dashed gold viewport indicator. Current zone label (Main Hall, Courtyard, Reception, Garden) in minimap corner. POI dots filtered to viewBox bounds in dynamic mode. Direction arrow scales with zoom level.
-
-#### v1.6.0 — 2D Mode Revamp (Spatial Portfolio)
-Complete rebuild of the 2D fallback mode as a recruiter-optimized scroll portfolio. Illustrated SVG castle map navigation with scroll sync (IntersectionObserver links scroll position to active map zone). Story-driven project cards with challenge/approach/outcome narrative for 6 top projects, graceful description fallback for others. Hero section with CSS-only floating gold particles and drifting wood-texture background. Vertical experience timeline with teak & gold styling and staggered dot reveal animations. Categorized skill tag groups and hackathon cards with gold achievement lines. Mobile-first responsive design: single-column scroll with floating map button → fullscreen overlay on mobile, sticky illustrated map sidebar + scrollable content on desktop. Card hover lift, CSS grid-rows expand/collapse animation, section dividers, and alternating section backgrounds. Accessible (role=button, aria-expanded, keyboard support). Visual QA pass across mobile/tablet/desktop breakpoints.
+#### v1.6.0 — 2D Mode Revamp
+Complete rebuild of 2D fallback as scroll portfolio with story-driven project cards, SVG pathway map, and intersection observer animations.
 
 #### v1.7.0 — Blender Asset Pipeline
-GLB import pipeline using Babylon.js `ImportMeshAsync` with `@babylonjs/loaders/glTF` plugin. Config-driven asset manifest (`src/3d/assetManifest.ts`) — typed `AssetEntry` and `AssetPlacement` records for all decoration placements. Three-strategy fallback system: load GLB → procedural box/cylinder with shared teak material → silent exit (existing procedural mesh stays). Shared material module (`src/3d/materials.ts`) — 8 named factory functions, `SceneMaterials` type, `createSceneMaterials(scene)` called once and threaded through all zone builders and asset loader. Material mapping modes (`keep` / `remap` / `hybrid`) and invisible collision proxies (`box` / `cylinder`) for loaded GLB assets. Dev tooling: `glbMimePlugin` in `vite.config.ts`, `assetLoadStats` export, `reloadAllAssets` (Ctrl+Shift+R), `toggleAssetFallback` A/B toggle, `AssetDebugOverlay` React component (dev-only, confirmed absent in production). Blender workflow reference: `docs/BLENDER_GUIDE.md` and `docs/ASSET_SPECS.md`.
+GLB import pipeline with config-driven manifest, material mapping, collision proxies, dev hot-reload, and debug overlay.
 
-#### v2.0.0 — Scroll Engine + Section Registry
-Architecture pivot to scroll-driven guided tour as default entry point. ScrollController with 500vh scroll runway and fixed viewport overlay, normalized 0→1 progress tracking via requestAnimationFrame-throttled scroll handler. TourSection config registry with four story-arc sections (intro/projects/impact/contact) mapped to scroll ranges and castle zones. ScrollContext provider with `useScrollProgress()` consumer hook. Gold accent progress bar with active section label. Placeholder section cards with opacity transitions. Legacy mode preserved via `?legacy=true` query param — existing Welcome Gate, 2D fallback, and 3D modes all accessible unchanged.
+#### v2.0.0 — Scroll Engine
+Architecture pivot to scroll-driven guided tour. ScrollController with 500vh runway and 0→1 progress tracking.
 
-#### v2.1.0 — Content Layer: Story Sections
-Replaced placeholder cards with real portfolio content across four story-arc sections. IntroSection with clip-path name reveal animation tied to scroll progress. Six hero projects (AVVR, DIY Stereo Camera, PetBot, EEE Roadmap, Food Wars, Portfolio Hall) with full-viewport slide-up transitions and staggered story blocks (challenge/approach/outcome). CompactCluster grid for secondary projects (Medical EMG, RoboHack, Game Jam, AI Hackathon). ImpactSection with philosophy statement, minimal vertical timeline, and skills-as-contextual-callouts. ContactSection with gold-accented CTA and links from pois.json. All animations GPU-composited (transform + opacity only), prefers-reduced-motion support, mobile-first responsive layout.
+#### v2.1.0 — Content Layer
+IntroSection with clip-path name reveal, 6 hero projects with staggered story blocks, compact cluster grid, impact section, contact CTA.
 
-#### v2.2.0 — 3D Visual Layer: Camera-on-Rail
-Babylon.js 3D canvas rendered behind the scroll-driven content layer. Camera follows a 10-waypoint spline path through the castle (gate → main hall → courtyard → garden) driven entirely by scroll progress with smoothstep interpolation. Reuses existing castle geometry, materials, POI meshes, lights, and GLB assets from v1.7.0 via a lightweight `TourCanvas` component (no user input, no VR, no interaction system). Content sections gain glass-morphism backgrounds (`backdrop-blur-sm` + semi-transparent `bg-hall-bg`) so text remains readable over the 3D scene; intro section stays fully transparent for the name-over-3D hero effect. WebGL capability gated — non-WebGL devices see content on the existing dark background. Mobile renders at half resolution (`setHardwareScalingLevel(2)`). Canvas fades in smoothly after scene loads.
+#### v2.2.0 — 3D Visual Layer
+Babylon.js canvas behind content with camera-on-rail following 13-waypoint spline path driven by scroll progress.
 
-#### v2.3.0 — 2D Illustrated Fallback Layer
-Pre-rendered screenshot fallback for non-WebGL devices. Dev-only capture tool (`?capture=true`) spins up the full Babylon.js scene and captures 1920×1080 PNGs at 10 camera positions along the tour path. `TourFallback` component crossfades between capture images per section as the user scrolls, with subtle CSS parallax (`translateY` shift) and ambient overlays (radial vignette + gold top gradient). Silent capability detection — `hasWebGL()` decides between `TourCanvas` and `TourFallback` automatically; `?force2d=true` forces fallback for testing. Missing images degrade gracefully to solid dark background. Capture workflow documented in `docs/CAPTURE_GUIDE.md`.
+#### v2.3.0 — 2D Fallback Layer
+Pre-rendered screenshot fallback for non-WebGL devices. Dev capture tool (`?capture=true`).
+
+#### v2.4.0 — Free-Roam Unlock
+"Explore the hall yourself" CTA, smooth tour→explore transitions, URL routing (`#explore`), return-to-tour button.
+
+#### v2.5.0 — Aero Glass Theme + New 3D Environment
+Frutiger Aero color system, open-air boardwalk museum over water, Space Grotesk typography, glass-morphism CSS, sky dome with fog, all POIs remapped to linear layout.
+
+#### v2.6.0 — Launch Polish
+Glass-panel contrast on all tour content panels, ProgressStrip replacing Minimap, Space Grotesk font locked in, TODO placeholders replaced with real content, focus-visible styles, ARIA landmarks, prefers-reduced-motion CSS, legacy mode removed, dead code cleanup.
 
 </details>
 
-### 🔧 Upcoming
+### Upcoming
 
-#### v2.x — Guided Balairung (Scroll-Driven Tour)
+#### v3.0.0 — VR Hardening & Enhancement
+- [ ] End-to-end VR playtest on Quest
+- [ ] Bug triage and fix pass
+- [ ] VR comfort tuning
+- [ ] Performance profiling on-device
 
-Architecture pivot: the site opens directly into a scroll-driven guided tour through the museum boardwalk. No mode selection gate. Scroll position drives camera movement through the 3D scene (WebGL) or illustrated parallax scenes (fallback). Free-roam 3D unlocks as an opt-in from within the tour.
-
-**Story arc:** "Who I am → What I build → Why it matters → Let's talk"
-
-##### v2.0.0 — Scroll Engine + Section Registry ✅
-- [x] ScrollController with normalized 0→1 progress tracking
-- [x] TourSection config (intro/projects/impact/contact with scroll ranges)
-- [x] Scroll progress bar (gold accent)
-- [x] Legacy mode preserved via `?legacy=true` query param
-- [x] Old Welcome Gate mode selection removed as default entry point
-
-##### v2.1.0 — Content Layer: Story Sections ✅
-- [x] "Who I am" intro with scroll-reveal name animation (clip-path + translateY)
-- [x] "What I build" — 6 hero projects with slide-up transitions + compact cluster grid
-- [x] "Why it matters" — philosophy statement, experience timeline, skills-as-callouts
-- [x] "Let's talk" — contact CTA with gold accent links
-- [x] Teak & gold theming, CSS scroll-driven animations (transform + opacity only)
-- [x] Mobile-first responsive layout, prefers-reduced-motion support
-
-##### v2.2.0 — 3D Visual Layer: Camera-on-Rail ✅
-- [x] Babylon.js canvas behind content layer (WebGL only, gated by `hasWebGL()`)
-- [x] Camera spline path through museum zones driven by scroll progress (13 waypoints, smoothstep interpolation)
-- [x] Reuses existing environment geometry, materials from v2.5.0
-- [x] Content layer glass-morphism (semi-transparent backgrounds + backdrop-blur)
-- [x] Reduced resolution on mobile for performance (`setHardwareScalingLevel(2)`)
-- [x] Smooth canvas fade-in after scene load
-
-##### v2.3.0 — 2D Illustrated Fallback Layer ✅
-- [x] Silent capability detection (no user choice)
-- [x] Pre-rendered screenshots from 3D scene as scroll backgrounds
-- [x] CSS parallax depth layers per section
-- [x] Same scroll timing and content as 3D layer
-- [x] Dev-only capture tool (`?capture=true`) with preview grid and download
-- [x] `?force2d=true` override for testing fallback on WebGL devices
-
-##### v2.4.0 — Free-Roam Unlock + Mode Transitions
-- [x] "Explore the hall yourself" CTA at multiple scroll points (WebGL only)
-- [x] Smooth camera handoff: scroll-driven → first-person free-roam
-- [x] All v1.x free-roam features preserved (WASD, joystick, minimap, sidebar, VR, POI interaction)
-- [x] "Return to tour" button in free-roam
-- [x] URL routing: `/` = tour, `#explore` = free-roam
-
-##### v2.5.0 — Aero Glass Theme + New 3D Environment ✅
-- [x] Frutiger Aero "Aero Glass" color system replacing Teak & Gold
-- [x] New 3D environment: open-air boardwalk museum over reflective water
-- [x] Lighting reduced from 20+ to 3 (fixes shader uniform overflow)
-- [x] Space Grotesk + Plus Jakarta Sans typography replacing Cinzel
-- [x] Glass-morphism CSS utilities (glass-panel, aero-gradient, accent-glow)
-- [x] Sky dome with gradient, distance fog, water plane with reflections
-- [x] All hardcoded colors swept to new palette across ~15 files
-- [x] Zone type rewired from castle rooms to museum zones (arrival/gallery/observatory/horizon)
-- [x] All 19 POI positions remapped to linear boardwalk layout
-- [x] Camera tour path follows Z-axis through gallery (13 waypoints)
-- [x] Minimap redesigned as horizontal strip
-- [x] PathwayMap replaces CastleMap in fallback mode
-- [x] Collision railings at platform edges
-- [x] Capture points renamed for museum zones
-
-#### v3.x — Backlog (Deferred from v1.8–v1.9)
-
-##### v3.0.0 — VR Hardening & Enhancement
-- [ ] End-to-end VR playtest on Quest (first real session)
-- [ ] Bug triage and fix pass from playtest findings
-- [ ] VR comfort tuning (vignette, snap turn, locomotion speed)
-- [ ] Performance profiling on-device (shadow maps, draw calls, frame budget)
-- [ ] VR UX polish (panel placement, hover feedback, interaction range)
-
-##### v3.1.0 — 3D Self-Portrait (Scan + Splat Avatar)
+#### v3.1.0 — 3D Self-Portrait (Scan + Splat Avatar)
 - [ ] iPhone LiDAR self-scan (via Scaniverse/Polycam)
 - [ ] Low-poly mesh avatar (.glb) on arrival platform
 - [ ] Gaussian splat toggle using Babylon.js native GaussianSplattingMesh
 - [ ] Graceful degradation (low-poly only on weak devices)
 
-##### v3.2.0 — Rich Project Displays
-- [ ] 3D slideshow panels for website projects (screenshot carousel on 3D plane)
-- [ ] Gaussian splat displays for physical projects on pedestals
-- [ ] Enhanced inspect modal with richer content
+#### v3.2.0 — Rich Project Displays
+- [ ] 3D slideshow panels for website projects
+- [ ] Gaussian splat displays for physical projects
+- [ ] Enhanced inspect modal
 
-##### v3.3.0 — Interactive Web Panels
-- [ ] Iframe-on-3D-plane for live website project browsing (desktop only)
-- [ ] DOM overlay positioned to match 3D plane projection
+#### v3.3.0 — Interactive Web Panels
+- [ ] Iframe-on-3D-plane for live website browsing
 - [ ] VR fallback to slideshow mode
 
-##### v3.4.0 — AI Integration
+#### v3.4.0 — AI Integration
 - [ ] Visitor type detection
 - [ ] LLM integration
 - [ ] Dynamic content prioritization
 
 ---
 
-## 🧪 Testing Strategy
-
-| Type | Tool | Coverage |
-|------|------|----------|
-| Unit | Vitest | Utils, hooks |
-| Component | React Testing Library | UI components |
-| E2E | Playwright | Critical flows |
-| Performance | Lighthouse CI | Core Web Vitals |
-
----
-
-## 📦 Deployment
-
-### GitHub Pages Setup
-
-Deployment is automated via GitHub Actions on push to `main`.
-
-1. Go to repo **Settings → Pages**
-2. Source: **GitHub Actions**
-3. Custom domain (optional): Add your domain in settings
-
-### Custom Domain (Cloudflare)
-
-1. Add domain in GitHub Pages settings
-2. In Cloudflare DNS, add:
-   - `CNAME` record: `[subdomain]` → `[username].github.io`
-3. Enable "Enforce HTTPS" in GitHub after DNS propagates
-
----
-
-## 🏃 Getting Started
+## Getting Started
 
 ### Prerequisites
 - Node.js 18+
@@ -705,21 +273,10 @@ Deployment is automated via GitHub Actions on push to `main`.
 ### Installation
 
 ```bash
-# Clone repository
 git clone https://github.com/Muhammad-Hazimi-Yusri/portfolio-hall.git
 cd portfolio-hall
-
-# Install dependencies
 npm install
-
-# Start development server
 npm run dev
-
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
 ```
 
 ### Scripts
@@ -727,38 +284,28 @@ npm run preview
 | Command | Description |
 |---------|-------------|
 | `npm run dev` | Start dev server (port 5173) |
-| `npm run build` | Production build |
+| `npm run build` | Production build (tsc + vite) |
 | `npm run preview` | Preview production build |
 | `npm run lint` | Run ESLint |
 | `npm run typecheck` | TypeScript check |
 
 ---
 
-## 📄 License
+## License
 
 **Proprietary — All Rights Reserved**
 
-Copyright © 2025-present Muhammad Hazimi Yusri
-
-See [LICENSE](./LICENSE) for details.
+Copyright 2025-present Muhammad Hazimi Yusri. See [LICENSE](./LICENSE).
 
 ---
 
-## 📝 Changelog
+## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md) for version history.
 
 ---
 
-## 🙏 Acknowledgments
-
-- [Babylon.js](https://www.babylonjs.com/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [Vite](https://vitejs.dev/)
-
----
-
-## 📬 Contact
+## Contact
 
 **Muhammad Hazimi Yusri**
 - GitHub: [Muhammad-Hazimi-Yusri](https://github.com/Muhammad-Hazimi-Yusri)
@@ -767,5 +314,5 @@ See [CHANGELOG.md](./CHANGELOG.md) for version history.
 ---
 
 <p align="center">
-  <i>Built with Claude AI 🤖 and water 🚰</i>
+  <i>Built with Claude AI and water</i>
 </p>

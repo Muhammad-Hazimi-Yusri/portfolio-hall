@@ -6,7 +6,7 @@ export function ScrollProgressBar() {
   return (
     <div className="fixed top-0 left-0 w-full z-50 h-[3px] bg-hall-frame/50">
       <div
-        className="h-full bg-hall-accent transition-[width] duration-150 ease-out"
+        className="h-full bg-hall-accent transition-[width] duration-150 ease-out shadow-[0_1px_4px_rgba(56,189,248,0.4)]"
         style={{ width: `${scrollProgress * 100}%` }}
       />
       <span

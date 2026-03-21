@@ -51,10 +51,11 @@ export function ImpactSection({ scrollProgress, reducedMotion }: Props) {
 
   return (
     <div
+      aria-label="Experience and skills"
       className="absolute inset-0 flex items-center justify-center p-6 md:p-12 overflow-y-auto"
       style={{ opacity: sectionOpacity }}
     >
-      <div className="max-w-2xl w-full py-8 bg-hall-bg/85 backdrop-blur-sm rounded-xl px-6 md:px-8">
+      <div className="max-w-2xl w-full py-8 glass-panel shadow-sm rounded-xl px-6 md:px-8">
         {/* Philosophy */}
         <div
           className="mb-10"
@@ -66,12 +67,11 @@ export function ImpactSection({ scrollProgress, reducedMotion }: Props) {
           <h2 className="text-2xl md:text-3xl font-bold font-['Space_Grotesk',sans-serif] text-hall-accent mb-4">
             Why It Matters
           </h2>
-          {/* TODO: Final copy */}
           <p className="text-hall-text story-text text-base md:text-lg">
-            I sit at the intersection of hardware and software — building things people can
-            see, hear, and walk through. Whether it&apos;s a VR scene reconstructed from real
-            acoustics or a robot that runs its own LLM, the thread is the same: make
-            technology something you experience, not just something you use.
+            I work at the intersection of hardware and software — building things people can
+            walk through, hold, or interact with. Whether it&apos;s a robot that runs an LLM
+            offline or a portfolio you&apos;re scrolling through right now, I care about making
+            technology feel tangible.
           </p>
         </div>
 

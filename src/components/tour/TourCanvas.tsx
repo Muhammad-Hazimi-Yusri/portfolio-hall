@@ -84,6 +84,7 @@ export function TourCanvas() {
   return (
     <canvas
       ref={canvasRef}
+      aria-hidden="true"
       className={`fixed inset-0 w-full h-full z-0 transition-opacity duration-500 ${
         isReady ? 'opacity-100' : 'opacity-0'
       }`}
