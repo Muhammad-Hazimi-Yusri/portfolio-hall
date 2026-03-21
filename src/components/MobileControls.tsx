@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import nipplejs from 'nipplejs'
 import type { POI } from '@/types/poi'
 import type { CameraRef } from '@/3d/cameraRef'
@@ -193,135 +193,95 @@ function ActionButtons({ canInteract, onInteract, onMoveEnd, onJump }: ActionBut
   )
 }
 
-const SECTIONS = ['projects', 'about', 'skills', 'contact'] as const
+const POI_SECTIONS = ['projects', 'about', 'skills', 'contact'] as const
 
-type TopScreenProps = {
+const toPercent = (z: number) => `${(z / 90) * 100}%`
+
+type MiniProgressTrackProps = {
+  playerZ: number
   pois: POI[]
-  playerPos: { x: number; z: number }
-  playerRot: number
-  onTeleportToPOI: (poi: POI) => void
   onTeleport: (x: number, z: number) => void
-  onSwitchMode?: () => void
+  onTeleportToPOI: (poi: POI) => void
 }
 
-function TopScreen({ pois, playerPos, playerRot, onTeleportToPOI, onTeleport, onSwitchMode }: TopScreenProps) {
-  const svgRef = useRef<SVGSVGElement>(null)
-  const rotDeg = -180 + (playerRot * 180) / Math.PI
-  const mapX = -playerPos.x
+function MiniProgressTrack({ playerZ, pois, onTeleport, onTeleportToPOI }: MiniProgressTrackProps) {
+  const trackRef = useRef<HTMLDivElement>(null)
 
-  const teleportFromPoint = useCallback((clientX: number, clientY: number) => {
-    const svg = svgRef.current
-    if (!svg) return
-    const pt = svg.createSVGPoint()
-    pt.x = clientX
-    pt.y = clientY
-    const ctm = svg.getScreenCTM()
-    if (!ctm) return
-    const svgPt = pt.matrixTransform(ctm.inverse())
-    // Negate X back to world coords (SVG X is negated for left-handed correction)
-    const clampedX = Math.max(-7, Math.min(7, -svgPt.x))
-    const clampedZ = Math.max(-6.5, Math.min(6.5, svgPt.y))
-    onTeleport(clampedX, clampedZ)
+  const teleportFromClientX = useCallback((clientX: number) => {
+    const track = trackRef.current
+    if (!track) return
+    const rect = track.getBoundingClientRect()
+    const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width))
+    onTeleport(0, ratio * 90)
   }, [onTeleport])
 
-  const handleMapClick = useCallback((e: React.MouseEvent<SVGSVGElement>) => {
-    teleportFromPoint(e.clientX, e.clientY)
-  }, [teleportFromPoint])
-
-  const handleMapTouch = useCallback((e: React.TouchEvent<SVGSVGElement>) => {
-    e.preventDefault()
-    const touch = e.changedTouches[0]
-    if (touch) teleportFromPoint(touch.clientX, touch.clientY)
-  }, [teleportFromPoint])
-
   return (
-    <div className="relative glass-panel-dark" style={{ height: '20%' } as React.CSSProperties}>
-      {/* Screen content — inset bezel */}
-      <div className="relative h-full flex mx-2 my-1 rounded-t-md border-2 border-hall-accent/50 overflow-hidden"
-        style={{
-          boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.3), 0 1px 0 rgba(56,189,248,0.15)',
-          background: '#1E293B',
-        }}
-      >
-        {/* Scanline overlay */}
-        <div className="absolute inset-0 pointer-events-none z-20 opacity-[0.04]"
-          style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(255,255,255,0.1) 1px, rgba(255,255,255,0.1) 2px)' }}
+    <div
+      ref={trackRef}
+      className="relative h-full cursor-crosshair"
+      onClick={(e) => teleportFromClientX(e.clientX)}
+      onTouchEnd={(e) => { e.preventDefault(); const t = e.changedTouches[0]; if (t) teleportFromClientX(t.clientX) }}
+    >
+      {/* Track line */}
+      <div className="absolute top-1/2 left-0 right-0 h-[2px] -translate-y-1/2 bg-hall-frame/50 rounded-full" />
+      {/* Zone ticks */}
+      <div className="absolute top-1/2 -translate-y-1/2 h-[3px] rounded-full bg-hall-frame/70"
+        style={{ left: toPercent(8), width: toPercent(50) }} />
+      <div className="absolute top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-hall-frame/40 -translate-x-1/2"
+        style={{ left: toPercent(68) }} />
+      {/* POI dots */}
+      {pois.map(poi => (
+        <div
+          key={poi.id}
+          className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-hall-accent/40 z-10"
+          style={{ left: toPercent(poi.position.z) }}
+          onClick={(e) => { e.stopPropagation(); onTeleportToPOI(poi) }}
+          onTouchEnd={(e) => { e.preventDefault(); e.stopPropagation(); onTeleportToPOI(poi) }}
         />
-        {/* Minimap — left half */}
-        <div className="w-3/5 p-1 border-r border-hall-bg cursor-crosshair">
-          <svg
-            ref={svgRef}
-            viewBox="-10 -9 20 18"
-            className="w-full h-full"
-            onTouchEnd={handleMapTouch}
-            onClick={handleMapClick}
-          >
-            {/* Hall outline */}
-            <rect x="-8" y="-7" width="16" height="14" fill="none" stroke="#64748B" strokeWidth="0.3" />
-            {/* Door */}
-            <rect x="-1" y="6.9" width="2" height="0.3" fill="#38BDF8" opacity="0.4" />
-            {/* POI markers with labels — click goes to approach position */}
-            {pois.map((poi) => (
-              <g key={poi.id} onTouchEnd={(e) => { e.preventDefault(); e.stopPropagation(); onTeleportToPOI(poi) }} onClick={(e) => { e.stopPropagation(); onTeleportToPOI(poi) }} className="cursor-pointer">
-                <circle
-                  cx={-poi.position.x}
-                  cy={poi.position.z}
-                  r="0.4"
-                  fill="#64748B"
-                  opacity="0.8"
-                />
-                <text
-                  x={-poi.position.x}
-                  y={poi.position.z + 1.0}
-                  textAnchor="middle"
-                  fill="#64748B"
-                  fontSize="0.7"
-                  className="pointer-events-none"
+      ))}
+      {/* Player dot */}
+      <div
+        className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-hall-accent pointer-events-none z-10"
+        style={{ left: toPercent(playerZ) }}
+      />
+    </div>
+  )
+}
+
+type POIPopoverProps = {
+  pois: POI[]
+  onTeleportToPOI: (poi: POI) => void
+  onClose: () => void
+}
+
+function POIPopover({ pois, onTeleportToPOI, onClose }: POIPopoverProps) {
+  return (
+    <div className="absolute inset-0 z-[55]" onClick={onClose}>
+      <div
+        className="absolute top-11 right-2 w-48 max-h-[50vh] overflow-y-auto glass-panel-dark rounded-lg p-2"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {POI_SECTIONS.map((section) => {
+          const sectionPois = pois.filter((p) => p.section === section)
+          if (sectionPois.length === 0) return null
+          return (
+            <div key={section} className="mb-1">
+              <div className="text-[9px] text-hall-muted uppercase tracking-wider font-bold px-1 py-0.5">
+                {section}
+              </div>
+              {sectionPois.map((poi) => (
+                <button
+                  key={poi.id}
+                  onTouchEnd={(e) => { e.preventDefault(); onTeleportToPOI(poi); onClose() }}
+                  onClick={() => { onTeleportToPOI(poi); onClose() }}
+                  className="block w-full text-left text-[11px] text-hall-muted px-2 py-1 rounded active:bg-hall-accent/10 active:text-hall-accent truncate"
                 >
                   {poi.content.title}
-                </text>
-              </g>
-            ))}
-            {/* Player indicator */}
-            <g transform={`translate(${mapX}, ${playerPos.z}) rotate(${rotDeg})`}>
-              <polygon points="0,-0.7 -0.5,0.5 0.5,0.5" fill="#38BDF8" />
-            </g>
-          </svg>
-        </div>
-        {/* Nav sections — right half */}
-        <div className="w-2/5 p-1.5 pt-1 flex flex-col gap-0.5 overflow-y-auto">
-          {SECTIONS.map((section) => {
-            const sectionPois = pois.filter((p) => p.section === section)
-            if (sectionPois.length === 0) return null
-            return (
-              <div key={section}>
-                <div className="text-[8px] text-hall-muted uppercase tracking-wider font-bold px-1">
-                  {section}
-                </div>
-                {sectionPois.map((poi) => (
-                  <button
-                    key={poi.id}
-                    onTouchEnd={(e) => { e.preventDefault(); onTeleportToPOI(poi) }}
-                    onClick={() => onTeleportToPOI(poi)}
-                    className="block w-full text-left text-[10px] text-hall-muted px-1 py-0.5 rounded active:bg-hall-accent/10 active:text-hall-accent truncate"
-                  >
-                    {poi.content.title}
-                  </button>
-                ))}
-              </div>
-            )
-          })}
-        </div>
-        {/* Exit 3D button — subtle, matching UI */}
-        {onSwitchMode && (
-          <button
-            onTouchEnd={(e) => { e.preventDefault(); onSwitchMode() }}
-            onClick={onSwitchMode}
-            className="absolute top-1 right-1 px-2 py-0.5 bg-hall-frame border border-hall-accent/30 rounded text-[8px] text-hall-muted uppercase tracking-wider active:bg-hall-frame-light z-30"
-          >
-            Exit 3D
-          </button>
-        )}
+                </button>
+              ))}
+            </div>
+          )
+        })}
       </div>
     </div>
   )
@@ -373,18 +333,17 @@ export function MobileControls({
   onLandscapeConfirm
 }: MobileControlsProps) {
   const CONTROL_PANEL_HEIGHT = 0.30
-  const TOP_SCREEN_HEIGHT = 0.20
 
   const portrait = !landscapeMode
+  const [showPOIPopover, setShowPOIPopover] = useState(false)
 
   const joystickRef = useRef<HTMLDivElement>(null)
   const lookRef = useRef<HTMLDivElement>(null)
   const touchId = useRef<number | null>(null)
   const lastTouch = useRef<{ x: number; y: number } | null>(null)
 
-  // Track player position for top screen minimap
+  // Track player position for toolbar progress track
   const [playerPos, setPlayerPos] = useState({ x: 0, z: 5 })
-  const [playerRot, setPlayerRot] = useState(0)
 
   useEffect(() => {
     if (!portrait) return
@@ -393,9 +352,8 @@ export function MobileControls({
     const update = () => {
       frameCount++
       if (frameCount % 6 === 0) {
-        const { position, rotationY } = cameraRef.current
+        const { position } = cameraRef.current
         setPlayerPos({ x: position.x, z: position.z })
-        setPlayerRot(rotationY)
       }
       rafId = requestAnimationFrame(update)
     }
@@ -486,8 +444,6 @@ export function MobileControls({
     : null
 
   if (portrait) {
-    const lookHeight = (1 - CONTROL_PANEL_HEIGHT - TOP_SCREEN_HEIGHT) * 100
-
     return (
       <div className="absolute inset-0 z-40 flex flex-col">
         {/* Hint popup */}
@@ -516,26 +472,52 @@ export function MobileControls({
           </div>
         )}
 
-        {/* 3DS Top Screen — minimap + nav */}
-        <TopScreen
-          pois={pois}
-          playerPos={playerPos}
-          playerRot={playerRot}
-          onTeleportToPOI={onTeleportToPOI}
-          onTeleport={onTeleport}
-          onSwitchMode={onSwitchMode}
-        />
+        {/* Compact toolbar — replaces old minimap */}
+        <div className="h-10 flex items-center px-2 gap-2 glass-panel-dark z-50 shrink-0">
+          {onSwitchMode && (
+            <button
+              onTouchEnd={(e) => { e.preventDefault(); onSwitchMode() }}
+              onClick={onSwitchMode}
+              className="px-2 py-1 text-[10px] text-hall-muted border border-hall-accent/30 rounded uppercase tracking-wider shrink-0"
+            >
+              Exit 3D
+            </button>
+          )}
+          <div className="flex-1 h-6 relative">
+            <MiniProgressTrack
+              playerZ={playerPos.z}
+              pois={pois}
+              onTeleport={onTeleport}
+              onTeleportToPOI={onTeleportToPOI}
+            />
+          </div>
+          <button
+            onTouchEnd={(e) => { e.preventDefault(); setShowPOIPopover(prev => !prev) }}
+            onClick={() => setShowPOIPopover(prev => !prev)}
+            className="px-2 py-1 text-[10px] text-hall-accent font-medium shrink-0"
+          >
+            POIs {showPOIPopover ? '▲' : '▼'}
+          </button>
+        </div>
+
+        {/* POI popover */}
+        {showPOIPopover && (
+          <POIPopover
+            pois={pois}
+            onTeleportToPOI={onTeleportToPOI}
+            onClose={() => setShowPOIPopover(false)}
+          />
+        )}
 
         {/* Middle area - main viewport (transparent so canvas shows through) */}
         <div
           ref={lookRef}
-          className="touch-none border-x-[8px] border-hall-frame"
-          style={{ height: `${lookHeight}%`, boxShadow: 'inset 0 4px 12px rgba(30,41,59,0.3), inset 0 -4px 12px rgba(30,41,59,0.2), inset 4px 0 12px rgba(30,41,59,0.2), inset -4px 0 12px rgba(30,41,59,0.2)' }}
+          className="flex-1 touch-none border-x border-hall-frame/30"
         />
 
         {/* Bottom controls - GameBoy style */}
         <div
-          className="flex flex-col justify-center touch-none border-t-2 border-hall-accent"
+          className="flex flex-col justify-center touch-none border-t-2 border-hall-accent shrink-0"
           style={{
             height: `${CONTROL_PANEL_HEIGHT * 100}%`,
             background: 'linear-gradient(to bottom, #334155, #1E293B 30%, #0F172A)',

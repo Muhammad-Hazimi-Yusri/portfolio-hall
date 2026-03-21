@@ -1,4 +1,26 @@
+import { isMobile } from '@/utils/detection'
+
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v))
+const mobile = isMobile()
+
+function MouseScrollIcon() {
+  return (
+    <svg width="28" height="44" viewBox="0 0 28 44" fill="none" className="scroll-hint-mouse">
+      <rect x="1" y="1" width="26" height="42" rx="13" stroke="currentColor" strokeWidth="2" />
+      <circle className="scroll-hint-wheel" cx="14" cy="14" r="3" fill="currentColor" />
+    </svg>
+  )
+}
+
+function SwipeUpIcon() {
+  return (
+    <svg width="32" height="44" viewBox="0 0 32 44" fill="none">
+      <path d="M16 40V12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <path d="M8 20L16 12L24 20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="16" cy="38" r="4" stroke="currentColor" strokeWidth="1.5" fill="none" />
+    </svg>
+  )
+}
 
 type Props = {
   scrollProgress: number
@@ -57,11 +79,19 @@ export function IntroSection({ scrollProgress, reducedMotion }: Props) {
 
       {indicatorOpacity > 0 && (
         <div
-          className="absolute bottom-12 md:bottom-16 flex flex-col items-center text-hall-muted text-sm"
+          className="absolute bottom-16 md:bottom-20 flex flex-col items-center gap-3 bg-black/20 backdrop-blur-sm rounded-2xl px-8 py-5"
           style={{ opacity: indicatorOpacity }}
         >
-          <span>Scroll to explore</span>
-          <span className="mt-2 animate-bounce">&#9660;</span>
+          <div className="text-hall-accent">
+            {mobile ? <SwipeUpIcon /> : <MouseScrollIcon />}
+          </div>
+          <span className="text-base sm:text-lg text-hall-accent font-medium tracking-wide">
+            {mobile ? 'Swipe up to explore' : 'Scroll to explore'}
+          </span>
+          <div className="flex flex-col items-center gap-0.5 scroll-hint-chevrons">
+            <span className="text-hall-accent/80 text-lg leading-none">&#8964;</span>
+            <span className="text-hall-accent/50 text-lg leading-none">&#8964;</span>
+          </div>
         </div>
       )}
     </div>

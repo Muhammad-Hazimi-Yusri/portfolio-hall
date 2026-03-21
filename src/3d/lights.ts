@@ -23,7 +23,7 @@ export function createLights(
   const ambient = new HemisphericLight('ambient', new Vector3(0, 1, 0), scene)
   ambient.intensity = 0.8
   ambient.diffuse = new Color3(0.95, 0.97, 1.0)
-  ambient.groundColor = new Color3(0.7, 0.82, 0.9)
+  ambient.groundColor = new Color3(0.65, 0.8, 0.9)
   ambient.specular = new Color3(0.2, 0.2, 0.2)
 
   scene.ambientColor = new Color3(0.85, 0.9, 0.95)
@@ -32,7 +32,7 @@ export function createLights(
   const sun = new DirectionalLight('sun', new Vector3(-0.3, -1, 0.5), scene)
   sun.position = new Vector3(10, 20, -10)
   sun.intensity = 0.6
-  sun.diffuse = new Color3(1.0, 0.99, 0.97)
+  sun.diffuse = new Color3(1.0, 0.97, 0.92)
   sun.specular = new Color3(0.5, 0.5, 0.5)
 
   const sunShadowGen = new ShadowGenerator(2048, sun)

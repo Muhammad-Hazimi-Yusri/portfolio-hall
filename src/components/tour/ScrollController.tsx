@@ -44,6 +44,13 @@ export function ScrollController({ children, initialScrollProgress }: ScrollCont
     })
   }, [])
 
+  const scrollToProgress = useCallback((targetProgress: number) => {
+    const el = scrollContainerRef.current
+    if (!el) return
+    const maxScroll = el.scrollHeight - el.clientHeight
+    el.scrollTo({ top: targetProgress * maxScroll, behavior: 'smooth' })
+  }, [])
+
   return (
     <div
       ref={scrollContainerRef}
@@ -53,7 +60,7 @@ export function ScrollController({ children, initialScrollProgress }: ScrollCont
       <div style={{ height: '500vh' }}>
         <div className="fixed inset-0 pointer-events-none">
           <div className="w-full h-full">
-            <ScrollProvider scrollProgress={scrollProgress} activeSection={activeSection}>
+            <ScrollProvider scrollProgress={scrollProgress} activeSection={activeSection} scrollToProgress={scrollToProgress}>
               {children}
             </ScrollProvider>
           </div>

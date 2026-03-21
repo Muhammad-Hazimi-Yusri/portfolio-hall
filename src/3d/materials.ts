@@ -34,7 +34,7 @@ export function createFloorMat(scene: Scene): StandardMaterial {
   const mat = new StandardMaterial('floorMat', scene)
   mat.diffuseColor = new Color3(0.92, 0.93, 0.95)
   mat.specularColor = new Color3(0.4, 0.4, 0.4)
-  mat.specularPower = 128
+  mat.specularPower = 200
 
   const bump = new DynamicTexture('floorBump', { width: 512, height: 512 }, scene)
   const ctx = bump.getContext()
@@ -88,14 +88,15 @@ export function createGlassMat(scene: Scene): StandardMaterial {
   mat.diffuseColor = new Color3(0.9, 0.95, 1.0)
   mat.specularColor = new Color3(0.6, 0.6, 0.6)
   mat.specularPower = 256
-  mat.alpha = 0.2
+  mat.alpha = 0.25
+  mat.emissiveColor = new Color3(0.05, 0.1, 0.15)
   mat.backFaceCulling = false
   return mat
 }
 
 export function createGrassFloorMat(scene: Scene): StandardMaterial {
   const mat = new StandardMaterial('grassFloorMat', scene)
-  mat.diffuseColor = new Color3(0.88, 0.92, 0.86)
+  mat.diffuseColor = new Color3(0.35, 0.72, 0.35)
   mat.specularColor = new Color3(0.1, 0.12, 0.1)
   mat.specularPower = 16
   return mat

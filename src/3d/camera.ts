@@ -62,8 +62,8 @@ export function createFirstPersonCamera(
   camera.inertia = 0.2
 
   // Movement speeds
-  const walkSpeed = 0.6
-  const sprintSpeed = 1.2
+  const walkSpeed = 0.9
+  const sprintSpeed = 1.8
   camera.speed = walkSpeed
 
   // Sprint (Shift key)
@@ -171,7 +171,7 @@ export function createFirstPersonCamera(
       if (joystickRef?.current) {
         const { x, y } = joystickRef.current
         if (x !== 0 || y !== 0) {
-          const moveSpeed = sprintRef?.current ? 0.04 : 0.02
+          const moveSpeed = sprintRef?.current ? 0.06 : 0.03
           camera.cameraDirection.addInPlace(
             camera.getDirection(Vector3.Forward()).scale(y * moveSpeed)
           )

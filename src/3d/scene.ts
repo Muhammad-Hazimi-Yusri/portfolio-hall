@@ -30,15 +30,32 @@ function createSkyDome(scene: Scene): Mesh {
   skyMat.disableLighting = true
   skyMat.backFaceCulling = false
 
-  const skyTex = new DynamicTexture('skyTex', { width: 1, height: 256 }, scene)
-  const ctx = skyTex.getContext()
+  const skyTex = new DynamicTexture('skyTex', { width: 512, height: 256 }, scene)
+  const ctx = skyTex.getContext() as unknown as CanvasRenderingContext2D
+
+  // Frutiger Aero sky gradient — vivid blue to warm horizon glow
   const grad = ctx.createLinearGradient(0, 0, 0, 256)
-  grad.addColorStop(0, '#87CEEB')
-  grad.addColorStop(0.4, '#B8DFEF')
-  grad.addColorStop(0.7, '#E8F4F8')
-  grad.addColorStop(1, '#F5F7FA')
+  grad.addColorStop(0, '#2196F3')
+  grad.addColorStop(0.3, '#64B5F6')
+  grad.addColorStop(0.6, '#B3E5FC')
+  grad.addColorStop(0.85, '#E1F5FE')
+  grad.addColorStop(1, '#FFF8E1')
   ctx.fillStyle = grad
-  ctx.fillRect(0, 0, 1, 256)
+  ctx.fillRect(0, 0, 512, 256)
+
+  // Procedural clouds — soft ellipses in the upper half
+  const rng = (min: number, max: number) => min + Math.random() * (max - min)
+  for (let i = 0; i < 15; i++) {
+    const cx = rng(20, 492)
+    const cy = rng(15, 110)
+    const rx = rng(30, 80)
+    const ry = rng(10, 25)
+    const alpha = rng(0.12, 0.28)
+    ctx.fillStyle = `rgba(255,255,255,${alpha})`
+    ctx.beginPath()
+    ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2)
+    ctx.fill()
+  }
   skyTex.update()
 
   skyMat.emissiveTexture = skyTex
@@ -61,13 +78,31 @@ function createWaterPlane(scene: Scene, reflectMeshes: Mesh[]): Mesh {
   waterMesh.position.y = -0.05
 
   const waterMat = new WaterMaterial('waterMat', scene)
-  // No bump texture — calm/still water
-  waterMat.windForce = 0
-  waterMat.waveHeight = 0
-  waterMat.waterColor = new Color3(0.7, 0.85, 0.95)
-  waterMat.waterColor2 = new Color3(0.8, 0.9, 0.97)
-  waterMat.colorBlendFactor = 0.3
-  waterMat.alpha = 0.85
+
+  // Procedural bump map — subtle normal perturbation for ripple effect
+  const bumpTex = new DynamicTexture('waterBump', { width: 256, height: 256 }, scene)
+  const bCtx = bumpTex.getContext()
+  bCtx.fillStyle = 'rgb(128,128,255)'
+  bCtx.fillRect(0, 0, 256, 256)
+  for (let i = 0; i < 800; i++) {
+    const x = Math.random() * 256
+    const y = Math.random() * 256
+    const r = Math.random() * 3 + 1
+    const shade = 120 + Math.random() * 16
+    bCtx.fillStyle = `rgb(${shade},${shade},255)`
+    bCtx.beginPath()
+    bCtx.arc(x, y, r, 0, Math.PI * 2)
+    bCtx.fill()
+  }
+  bumpTex.update()
+  waterMat.bumpTexture = bumpTex
+
+  waterMat.windForce = 2
+  waterMat.waveHeight = 0.03
+  waterMat.waterColor = new Color3(0.55, 0.78, 0.92)
+  waterMat.waterColor2 = new Color3(0.65, 0.85, 0.95)
+  waterMat.colorBlendFactor = 0.4
+  waterMat.alpha = 0.92
   for (const mesh of reflectMeshes) {
     waterMat.addToRenderList(mesh)
   }
@@ -91,9 +126,9 @@ export function createEnvironment(scene: Scene, mats: SceneMaterials): Environme
   scene.collisionsEnabled = true
 
   // Scene atmosphere
-  scene.clearColor = new Color4(0.93, 0.96, 0.98, 1)
+  scene.clearColor = new Color4(0.53, 0.81, 0.92, 1)
   scene.fogMode = Scene.FOGMODE_LINEAR
-  scene.fogColor = new Color3(0.93, 0.96, 0.98)
+  scene.fogColor = new Color3(0.7, 0.85, 0.95)
   scene.fogStart = 60
   scene.fogEnd = 100
 

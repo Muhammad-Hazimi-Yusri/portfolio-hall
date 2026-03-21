@@ -148,6 +148,24 @@ html, body, #root {
   overflow: hidden;
 }
 
+/* Scroll hint — chevrons bounce */
+@keyframes scrollHintBounce {
+  0%, 100% { transform: translateY(0); opacity: 0.6; }
+  50% { transform: translateY(10px); opacity: 1; }
+}
+.scroll-hint-chevrons {
+  animation: scrollHintBounce 2s ease-in-out infinite;
+}
+
+/* Scroll hint — mouse wheel dot */
+@keyframes scrollWheelMove {
+  0%, 100% { cy: 14; opacity: 1; }
+  50% { cy: 22; opacity: 0.3; }
+}
+.scroll-hint-mouse .scroll-hint-wheel {
+  animation: scrollWheelMove 2s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .fade-in-section { transition: none; }
   .card-lift { transition: none; }
@@ -155,4 +173,6 @@ html, body, #root {
   .poi-highlight-pulse { animation: none; }
   .timeline-dot { animation: none; opacity: 1; transform: scale(1); }
   .animate-bounce { animation: none; }
+  .scroll-hint-chevrons { animation: none; }
+  .scroll-hint-mouse .scroll-hint-wheel { animation: none; }
 }

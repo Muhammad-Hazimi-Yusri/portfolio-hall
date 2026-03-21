@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { ScrollController } from '@/components/tour/ScrollController'
-import { ScrollProgressBar } from '@/components/tour/ScrollProgressBar'
+import { TourNavBar } from '@/components/tour/TourNavBar'
 import { TourContent } from '@/components/tour/TourContent'
 import { TourCanvas } from '@/components/tour/TourCanvas'
 import { TourFallback } from '@/components/tour/TourFallback'
@@ -91,7 +91,7 @@ function TourApp() {
       {appView === 'tour' && (
         <ScrollController initialScrollProgress={exploreOrigin?.scrollProgress}>
           {webGLSupported && !force2d ? <TourCanvas /> : <TourFallback />}
-          <ScrollProgressBar />
+          <TourNavBar />
           <TourContent onExplore={handleExplore} />
         </ScrollController>
       )}

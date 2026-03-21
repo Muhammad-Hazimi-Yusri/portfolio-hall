@@ -4,21 +4,26 @@ import type { TourSection } from '@/data/tourSections'
 export interface ScrollContextValue {
   scrollProgress: number
   activeSection: TourSection | null
+  scrollToProgress: (progress: number) => void
 }
 
+const noop = () => {}
 const ScrollContext = createContext<ScrollContextValue | null>(null)
 
 export function ScrollProvider({
   scrollProgress,
   activeSection,
+  scrollToProgress,
   children,
 }: ScrollContextValue & { children: ReactNode }) {
   const value = useMemo(
-    () => ({ scrollProgress, activeSection }),
-    [scrollProgress, activeSection],
+    () => ({ scrollProgress, activeSection, scrollToProgress }),
+    [scrollProgress, activeSection, scrollToProgress],
   )
   return <ScrollContext.Provider value={value}>{children}</ScrollContext.Provider>
 }
+
+export { noop as scrollToProgressDefault }
 
 // eslint-disable-next-line react-refresh/only-export-components
 export function useScrollProgress(): ScrollContextValue {
