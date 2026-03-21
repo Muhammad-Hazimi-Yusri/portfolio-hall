@@ -7,7 +7,6 @@ export interface ScrollContextValue {
   scrollToProgress: (progress: number) => void
 }
 
-const noop = () => {}
 const ScrollContext = createContext<ScrollContextValue | null>(null)
 
 export function ScrollProvider({
@@ -22,8 +21,6 @@ export function ScrollProvider({
   )
   return <ScrollContext.Provider value={value}>{children}</ScrollContext.Provider>
 }
-
-export { noop as scrollToProgressDefault }
 
 // eslint-disable-next-line react-refresh/only-export-components
 export function useScrollProgress(): ScrollContextValue {
