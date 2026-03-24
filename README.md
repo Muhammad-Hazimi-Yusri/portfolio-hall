@@ -236,31 +236,45 @@ Glass-panel contrast on all tour content panels, ProgressStrip replacing Minimap
 
 ### Upcoming
 
-#### v3.0.0 — VR Hardening & Enhancement
-- [ ] End-to-end VR playtest on Quest
-- [ ] Bug triage and fix pass
-- [ ] VR comfort tuning
-- [ ] Performance profiling on-device
+#### v3.x — Gallery Content + Advanced Displays
 
-#### v3.1.0 — 3D Self-Portrait (Scan + Splat Avatar)
-- [ ] iPhone LiDAR self-scan (via Scaniverse/Polycam)
+##### v3.0.0 — Rich Gallery Wall
+- [ ] Project screenshots captured at 16:9, optimized for 3D textures
+- [ ] Animated slideshow on each gallery painting (cycles through 2-4 screenshots per project)
+- [ ] Texture loading pipeline with lazy loading and placeholder fallback
+- [ ] Slideshow timing and transition effects (crossfade or slide)
+- [ ] Thumbnail paths updated in pois.json
+
+##### v3.1.0 — 3D Self-Portrait (Scan + Splat Avatar)
+- [ ] iPhone LiDAR self-scan (via Polycam)
 - [ ] Low-poly mesh avatar (.glb) on arrival platform
-- [ ] Gaussian splat toggle using Babylon.js native GaussianSplattingMesh
+- [ ] Gaussian splat toggle using Babylon.js GaussianSplattingMesh
+- [ ] UI toggle between low-poly and splat with loading indicator
 - [ ] Graceful degradation (low-poly only on weak devices)
 
-#### v3.2.0 — Rich Project Displays
-- [ ] 3D slideshow panels for website projects
-- [ ] Gaussian splat displays for physical projects
-- [ ] Enhanced inspect modal
+##### v3.2.0 — Gaussian Splat Project Displays
+- [ ] LiDAR scans of physical projects (PetBot, stereo camera rig)
+- [ ] Gaussian splat rendering on pedestals in observatory zone
+- [ ] Per-project splat loading with progress indicator
+- [ ] Fallback to static thumbnail on weak devices
 
-#### v3.3.0 — Interactive Web Panels
-- [ ] Iframe-on-3D-plane for live website browsing
+##### v3.3.0 — Interactive Web Panels (Stretch)
+- [ ] Screenshot slideshow on 3D plane for website projects (v3.0.0 foundation extended with more frames and captions)
+- [ ] Iframe-on-3D-plane for live website browsing (desktop only, stretch goal)
+- [ ] DOM overlay positioned to match 3D plane projection
 - [ ] VR fallback to slideshow mode
 
-#### v3.4.0 — AI Integration
-- [ ] Visitor type detection
-- [ ] LLM integration
-- [ ] Dynamic content prioritization
+##### v3.4.0 — VR Hardening
+- [ ] End-to-end VR playtest on Quest Pro
+- [ ] Bug triage and fix pass from playtest findings
+- [ ] VR comfort tuning (vignette, snap turn, locomotion speed)
+- [ ] Performance profiling on-device (shadow maps, draw calls)
+- [ ] VR UX polish (panel placement, hover feedback, interaction range)
+
+#### v4.x — Future (Deferred)
+- [ ] AI visitor type detection
+- [ ] LLM integration for dynamic tour narration
+- [ ] Dynamic content prioritization based on visitor behavior
 
 ---
 
