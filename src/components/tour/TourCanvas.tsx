@@ -3,6 +3,8 @@ import { createEngine, createScene } from '@/3d/engine'
 import { createEnvironment } from '@/3d/scene'
 import { createSceneMaterials } from '@/3d/materials'
 import { createPOIMeshes } from '@/3d/pois'
+import { createSlideshow } from '@/3d/paintingSlideshow'
+import type { SlideshowInstance } from '@/3d/paintingSlideshow'
 import { createLights } from '@/3d/lights'
 import { loadAssets } from '@/3d/assetLoader'
 import type { LoadAssetsOptions } from '@/3d/assetLoader'
@@ -34,7 +36,7 @@ export function TourCanvas() {
     const scene = createScene(engine)
     const mats = createSceneMaterials(scene)
     const castle = createEnvironment(scene, mats)
-    const poiMeshes = createPOIMeshes(scene, poisData.pois as POI[])
+    const { meshMap: poiMeshes, slideshowTargets } = createPOIMeshes(scene, poisData.pois as POI[])
     const lights = createLights(scene, castle, poiMeshes)
 
     const loadOpts: LoadAssetsOptions = {
@@ -43,6 +45,17 @@ export function TourCanvas() {
       sceneMaterials: mats,
     }
     loadAssets(scene, loadOpts)
+
+    // Create painting slideshows (all active in tour mode — no distance pausing)
+    const slideshows: SlideshowInstance[] = slideshowTargets.map((target, i) =>
+      createSlideshow({
+        poiId: target.poi.id,
+        canvasMesh: target.mesh,
+        images: target.images,
+        scene,
+        delayMs: i * 400,
+      })
+    )
 
     // On-rail camera — no user input
     const initial = getCameraStateAtProgress(0)
@@ -74,6 +87,7 @@ export function TourCanvas() {
     window.addEventListener('resize', onResize)
 
     return () => {
+      slideshows.forEach(s => s.dispose())
       window.removeEventListener('resize', onResize)
       engine.stopRenderLoop()
       scene.dispose()

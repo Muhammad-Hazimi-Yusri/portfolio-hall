@@ -12,6 +12,7 @@ export type POILink = {
 export type POIContent = {
   title: string
   thumbnail: string
+  thumbnails?: string[]
   description: string
   storyHook?: string
   challenge?: string

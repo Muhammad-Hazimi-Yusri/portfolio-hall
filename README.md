@@ -5,7 +5,7 @@
 > A grand royal hall or throne room; the ceremonial heart of a palace where audiences are received and important gatherings held.
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
-[![Version](https://img.shields.io/badge/version-2.6.0-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-3.0.0-blue.svg)]()
 [![Status](https://img.shields.io/badge/status-In_Progress-yellow.svg)]()
 
 <details>
@@ -194,7 +194,7 @@ Z=0          Z=8                              Z=58        Z=68           Z=83-90
 ## Development Roadmap
 
 <details>
-<summary>Completed Versions (v0.1.0 – v2.6.0)</summary>
+<summary>Completed Versions (v0.1.0 – v3.0.0)</summary>
 
 #### v0.1.0 – v0.3.0 — Foundation
 Project scaffold, welcome gate, SVG floor plan fallback mode.
@@ -232,18 +232,14 @@ Frutiger Aero color system, open-air boardwalk museum over water, Space Grotesk 
 #### v2.6.0 — Launch Polish
 Glass-panel contrast on all tour content panels, ProgressStrip replacing Minimap, Space Grotesk font locked in, TODO placeholders replaced with real content, focus-visible styles, ARIA landmarks, prefers-reduced-motion CSS, legacy mode removed, dead code cleanup.
 
+#### v3.0.0 — Rich Gallery Wall
+Animated slideshow system for gallery paintings — each painting cycles through 2-4 project screenshots with crossfade transitions. Preloaded texture pipeline with per-image error handling, staggered start for performance, distance-based pausing in free-roam mode. Graceful degradation: 0 images → title card fallback, 1 → static, 2+ → animated crossfade.
+
 </details>
 
 ### Upcoming
 
 #### v3.x — Gallery Content + Advanced Displays
-
-##### v3.0.0 — Rich Gallery Wall
-- [ ] Project screenshots captured at 16:9, optimized for 3D textures
-- [ ] Animated slideshow on each gallery painting (cycles through 2-4 screenshots per project)
-- [ ] Texture loading pipeline with lazy loading and placeholder fallback
-- [ ] Slideshow timing and transition effects (crossfade or slide)
-- [ ] Thumbnail paths updated in pois.json
 
 ##### v3.1.0 — 3D Self-Portrait (Scan + Splat Avatar)
 - [ ] iPhone LiDAR self-scan (via Polycam)

@@ -37,7 +37,12 @@ function createSharedMaterials(scene: Scene) {
   return { frame, teak, teakLight, glass }
 }
 
-function createPaintingMesh(poi: POI, scene: Scene, mats: ReturnType<typeof createSharedMaterials>): Mesh {
+type PaintingResult = {
+  group: Mesh
+  slideshowTarget?: { mesh: Mesh; images: string[] }
+}
+
+function createPaintingMesh(poi: POI, scene: Scene, mats: ReturnType<typeof createSharedMaterials>): PaintingResult {
   const rad = (poi.rotation * Math.PI) / 180
   const group = new Mesh(`${poi.id}-group`, scene)
   group.position = new Vector3(poi.position.x, 1.65, poi.position.z)
@@ -97,7 +102,13 @@ function createPaintingMesh(poi: POI, scene: Scene, mats: ReturnType<typeof crea
   // Collision box for the whole painting
   group.checkCollisions = true
 
-  return group
+  // Return slideshow target if multiple thumbnails are available
+  const thumbnails = poi.content.thumbnails
+  const slideshowTarget = thumbnails && thumbnails.length >= 2
+    ? { mesh: canvas, images: thumbnails }
+    : undefined
+
+  return { group, slideshowTarget }
 }
 
 const FALLBACK_COLORS = [
@@ -124,7 +135,7 @@ function getInitials(title: string): string {
   return words.slice(0, 3).map(w => w[0]).join('').toUpperCase()
 }
 
-function applyFallbackTexture(mat: StandardMaterial, title: string, scene: Scene) {
+export function applyFallbackTexture(mat: StandardMaterial, title: string, scene: Scene) {
   const fallback = new DynamicTexture(`fallback-${title}`, { width: 512, height: 340 }, scene)
   const ctx = fallback.getContext() as unknown as CanvasRenderingContext2D
 
@@ -222,23 +233,35 @@ function createPedestalMesh(poi: POI, scene: Scene, mats: ReturnType<typeof crea
   return group
 }
 
-export function createPOIMeshes(scene: Scene, pois: POI[]) {
-  const meshes: Map<string, { mesh: Mesh; poi: POI }> = new Map()
+export type SlideshowTarget = { poi: POI; mesh: Mesh; images: string[] }
+
+export type POIMeshesResult = {
+  meshMap: Map<string, { mesh: Mesh; poi: POI }>
+  slideshowTargets: SlideshowTarget[]
+}
+
+export function createPOIMeshes(scene: Scene, pois: POI[]): POIMeshesResult {
+  const meshMap: Map<string, { mesh: Mesh; poi: POI }> = new Map()
+  const slideshowTargets: SlideshowTarget[] = []
   const mats = createSharedMaterials(scene)
 
   pois.forEach((poi) => {
     let mesh: Mesh
 
     if (poi.type === 'painting') {
-      mesh = createPaintingMesh(poi, scene, mats)
+      const result = createPaintingMesh(poi, scene, mats)
+      mesh = result.group
+      if (result.slideshowTarget) {
+        slideshowTargets.push({ poi, ...result.slideshowTarget })
+      }
     } else if (poi.type === 'display-case') {
       mesh = createDisplayCaseMesh(poi, scene, mats)
     } else {
       mesh = createPedestalMesh(poi, scene, mats)
     }
 
-    meshes.set(poi.id, { mesh, poi })
+    meshMap.set(poi.id, { mesh, poi })
   })
 
-  return meshes
+  return { meshMap, slideshowTargets }
 }

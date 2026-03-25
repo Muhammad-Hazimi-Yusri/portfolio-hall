@@ -10,8 +10,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- v3.0.0: VR hardening & enhancement
 - v3.1.0: 3D self-portrait (iPhone LiDAR scan, low-poly mesh + gaussian splat toggle)
+- v3.4.0: VR hardening & enhancement
+
+## [3.0.0] - 2026-03-25
+
+### Added
+- `thumbnails` field on `POIContent` for multi-image slideshows
+- `paintingSlideshow.ts` module with single-plane crossfade animation system
+- Staggered slideshow start (400ms offset per painting) for performance and visual wave effect
+- Distance-based slideshow pausing in free-roam mode (> 30 units from camera)
+- Preloaded texture pipeline with per-image error handling and graceful fallback
+- `thumbnails` arrays in `pois.json` for all 10 gallery painting POIs
+
+### Changed
+- `createPOIMeshes` returns `{ meshMap, slideshowTargets }` instead of bare Map
+- Painting canvases show animated slideshows when 2+ images available
+- Single-image paintings display static texture (existing behavior preserved)
+- `BabylonScene`, `TourCanvas`, and `CaptureMode` manage slideshow lifecycle (create + dispose)
+- `applyFallbackTexture` exported from `pois.ts` for reuse by slideshow module
 
 ## [2.6.0] - 2026-03-21
 

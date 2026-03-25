@@ -5,6 +5,8 @@ import { createLights } from './lights'
 import { createFirstPersonCamera } from './camera'
 import { setupPointerLock } from './pointerLock'
 import { createPOIMeshes } from './pois'
+import { createSlideshow } from './paintingSlideshow'
+import type { SlideshowInstance } from './paintingSlideshow'
 import { setupInteraction } from './interaction'
 import { createCameraRefDefault } from './cameraRef'
 import { flyToCinematic, getApproachPosition } from './flyTo'
@@ -207,7 +209,7 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress, initialC
     sceneRef.current = scene
 
     onLoadProgress?.(50, 'textures')
-    const poiMeshes = createPOIMeshes(scene, poisData.pois as POI[])
+    const { meshMap: poiMeshes, slideshowTargets } = createPOIMeshes(scene, poisData.pois as POI[])
     onLoadProgress?.(70, 'textures')
 
     const lights = createLights(scene, castle, poiMeshes)
@@ -221,6 +223,18 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress, initialC
     }
     loadAssetsOptionsRef.current = loadOpts
     loadAssets(scene, loadOpts)
+
+    // Create painting slideshows (staggered start, distance-based pausing)
+    const slideshows: SlideshowInstance[] = slideshowTargets.map((target, i) =>
+      createSlideshow({
+        poiId: target.poi.id,
+        canvasMesh: target.mesh,
+        images: target.images,
+        scene,
+        delayMs: i * 400,
+        camera,
+      })
+    )
 
     onLoadProgress?.(90, 'textures')
 
@@ -285,6 +299,7 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress, initialC
 
     return () => {
       unmounted = true
+      slideshows.forEach(s => s.dispose())
       cleanupHands?.()
       fpsCtr?.dispose()
       babylonCameraRef.current = null
