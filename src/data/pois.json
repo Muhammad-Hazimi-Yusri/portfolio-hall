@@ -5,13 +5,21 @@
       "type": "pedestal",
       "section": "about",
       "zone": "arrival",
-      "position": { "x": 0, "z": 0 },
+      "position": {
+        "x": 0,
+        "z": 0
+      },
       "rotation": 180,
       "content": {
         "title": "About Me",
         "thumbnail": "/thumbnails/placeholder.png",
         "description": "MEng Electrical & Electronic Engineering from the University of Southampton (First Class Honours). UK-based with graduate visa until October 2027 — no sponsorship needed, willing to relocate. I build immersive experiences, from VR apps to full-stack web platforms.",
-        "tags": ["MEng EEE", "First Class", "UK Graduate Visa", "Full-Stack"]
+        "tags": [
+          "MEng EEE",
+          "First Class",
+          "UK Graduate Visa",
+          "Full-Stack"
+        ]
       }
     },
     {
@@ -19,18 +27,36 @@
       "type": "pedestal",
       "section": "contact",
       "zone": "horizon",
-      "position": { "x": 0, "z": 85 },
+      "position": {
+        "x": 0,
+        "z": 85
+      },
       "rotation": 0,
       "content": {
         "title": "Contact",
         "thumbnail": "/thumbnails/placeholder.png",
         "description": "Get in touch — I'm open to opportunities in software engineering, XR development, and creative tech.",
         "links": [
-          { "label": "Email", "url": "mailto:muhammadhazimiyusri@gmail.com" },
-          { "label": "LinkedIn", "url": "https://linkedin.com/in/muhammadhazimiyusri" },
-          { "label": "GitHub", "url": "https://github.com/Muhammad-Hazimi-Yusri" },
-          { "label": "GitLab", "url": "https://git.soton.ac.uk/mhby1g21" },
-          { "label": "Website", "url": "https://muhammadhazimiyusri.uk" }
+          {
+            "label": "Email",
+            "url": "mailto:muhammadhazimiyusri@gmail.com"
+          },
+          {
+            "label": "LinkedIn",
+            "url": "https://linkedin.com/in/muhammadhazimiyusri"
+          },
+          {
+            "label": "GitHub",
+            "url": "https://github.com/Muhammad-Hazimi-Yusri"
+          },
+          {
+            "label": "GitLab",
+            "url": "https://git.soton.ac.uk/mhby1g21"
+          },
+          {
+            "label": "Website",
+            "url": "https://muhammadhazimiyusri.uk"
+          }
         ]
       }
     },
@@ -39,15 +65,27 @@
       "type": "pedestal",
       "section": "experience",
       "zone": "observatory",
-      "position": { "x": -3, "z": 65 },
+      "position": {
+        "x": -3,
+        "z": 65
+      },
       "rotation": 0,
       "content": {
         "title": "Audioscenic — Intern",
         "thumbnail": "/thumbnails/placeholder.png",
         "description": "Developed Python tool for multi-channel audio analysis interfacing with embedded devices. Increased test coverage from ~30% to 85% using PyTest with TDD/BDD practices. Applied WebSocket for real-time communication and multiprocessing for concurrent audio stream handling.",
-        "tags": ["Python", "PyTest", "WebSocket", "PySerial", "GitLab"],
+        "tags": [
+          "Python",
+          "PyTest",
+          "WebSocket",
+          "PySerial",
+          "GitLab"
+        ],
         "links": [
-          { "label": "Audioscenic", "url": "https://audioscenic.com" }
+          {
+            "label": "Audioscenic",
+            "url": "https://audioscenic.com"
+          }
         ]
       }
     },
@@ -56,13 +94,22 @@
       "type": "pedestal",
       "section": "experience",
       "zone": "observatory",
-      "position": { "x": 3, "z": 65 },
+      "position": {
+        "x": 3,
+        "z": 65
+      },
       "rotation": 0,
       "content": {
         "title": "Southampton — Research Asst.",
         "thumbnail": "/thumbnails/placeholder.png",
         "description": "Refined ML pipeline for VR scene reconstruction (EdgeNet360). Adapted ML models for 360° image processing and implemented VR scene rendering in Unity with Steam Audio. Created custom audio recording system for room impulse response and developed acoustic evaluation methods in MATLAB.",
-        "tags": ["Unity", "Python", "MATLAB", "Steam Audio", "EdgeNet360"]
+        "tags": [
+          "Unity",
+          "Python",
+          "MATLAB",
+          "Steam Audio",
+          "EdgeNet360"
+        ]
       }
     },
     {
@@ -70,11 +117,14 @@
       "type": "painting",
       "section": "projects",
       "zone": "gallery",
-      "position": { "x": -4.5, "z": 10 },
+      "position": {
+        "x": -4.5,
+        "z": 10
+      },
       "rotation": 90,
       "content": {
         "title": "EEE Roadmap",
-        "thumbnail": "/thumbnails/placeholder.png",
+        "thumbnail": "/thumbnails/eee-roadmap-1.webp",
         "thumbnails": [
           "/thumbnails/eee-roadmap-1.webp",
           "/thumbnails/eee-roadmap-2.webp",
@@ -85,10 +135,23 @@
         "challenge": "EEE students at Southampton had no clear visual map of how 50+ topics connected across years. Module guides were scattered PDFs. I built the tool I wished I'd had in year one.",
         "approach": "Interactive graph with Cytoscape.js showing topic dependencies, progress tracking with cross-device sync via Supabase + Google OAuth, shipped as a fast static site with Astro. 43+ unit and E2E tests.",
         "outcome": "Adopted by coursemates. Open-sourced on GitHub. The project sharpened my instinct for product decisions — knowing when a feature is genuinely useful vs. just technically interesting.",
-        "tags": ["Astro", "TypeScript", "TailwindCSS", "Supabase", "Cytoscape.js", "Vitest"],
+        "tags": [
+          "Astro",
+          "TypeScript",
+          "TailwindCSS",
+          "Supabase",
+          "Cytoscape.js",
+          "Vitest"
+        ],
         "links": [
-          { "label": "GitHub", "url": "https://github.com/Muhammad-Hazimi-Yusri/eee-roadmap" },
-          { "label": "Live", "url": "https://eee-roadmap.muhammadhazimiyusri.uk" }
+          {
+            "label": "GitHub",
+            "url": "https://github.com/Muhammad-Hazimi-Yusri/eee-roadmap"
+          },
+          {
+            "label": "Live",
+            "url": "https://eee-roadmap.muhammadhazimiyusri.uk"
+          }
         ]
       }
     },
@@ -97,11 +160,14 @@
       "type": "painting",
       "section": "projects",
       "zone": "gallery",
-      "position": { "x": -4.5, "z": 15.1 },
+      "position": {
+        "x": -4.5,
+        "z": 15.1
+      },
       "rotation": 90,
       "content": {
         "title": "Food Wars (食戟)",
-        "thumbnail": "/thumbnails/placeholder.png",
+        "thumbnail": "/thumbnails/food-wars-1.webp",
         "thumbnails": [
           "/thumbnails/food-wars-1.webp",
           "/thumbnails/food-wars-2.webp",
@@ -112,10 +178,23 @@
         "challenge": "Existing kitchen inventory tools are either desktop-only, ugly, or overkill for a shared household. I wanted something that felt like a real product — fast, mobile-friendly, and actually pleasant to use.",
         "approach": "Grocy-compatible PostgreSQL schema with Supabase RLS, drag-and-drop tables, product image uploads, and dual auth. A Japanese diner aesthetic makes the mundane task of tracking groceries feel like a game.",
         "outcome": "A fully functional inventory app live in production. The project pushed my Next.js 14 and Tailwind CSS 4 knowledge to production quality.",
-        "tags": ["Next.js 14", "TypeScript", "Tailwind CSS 4", "Supabase", "shadcn/ui", "Vercel"],
+        "tags": [
+          "Next.js 14",
+          "TypeScript",
+          "Tailwind CSS 4",
+          "Supabase",
+          "shadcn/ui",
+          "Vercel"
+        ],
         "links": [
-          { "label": "GitHub", "url": "https://github.com/Muhammad-Hazimi-Yusri/food-wars" },
-          { "label": "Live", "url": "https://food-wars.muhammadhazimiyusri.uk" }
+          {
+            "label": "GitHub",
+            "url": "https://github.com/Muhammad-Hazimi-Yusri/food-wars"
+          },
+          {
+            "label": "Live",
+            "url": "https://food-wars.muhammadhazimiyusri.uk"
+          }
         ]
       }
     },
@@ -124,11 +203,14 @@
       "type": "painting",
       "section": "projects",
       "zone": "gallery",
-      "position": { "x": -4.5, "z": 20.2 },
+      "position": {
+        "x": -4.5,
+        "z": 20.2
+      },
       "rotation": 90,
       "content": {
         "title": "Portfolio Hall (This!)",
-        "thumbnail": "/thumbnails/placeholder.png",
+        "thumbnail": "/thumbnails/portfolio-hall-1.webp",
         "thumbnails": [
           "/thumbnails/portfolio-hall-1.webp",
           "/thumbnails/portfolio-hall-2.webp",
@@ -139,10 +221,22 @@
         "challenge": "Most portfolios are read — scanned for keywords in 30 seconds. I wanted mine to be experienced: a place where the work itself becomes the environment.",
         "approach": "Built a 3D museum in the browser with Babylon.js — procedural environment generation, spatial audio cues, collision detection, and three control schemes for desktop, mobile, and VR. The 2D fallback mirrors the pathway map.",
         "outcome": "A portfolio that recruiters remember by name. Every technical decision — gyroscope camera, minimap, WebXR — became a story in its own right.",
-        "tags": ["React", "Babylon.js", "TypeScript", "Vite", "Tailwind CSS"],
+        "tags": [
+          "React",
+          "Babylon.js",
+          "TypeScript",
+          "Vite",
+          "Tailwind CSS"
+        ],
         "links": [
-          { "label": "GitHub", "url": "https://github.com/Muhammad-Hazimi-Yusri/portfolio-hall" },
-          { "label": "Live", "url": "https://muhammad-hazimi-yusri.github.io/portfolio-hall" }
+          {
+            "label": "GitHub",
+            "url": "https://github.com/Muhammad-Hazimi-Yusri/portfolio-hall"
+          },
+          {
+            "label": "Live",
+            "url": "https://muhammad-hazimi-yusri.github.io/portfolio-hall"
+          }
         ]
       }
     },
@@ -151,19 +245,29 @@
       "type": "painting",
       "section": "projects",
       "zone": "gallery",
-      "position": { "x": -4.5, "z": 25.3 },
+      "position": {
+        "x": -4.5,
+        "z": 25.3
+      },
       "rotation": 90,
       "content": {
         "title": "Claude Refresher Orb",
-        "thumbnail": "/thumbnails/placeholder.png",
+        "thumbnail": "/thumbnails/claude-refresher-orb-1.webp",
         "thumbnails": [
-          "/thumbnails/claude-refresher-orb-1.webp",
-          "/thumbnails/claude-refresher-orb-2.webp"
+          "/thumbnails/claude-refresher-orb-1.webp"
         ],
         "description": "Cross-platform mobile app to track Claude AI usage limits with proactive alarm notifications when the 5-hour rolling window resets. Designed notification system with reset alarms, daily kickstart, and manual countdown timer.",
-        "tags": ["Flutter", "Dart", "Swift", "Local Notifications"],
+        "tags": [
+          "Flutter",
+          "Dart",
+          "Swift",
+          "Local Notifications"
+        ],
         "links": [
-          { "label": "GitHub", "url": "https://github.com/Muhammad-Hazimi-Yusri/claude-refresher-orb" }
+          {
+            "label": "GitHub",
+            "url": "https://github.com/Muhammad-Hazimi-Yusri/claude-refresher-orb"
+          }
         ]
       }
     },
@@ -172,7 +276,10 @@
       "type": "painting",
       "section": "projects",
       "zone": "gallery",
-      "position": { "x": -4.5, "z": 30.4 },
+      "position": {
+        "x": -4.5,
+        "z": 30.4
+      },
       "rotation": 90,
       "content": {
         "title": "Home Server",
@@ -182,7 +289,14 @@
           "/thumbnails/home-server-2.webp"
         ],
         "description": "Personal media and photo management serving a household of 4 with 20TB storage. Deployed containerised apps (Plex, Immich, JellyFin) on Linux with DLNA streaming to VR headsets and various devices.",
-        "tags": ["Docker", "Linux", "Plex", "Immich", "DLNA", "Networking"]
+        "tags": [
+          "Docker",
+          "Linux",
+          "Plex",
+          "Immich",
+          "DLNA",
+          "Networking"
+        ]
       }
     },
     {
@@ -190,11 +304,14 @@
       "type": "painting",
       "section": "projects",
       "zone": "gallery",
-      "position": { "x": -4.5, "z": 35.6 },
+      "position": {
+        "x": -4.5,
+        "z": 35.6
+      },
       "rotation": 90,
       "content": {
         "title": "PetBot",
-        "thumbnail": "/thumbnails/placeholder.png",
+        "thumbnail": "/thumbnails/petbot-1.webp",
         "thumbnails": [
           "/thumbnails/petbot-1.webp",
           "/thumbnails/petbot-2.webp",
@@ -205,9 +322,19 @@
         "challenge": "Smart home devices are either cloud-dependent or expensive. I wanted a companion robot with a real LLM on-device — no internet required, no data leaving the house.",
         "approach": "Integrated Ollama on a Raspberry Pi 5 for local inference, built a Flask + Socket.IO server for real-time control, designed and 3D-printed the chassis, added TTS (Piper) and STT (Vosk) for voice interaction.",
         "outcome": "PetBot responds to voice, holds conversation, and moves around — entirely offline. A proof that consumer hardware is now powerful enough for meaningful AI at the edge.",
-        "tags": ["Raspberry Pi 5", "Python", "Flask", "Ollama", "Socket.IO", "3D Printing"],
+        "tags": [
+          "Raspberry Pi 5",
+          "Python",
+          "Flask",
+          "Ollama",
+          "Socket.IO",
+          "3D Printing"
+        ],
         "links": [
-          { "label": "Demo", "url": "https://youtu.be/3umn0yt_FcE" }
+          {
+            "label": "Demo",
+            "url": "https://youtu.be/3umn0yt_FcE"
+          }
         ]
       }
     },
@@ -216,11 +343,14 @@
       "type": "painting",
       "section": "projects",
       "zone": "gallery",
-      "position": { "x": -4.5, "z": 40.7 },
+      "position": {
+        "x": -4.5,
+        "z": 40.7
+      },
       "rotation": 90,
       "content": {
         "title": "AVVR — VR Audio-Visual",
-        "thumbnail": "/thumbnails/placeholder.png",
+        "thumbnail": "/thumbnails/avvr-1.webp",
         "thumbnails": [
           "/thumbnails/avvr-1.webp",
           "/thumbnails/avvr-2.webp",
@@ -231,10 +361,22 @@
         "challenge": "Spatial audio in VR is notoriously hard to get right — most implementations feel pasted on. Our final-year project aimed to reconstruct real-world scenes with accurate acoustic behaviour.",
         "approach": "Led a team of 6 across Unity VR, ML pipeline, and acoustic evaluation. Integrated Steam Audio for physics-based reverb, redesigned the ML pipeline GUI with PyQt6, and developed a custom room impulse response recording system.",
         "outcome": "Scored 84%. Presented to industry judges. The project demonstrated that photorealistic 3D reconstruction and spatial audio can be achieved together on consumer hardware.",
-        "tags": ["Unity", "C#", "Steam Audio", "PyQt6", "Python"],
+        "tags": [
+          "Unity",
+          "C#",
+          "Steam Audio",
+          "PyQt6",
+          "Python"
+        ],
         "links": [
-          { "label": "Itch.io", "url": "https://chronohaxx.itch.io/avvr" },
-          { "label": "Resources", "url": "https://linktr.ee/gdp4" }
+          {
+            "label": "Itch.io",
+            "url": "https://chronohaxx.itch.io/avvr"
+          },
+          {
+            "label": "Resources",
+            "url": "https://linktr.ee/gdp4"
+          }
         ]
       }
     },
@@ -243,26 +385,45 @@
       "type": "painting",
       "section": "projects",
       "zone": "gallery",
-      "position": { "x": -4.5, "z": 45.8 },
+      "position": {
+        "x": -4.5,
+        "z": 45.8
+      },
       "rotation": 90,
       "content": {
         "title": "DIY Stereo Camera",
-        "thumbnail": "/thumbnails/placeholder.png",
+        "thumbnail": "/thumbnails/diy-stereo-camera-1.webp",
         "thumbnails": [
           "/thumbnails/diy-stereo-camera-1.webp",
           "/thumbnails/diy-stereo-camera-2.webp",
-          "/thumbnails/diy-stereo-camera-3.webp"
+          "/thumbnails/diy-stereo-camera-3.webp",
+          "/thumbnails/diy-stereo-camera-4.webp"
         ],
         "description": "Low-cost stereoscopic camera for 3D video capture with VR viewer. Designed hardware with Raspberry Pi 5 and dual cameras, developed stereo processing pipeline, and created VR 6DOF viewing app in Godot 4.",
         "storyHook": "Building eyes that see in 3D for under £100.",
         "challenge": "Commercial 3D cameras cost thousands. I wanted to capture stereoscopic video and view it in VR — without spending a month's rent.",
         "approach": "Designed a Raspberry Pi 5 rig with dual CSI cameras, built a stereo processing pipeline with OpenCV for depth estimation and 3D-180° video, then created a VR viewing app in Godot 4 with 6DOF playback.",
         "outcome": "Functional stereoscopic capture and VR viewing on a tight budget. Submitted as my final-year individual project — open-source and documented for others to replicate.",
-        "tags": ["Raspberry Pi 5", "Godot 4", "GDScript", "OpenCV", "3D Printing"],
+        "tags": [
+          "Raspberry Pi 5",
+          "Godot 4",
+          "GDScript",
+          "OpenCV",
+          "3D Printing"
+        ],
         "links": [
-          { "label": "GitHub", "url": "https://github.com/Muhammad-Hazimi-Yusri/COMP3200" },
-          { "label": "Pipeline Demo", "url": "https://youtu.be/AcH3xw2EPmc" },
-          { "label": "VR Demo", "url": "https://youtu.be/MtZ8gLKz6AU" }
+          {
+            "label": "GitHub",
+            "url": "https://github.com/Muhammad-Hazimi-Yusri/COMP3200"
+          },
+          {
+            "label": "Pipeline Demo",
+            "url": "https://youtu.be/AcH3xw2EPmc"
+          },
+          {
+            "label": "VR Demo",
+            "url": "https://youtu.be/MtZ8gLKz6AU"
+          }
         ]
       }
     },
@@ -271,17 +432,25 @@
       "type": "painting",
       "section": "projects",
       "zone": "gallery",
-      "position": { "x": -4.5, "z": 50.9 },
+      "position": {
+        "x": -4.5,
+        "z": 50.9
+      },
       "rotation": 90,
       "content": {
         "title": "Medical EMG Control",
-        "thumbnail": "/thumbnails/placeholder.png",
+        "thumbnail": "/thumbnails/medical-emg-1.webp",
         "thumbnails": [
           "/thumbnails/medical-emg-1.webp",
           "/thumbnails/medical-emg-2.webp"
         ],
         "description": "EMG signal processing for robotic hand control. Developed processing pipeline for finger control, integrated Delsys Trigno sensors with real-time acquisition. Created Random Forest classifier (72% accuracy). Extended with wheelchair integration for assistive robotics. Scored 84%.",
-        "tags": ["Python", "Delsys Trigno", "scikit-learn", "Signal Processing"]
+        "tags": [
+          "Python",
+          "Delsys Trigno",
+          "scikit-learn",
+          "Signal Processing"
+        ]
       }
     },
     {
@@ -289,7 +458,10 @@
       "type": "painting",
       "section": "projects",
       "zone": "gallery",
-      "position": { "x": -4.5, "z": 56 },
+      "position": {
+        "x": -4.5,
+        "z": 56
+      },
       "rotation": 90,
       "content": {
         "title": "StormMed Smart Meter",
@@ -299,7 +471,12 @@
           "/thumbnails/stormed-2.webp"
         ],
         "description": "Autonomous smart electricity meter managing renewable power sources for disaster recovery field hospital. Led system integration and ran LabVIEW simulation achieving 71.8% score. Team of 6, scored 71%.",
-        "tags": ["LabVIEW", "Embedded C", "AVR", "Power Electronics"]
+        "tags": [
+          "LabVIEW",
+          "Embedded C",
+          "AVR",
+          "Power Electronics"
+        ]
       }
     },
     {
@@ -307,13 +484,25 @@
       "type": "display-case",
       "section": "skills",
       "zone": "observatory",
-      "position": { "x": 0, "z": 68 },
+      "position": {
+        "x": 0,
+        "z": 68
+      },
       "rotation": 180,
       "content": {
         "title": "Skills & Tech",
         "thumbnail": "/thumbnails/placeholder.png",
         "description": "Expert: Python. Proficient: C++, C#, JS/TS, MATLAB. Familiar: Java, Dart, GDScript, embedded C. Frameworks: React, Next.js, Astro, Flask, Unity, Godot, Babylon.js, Flutter. DevOps: Docker, GitHub Actions, Cloudflare, Supabase, Vercel. Hardware: Raspberry Pi, Arduino, ESP32.",
-        "tags": ["Python", "TypeScript", "React", "Unity", "Docker", "Raspberry Pi", "Flutter", "Next.js"]
+        "tags": [
+          "Python",
+          "TypeScript",
+          "React",
+          "Unity",
+          "Docker",
+          "Raspberry Pi",
+          "Flutter",
+          "Next.js"
+        ]
       }
     },
     {
@@ -321,14 +510,23 @@
       "type": "pedestal",
       "section": "hackathons",
       "zone": "observatory",
-      "position": { "x": -4, "z": 71 },
+      "position": {
+        "x": -4,
+        "z": 71
+      },
       "rotation": 180,
       "content": {
         "title": "Kibo Robot Challenge",
         "thumbnail": "/thumbnails/placeholder.png",
         "description": "7th place International Final (represented Malaysia). 1st place Malaysia 2023 (OpenCV ArUco detection). 2nd place Malaysia 2022 (RM1000 prize). Developed 3D pathfinding for ISS simulation using quadtrees.",
         "storyHook": "🏆 7th place internationally — representing Malaysia at the NASA Kibo Robot Challenge",
-        "tags": ["Java", "Android", "OpenCV", "ArUco", "Pathfinding"]
+        "tags": [
+          "Java",
+          "Android",
+          "OpenCV",
+          "ArUco",
+          "Pathfinding"
+        ]
       }
     },
     {
@@ -336,13 +534,20 @@
       "type": "pedestal",
       "section": "hackathons",
       "zone": "observatory",
-      "position": { "x": 0, "z": 72 },
+      "position": {
+        "x": 0,
+        "z": 72
+      },
       "rotation": 180,
       "content": {
         "title": "RoboHack 2024 & 2025",
         "thumbnail": "/thumbnails/placeholder.png",
         "description": "University of Southampton robotics hackathon. Competed in 2024 and 2025 editions using Python robotics API for autonomous robot control and navigation challenges.",
-        "tags": ["Python", "Robotics", "Hackathon"]
+        "tags": [
+          "Python",
+          "Robotics",
+          "Hackathon"
+        ]
       }
     },
     {
@@ -350,17 +555,31 @@
       "type": "pedestal",
       "section": "hackathons",
       "zone": "observatory",
-      "position": { "x": 4, "z": 71 },
+      "position": {
+        "x": 4,
+        "z": 71
+      },
       "rotation": 180,
       "content": {
         "title": "Global Game Jam 2025",
         "thumbnail": "/thumbnails/placeholder.png",
         "description": "48-hour game development hackathon at Southampton. Developed an asymmetrical VR puzzle game with Unity in a team of 3 — VR player in a submarine, PC player helping navigate.",
         "storyHook": "🎮 An asymmetric VR puzzle game built in 48 hours at Global Game Jam 2025",
-        "tags": ["Unity", "VR", "C#", "Game Dev"],
+        "tags": [
+          "Unity",
+          "VR",
+          "C#",
+          "Game Dev"
+        ],
         "links": [
-          { "label": "GitHub", "url": "https://github.com/Muhammad-Hazimi-Yusri/GGJ25" },
-          { "label": "GGJ Page", "url": "https://globalgamejam.org/games/2025/under-pressure-9" }
+          {
+            "label": "GitHub",
+            "url": "https://github.com/Muhammad-Hazimi-Yusri/GGJ25"
+          },
+          {
+            "label": "GGJ Page",
+            "url": "https://globalgamejam.org/games/2025/under-pressure-9"
+          }
         ]
       }
     },
@@ -369,13 +588,20 @@
       "type": "pedestal",
       "section": "hackathons",
       "zone": "observatory",
-      "position": { "x": -2, "z": 73 },
+      "position": {
+        "x": -2,
+        "z": 73
+      },
       "rotation": 180,
       "content": {
         "title": "AI Hackathon 2022",
         "thumbnail": "/thumbnails/placeholder.png",
         "description": "University of Southampton AI hackathon. Early exploration into machine learning and AI application development during first year of studies.",
-        "tags": ["AI", "Machine Learning", "Hackathon"]
+        "tags": [
+          "AI",
+          "Machine Learning",
+          "Hackathon"
+        ]
       }
     }
   ]

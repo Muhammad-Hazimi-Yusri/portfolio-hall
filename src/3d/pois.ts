@@ -59,7 +59,8 @@ function createPaintingMesh(poi: POI, scene: Scene, mats: ReturnType<typeof crea
   canvasMat.emissiveColor = new Color3(0.03, 0.03, 0.03)
 
   if (poi.content.thumbnail) {
-    const tex = new Texture(poi.content.thumbnail, scene, false, false)
+    const tex = new Texture(poi.content.thumbnail, scene, false, true)
+    tex.uScale = -1
     canvasMat.diffuseTexture = tex
     tex.onLoadObservable.addOnce(() => {
       // texture loaded successfully

@@ -109,7 +109,8 @@ export function createSlideshow(config: SlideshowConfig): SlideshowInstance {
   const totalCount = images.length
 
   images.forEach((path) => {
-    const tex = new Texture(path, scene, false, false)
+    const tex = new Texture(path, scene, false, true)
+    tex.uScale = -1
     tex.onLoadObservable.addOnce(() => {
       if (disposed) { tex.dispose(); return }
       loadedTextures.push(tex)
