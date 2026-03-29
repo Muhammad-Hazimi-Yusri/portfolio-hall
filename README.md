@@ -5,7 +5,7 @@
 > A grand royal hall or throne room; the ceremonial heart of a palace where audiences are received and important gatherings held.
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
-[![Version](https://img.shields.io/badge/version-3.0.0-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-3.1.0-blue.svg)]()
 [![Status](https://img.shields.io/badge/status-In_Progress-yellow.svg)]()
 
 <details>
@@ -235,18 +235,14 @@ Glass-panel contrast on all tour content panels, ProgressStrip replacing Minimap
 #### v3.0.0 — Rich Gallery Wall
 Animated slideshow system for gallery paintings — each painting cycles through 2-4 project screenshots with crossfade transitions. Preloaded texture pipeline with per-image error handling, staggered start for performance, distance-based pausing in free-roam mode. Graceful degradation: 0 images → title card fallback, 1 → static, 2+ → animated crossfade.
 
+#### v3.1.0 — 3D Self-Portrait (Scan + Splat Avatar)
+Avatar display system on arrival platform with three-tier degradation: gaussian splat (lazy-loaded on toggle) → low-poly GLB mesh (default) → procedural placeholder. AvatarToggle UI for switching between mesh and splat in free-roam mode. Lazy splat loading saves bandwidth for visitors who never toggle.
+
 </details>
 
 ### Upcoming
 
 #### v3.x — Gallery Content + Advanced Displays
-
-##### v3.1.0 — 3D Self-Portrait (Scan + Splat Avatar)
-- [ ] iPhone LiDAR self-scan (via Polycam)
-- [ ] Low-poly mesh avatar (.glb) on arrival platform
-- [ ] Gaussian splat toggle using Babylon.js GaussianSplattingMesh
-- [ ] UI toggle between low-poly and splat with loading indicator
-- [ ] Graceful degradation (low-poly only on weak devices)
 
 ##### v3.2.0 — Gaussian Splat Project Displays
 - [ ] LiDAR scans of physical projects (PetBot, stereo camera rig)

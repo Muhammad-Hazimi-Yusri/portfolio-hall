@@ -10,8 +10,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- v3.1.0: 3D self-portrait (iPhone LiDAR scan, low-poly mesh + gaussian splat toggle)
 - v3.4.0: VR hardening & enhancement
+
+## [3.1.0] - 2026-03-26
+
+### Added
+- Avatar display system on arrival platform with three-tier degradation (gaussian splat → low-poly mesh → procedural placeholder)
+- `avatarConfig.ts` for centralized position/scale/offset tuning
+- `avatarLoader.ts` with `loadAvatar()` function, procedural humanoid placeholder, and lazy-loaded gaussian splat support
+- `AvatarToggle` UI component for switching between mesh and splat views in free-roam mode
+- SPLAT file loader registration via dynamic `import('@babylonjs/loaders/SPLAT')` (only fetched on first toggle)
+- `.splat` MIME type support in Vite dev server (`assetMimePlugin`)
+- `public/assets/avatar/` directory with test splat and scanning instructions
+- `docs/AVATAR_GUIDE.md` with LiDAR scanning workflow, export instructions, and configuration guide
+
+### Changed
+- `BabylonScene.tsx` loads avatar on arrival platform with toggle state management and cleanup
+- `TourCanvas.tsx` loads mesh-only avatar (no splat toggle during scroll tour)
+- Renamed `glbMimePlugin` to `assetMimePlugin` in `vite.config.ts` to reflect broader scope
 
 ## [3.0.0] - 2026-03-25
 

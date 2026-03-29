@@ -8,6 +8,8 @@ import type { SlideshowInstance } from '@/3d/paintingSlideshow'
 import { createLights } from '@/3d/lights'
 import { loadAssets } from '@/3d/assetLoader'
 import type { LoadAssetsOptions } from '@/3d/assetLoader'
+import { loadAvatar } from '@/3d/avatarLoader'
+import type { AvatarInstance } from '@/3d/avatarLoader'
 import { getCameraStateAtProgress } from '@/3d/tourPath'
 import { useScrollProgress } from '@/contexts/ScrollContext'
 import { isMobile } from '@/utils/detection'
@@ -45,6 +47,12 @@ export function TourCanvas() {
       sceneMaterials: mats,
     }
     loadAssets(scene, loadOpts)
+
+    // Load avatar on arrival platform (mesh-only, no splat toggle in tour)
+    let avatarInstance: AvatarInstance | null = null
+    loadAvatar(scene, mats).then(instance => {
+      avatarInstance = instance
+    })
 
     // Create painting slideshows (all active in tour mode — no distance pausing)
     const slideshows: SlideshowInstance[] = slideshowTargets.map((target, i) =>
@@ -88,6 +96,7 @@ export function TourCanvas() {
 
     return () => {
       slideshows.forEach(s => s.dispose())
+      avatarInstance?.dispose()
       window.removeEventListener('resize', onResize)
       engine.stopRenderLoop()
       scene.dispose()

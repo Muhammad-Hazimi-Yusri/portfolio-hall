@@ -26,9 +26,12 @@ import type { Scene as BabylonScene_ } from '@babylonjs/core/scene'
 import type { WebXRDefaultExperience } from '@babylonjs/core/XR/webXRDefaultExperience'
 import { WebXRState } from '@babylonjs/core/XR/webXRTypes'
 import { isMobile } from '@/utils/detection'
+import { loadAvatar } from './avatarLoader'
+import type { AvatarInstance } from './avatarLoader'
 import { MobileControls } from '@/components/MobileControls'
 import { ProgressStrip } from '@/components/ProgressStrip'
 import { ThreeDSidebar } from '@/components/ThreeDSidebar'
+import { AvatarToggle } from '@/components/AvatarToggle'
 
 type BabylonSceneProps = {
   onInspect: (poi: POI) => void
@@ -68,6 +71,15 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress, initialC
   const [isVRSupported, setIsVRSupported] = useState(false)
   const [isInVR, setIsInVR] = useState(false)
   const xrExperienceRef = useRef<WebXRDefaultExperience | null>(null)
+
+  // Avatar state
+  const avatarRef = useRef<AvatarInstance | null>(null)
+  const [avatarState, setAvatarState] = useState<{
+    loaded: boolean
+    mode: 'mesh' | 'splat'
+    splatAvailable: boolean
+    splatLoading: boolean
+  }>({ loaded: false, mode: 'mesh', splatAvailable: false, splatLoading: false })
 
   useEffect(() => {
     const handleResize = () => setIsPortrait(window.innerHeight > window.innerWidth)
@@ -182,6 +194,16 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress, initialC
     await xrExperienceRef.current?.baseExperience.exitXRAsync()
   }, [])
 
+  const handleAvatarToggle = useCallback(() => {
+    const av = avatarRef.current
+    if (!av) return
+    if (av.getMode() === 'mesh') {
+      av.showSplat()
+    } else {
+      av.showMesh()
+    }
+  }, [])
+
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
@@ -223,6 +245,28 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress, initialC
     }
     loadAssetsOptionsRef.current = loadOpts
     loadAssets(scene, loadOpts)
+
+    // Load avatar on arrival platform
+    loadAvatar(scene, mats, {
+      onModeChange: (mode) => {
+        if (!unmounted) setAvatarState(prev => ({ ...prev, mode }))
+      },
+      onSplatLoadStart: () => {
+        if (!unmounted) setAvatarState(prev => ({ ...prev, splatLoading: true }))
+      },
+      onSplatLoadEnd: () => {
+        if (!unmounted) setAvatarState(prev => ({ ...prev, splatLoading: false }))
+      },
+    }).then(instance => {
+      if (unmounted) { instance?.dispose(); return }
+      avatarRef.current = instance
+      setAvatarState({
+        loaded: true,
+        mode: instance?.getMode() ?? 'mesh',
+        splatAvailable: instance?.isSplatAvailable() ?? false,
+        splatLoading: false,
+      })
+    })
 
     // Create painting slideshows (staggered start, distance-based pausing)
     const slideshows: SlideshowInstance[] = slideshowTargets.map((target, i) =>
@@ -300,6 +344,8 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress, initialC
     return () => {
       unmounted = true
       slideshows.forEach(s => s.dispose())
+      avatarRef.current?.dispose()
+      avatarRef.current = null
       cleanupHands?.()
       fpsCtr?.dispose()
       babylonCameraRef.current = null
@@ -349,6 +395,15 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress, initialC
           onTeleport={handleTeleport}
           onTeleportToPOI={handleTeleportToPOI}
           isPortrait={isPortrait}
+        />
+      )}
+
+      {!isInVR && avatarState.loaded && (
+        <AvatarToggle
+          mode={avatarState.mode}
+          splatAvailable={avatarState.splatAvailable}
+          splatLoading={avatarState.splatLoading}
+          onToggle={handleAvatarToggle}
         />
       )}
 
