@@ -10,7 +10,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
+- v3.3.0: Interactive web panels (stretch)
 - v3.4.0: VR hardening & enhancement
+
+## [3.2.0] - 2026-04-15
+
+### Added
+- Gaussian splat project display system on observatory pedestals
+- `projectSplatLoader.ts` — proximity-triggered lazy loader (fires at 6 m) mirroring the v3.1.0 avatar splat pattern, with thumbnail placeholder plane as default/fallback state
+- `SplatTarget` type and `splatTargets` array returned from `createPOIMeshes` for scene-level splat wiring
+- `createPOIMeshes` now routes `type === 'custom'` POIs with a `custom.splatPath` through `createPedestalMesh` + splat loader
+- Splat support fields on `POICustomConfig`: `splatPath`, `splatOffset`, `splatScale`
+- `SplatLoadIndicator` component — glass-panel toast at top-centre showing which scan is currently downloading
+- `petbot-scan` and `stereo-camera-scan` POI entries flanking the `skills` display-case on the observatory platform at `(-5, 68)` and `(5, 68)`
+- `public/assets/projects/` directory with `README.md` documenting the scanning workflow and expected file layout
+- Per-POI scene observer in `BabylonScene.tsx` that iterates splat instances and checks camera proximity once per frame
+
+### Changed
+- `BabylonScene.tsx` creates, observes, and disposes project splat instances alongside the existing slideshow lifecycle
+- `POIMeshesResult` now includes `splatTargets: SplatTarget[]` (additive — existing destructures in `TourCanvas.tsx` and `CaptureMode.tsx` remain compatible; tour mode intentionally skips splat loading)
+
+### Known gaps
+- Real LiDAR scans of PetBot and the DIY stereo camera are not yet captured. Both scan POIs currently point `custom.splatPath` at `./assets/avatar/avatar.splat` as a stand-in so the loader, proximity trigger, indicator UI, and fallback paths can be exercised end-to-end. Real scans will land in a follow-up patch — see [`public/assets/projects/README.md`](public/assets/projects/README.md) for drop-in instructions.
 
 ## [3.1.0] - 2026-03-26
 

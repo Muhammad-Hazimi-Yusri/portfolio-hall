@@ -7,6 +7,8 @@ import { setupPointerLock } from './pointerLock'
 import { createPOIMeshes } from './pois'
 import { createSlideshow } from './paintingSlideshow'
 import type { SlideshowInstance } from './paintingSlideshow'
+import { loadProjectSplat } from './projectSplatLoader'
+import type { ProjectSplatInstance } from './projectSplatLoader'
 import { setupInteraction } from './interaction'
 import { createCameraRefDefault } from './cameraRef'
 import { flyToCinematic, getApproachPosition } from './flyTo'
@@ -32,6 +34,7 @@ import { MobileControls } from '@/components/MobileControls'
 import { ProgressStrip } from '@/components/ProgressStrip'
 import { ThreeDSidebar } from '@/components/ThreeDSidebar'
 import { AvatarToggle } from '@/components/AvatarToggle'
+import { SplatLoadIndicator } from '@/components/SplatLoadIndicator'
 
 type BabylonSceneProps = {
   onInspect: (poi: POI) => void
@@ -80,6 +83,9 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress, initialC
     splatAvailable: boolean
     splatLoading: boolean
   }>({ loaded: false, mode: 'mesh', splatAvailable: false, splatLoading: false })
+
+  // Project splat loading state — shows which scan is currently downloading
+  const [loadingSplatTitle, setLoadingSplatTitle] = useState<string | null>(null)
 
   useEffect(() => {
     const handleResize = () => setIsPortrait(window.innerHeight > window.innerWidth)
@@ -231,7 +237,7 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress, initialC
     sceneRef.current = scene
 
     onLoadProgress?.(50, 'textures')
-    const { meshMap: poiMeshes, slideshowTargets } = createPOIMeshes(scene, poisData.pois as POI[])
+    const { meshMap: poiMeshes, slideshowTargets, splatTargets } = createPOIMeshes(scene, poisData.pois as POI[])
     onLoadProgress?.(70, 'textures')
 
     const lights = createLights(scene, castle, poiMeshes)
@@ -279,6 +285,28 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress, initialC
         camera,
       })
     )
+
+    // Create project splat instances (proximity-triggered lazy loading)
+    const loadingTitles: string[] = []
+    const splatInstances: ProjectSplatInstance[] = splatTargets.map(target =>
+      loadProjectSplat(scene, target.poi, target.pedestalGroup, {
+        onLoadStart: (title) => {
+          if (unmounted) return
+          loadingTitles.push(title)
+          setLoadingSplatTitle(loadingTitles[loadingTitles.length - 1])
+        },
+        onLoadEnd: () => {
+          if (unmounted) return
+          loadingTitles.shift()
+          setLoadingSplatTitle(loadingTitles.length > 0 ? loadingTitles[loadingTitles.length - 1] : null)
+        },
+      })
+    )
+    const splatProximityObserver = splatInstances.length > 0
+      ? scene.onBeforeRenderObservable.add(() => {
+          splatInstances.forEach(inst => inst.checkProximity(camera.position))
+        })
+      : null
 
     onLoadProgress?.(90, 'textures')
 
@@ -344,6 +372,8 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress, initialC
     return () => {
       unmounted = true
       slideshows.forEach(s => s.dispose())
+      if (splatProximityObserver) scene.onBeforeRenderObservable.remove(splatProximityObserver)
+      splatInstances.forEach(s => s.dispose())
       avatarRef.current?.dispose()
       avatarRef.current = null
       cleanupHands?.()
@@ -406,6 +436,8 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress, initialC
           onToggle={handleAvatarToggle}
         />
       )}
+
+      {!isInVR && <SplatLoadIndicator loadingTitle={loadingSplatTitle} />}
 
       {!isInVR && (
         <ThreeDSidebar

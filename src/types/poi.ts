@@ -26,6 +26,9 @@ export type POICustomConfig = {
   meshUrl?: string
   interactionType?: 'default' | 'video' | 'iframe' | 'custom-script'
   interactionConfig?: Record<string, unknown>
+  splatPath?: string
+  splatOffset?: { x: number; y: number; z: number }
+  splatScale?: number
 }
 
 export type POI = {

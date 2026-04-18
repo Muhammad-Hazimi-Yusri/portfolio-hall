@@ -603,6 +603,48 @@
           "Hackathon"
         ]
       }
+    },
+    {
+      "id": "petbot-scan",
+      "type": "custom",
+      "section": "projects",
+      "zone": "observatory",
+      "position": {
+        "x": -5,
+        "z": 68
+      },
+      "rotation": 90,
+      "content": {
+        "title": "PetBot (3D Scan)",
+        "thumbnail": "/thumbnails/petbot-1.webp",
+        "description": "LiDAR scan of the physical PetBot chassis. See the gallery painting for the full project story."
+      },
+      "custom": {
+        "splatPath": "./assets/avatar/avatar.splat",
+        "splatOffset": { "x": 0, "y": 1.2, "z": 0 },
+        "splatScale": 0.5
+      }
+    },
+    {
+      "id": "stereo-camera-scan",
+      "type": "custom",
+      "section": "projects",
+      "zone": "observatory",
+      "position": {
+        "x": 5,
+        "z": 68
+      },
+      "rotation": 270,
+      "content": {
+        "title": "DIY Stereo Camera (3D Scan)",
+        "thumbnail": "/thumbnails/diy-stereo-camera-1.webp",
+        "description": "LiDAR scan of the Raspberry Pi 5 stereo rig. See the gallery painting for the full project story."
+      },
+      "custom": {
+        "splatPath": "./assets/avatar/avatar.splat",
+        "splatOffset": { "x": 0, "y": 1.2, "z": 0 },
+        "splatScale": 0.5
+      }
     }
   ]
 }

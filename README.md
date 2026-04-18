@@ -5,7 +5,7 @@
 > A grand royal hall or throne room; the ceremonial heart of a palace where audiences are received and important gatherings held.
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
-[![Version](https://img.shields.io/badge/version-3.1.0-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-3.2.0-blue.svg)]()
 [![Status](https://img.shields.io/badge/status-In_Progress-yellow.svg)]()
 
 <details>
@@ -194,7 +194,7 @@ Z=0          Z=8                              Z=58        Z=68           Z=83-90
 ## Development Roadmap
 
 <details>
-<summary>Completed Versions (v0.1.0 – v3.0.0)</summary>
+<summary>Completed Versions (v0.1.0 – v3.2.0)</summary>
 
 #### v0.1.0 – v0.3.0 — Foundation
 Project scaffold, welcome gate, SVG floor plan fallback mode.
@@ -238,17 +238,14 @@ Animated slideshow system for gallery paintings — each painting cycles through
 #### v3.1.0 — 3D Self-Portrait (Scan + Splat Avatar)
 Avatar display system on arrival platform with three-tier degradation: gaussian splat (lazy-loaded on toggle) → low-poly GLB mesh (default) → procedural placeholder. AvatarToggle UI for switching between mesh and splat in free-roam mode. Lazy splat loading saves bandwidth for visitors who never toggle.
 
+#### v3.2.0 — Gaussian Splat Project Displays
+Observatory pedestals for physical project artifacts. New `custom` POI type with splat config, proximity-triggered lazy loader (`projectSplatLoader.ts`) that fires at 6 m range, SplatLoadIndicator toast while downloading, and floating thumbnail placeholder as weak-device / load-failure fallback. Two new POIs (`petbot-scan`, `stereo-camera-scan`) flank the skills display on the observatory platform. Real LiDAR scans land in a follow-up patch — infrastructure ships with a stand-in splat asset.
+
 </details>
 
 ### Upcoming
 
 #### v3.x — Gallery Content + Advanced Displays
-
-##### v3.2.0 — Gaussian Splat Project Displays
-- [ ] LiDAR scans of physical projects (PetBot, stereo camera rig)
-- [ ] Gaussian splat rendering on pedestals in observatory zone
-- [ ] Per-project splat loading with progress indicator
-- [ ] Fallback to static thumbnail on weak devices
 
 ##### v3.3.0 — Interactive Web Panels (Stretch)
 - [ ] Screenshot slideshow on 3D plane for website projects (v3.0.0 foundation extended with more frames and captions)

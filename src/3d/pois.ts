@@ -236,14 +236,18 @@ function createPedestalMesh(poi: POI, scene: Scene, mats: ReturnType<typeof crea
 
 export type SlideshowTarget = { poi: POI; mesh: Mesh; images: string[] }
 
+export type SplatTarget = { poi: POI; pedestalGroup: Mesh }
+
 export type POIMeshesResult = {
   meshMap: Map<string, { mesh: Mesh; poi: POI }>
   slideshowTargets: SlideshowTarget[]
+  splatTargets: SplatTarget[]
 }
 
 export function createPOIMeshes(scene: Scene, pois: POI[]): POIMeshesResult {
   const meshMap: Map<string, { mesh: Mesh; poi: POI }> = new Map()
   const slideshowTargets: SlideshowTarget[] = []
+  const splatTargets: SplatTarget[] = []
   const mats = createSharedMaterials(scene)
 
   pois.forEach((poi) => {
@@ -257,6 +261,11 @@ export function createPOIMeshes(scene: Scene, pois: POI[]): POIMeshesResult {
       }
     } else if (poi.type === 'display-case') {
       mesh = createDisplayCaseMesh(poi, scene, mats)
+    } else if (poi.type === 'custom') {
+      mesh = createPedestalMesh(poi, scene, mats)
+      if (poi.custom?.splatPath) {
+        splatTargets.push({ poi, pedestalGroup: mesh })
+      }
     } else {
       mesh = createPedestalMesh(poi, scene, mats)
     }
@@ -264,5 +273,5 @@ export function createPOIMeshes(scene: Scene, pois: POI[]): POIMeshesResult {
     meshMap.set(poi.id, { mesh, poi })
   })
 
-  return { meshMap, slideshowTargets }
+  return { meshMap, slideshowTargets, splatTargets }
 }
