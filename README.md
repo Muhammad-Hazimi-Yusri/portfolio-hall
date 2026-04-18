@@ -5,7 +5,7 @@
 > A grand royal hall or throne room; the ceremonial heart of a palace where audiences are received and important gatherings held.
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
-[![Version](https://img.shields.io/badge/version-3.2.0-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-3.2.1-blue.svg)]()
 [![Status](https://img.shields.io/badge/status-In_Progress-yellow.svg)]()
 
 <details>
@@ -240,6 +240,9 @@ Avatar display system on arrival platform with three-tier degradation: gaussian 
 
 #### v3.2.0 — Gaussian Splat Project Displays
 Observatory pedestals for physical project artifacts. New `custom` POI type with splat config, proximity-triggered lazy loader (`projectSplatLoader.ts`) that fires at 6 m range, SplatLoadIndicator toast while downloading, and floating thumbnail placeholder as weak-device / load-failure fallback. Two new POIs (`petbot-scan`, `stereo-camera-scan`) flank the skills display on the observatory platform. Real LiDAR scans land in a follow-up patch — infrastructure ships with a stand-in splat asset.
+
+#### v3.2.1 — Mobile Polish
+Hardens the tour layout against horizontal overflow on small viewports (`overflow-x-hidden` on the scroll runway, ImpactSection, and `html/body`; `overscroll-behavior: none` to stop rubber-band; `500dvh` scroll runway so iOS URL-bar chrome doesn't distort the scroll range). Raises free-roam touch-look sensitivity with a viewport-relative formula — a full-screen swipe now turns ~1.5 full views regardless of DPR/device.
 
 </details>
 

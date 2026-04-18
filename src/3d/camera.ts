@@ -7,6 +7,12 @@ import type { CameraRef } from './cameraRef'
 import '@babylonjs/core/Cameras/Inputs/freeCameraKeyboardMoveInput'
 import '@babylonjs/core/Cameras/Inputs/freeCameraMouseInput'
 
+// Touch-look yaw: a full screen-width swipe turns ~1.5 full views.
+// Viewport-relative so dense-DPI phones and tablets feel the same.
+const TOUCH_LOOK_FULL_SCREEN_YAW = Math.PI * 1.5
+// Gyro-ON touch offset is a nudge on top of gyro, so ~1/3 the yaw per swipe.
+const TOUCH_LOOK_GYRO_OFFSET_YAW = Math.PI * 0.5
+
 export function createFirstPersonCamera(
   scene: Scene,
   canvas: HTMLCanvasElement,
@@ -181,19 +187,21 @@ export function createFirstPersonCamera(
         }
       }
 
-      // Touch look
+      // Touch look — sensitivity scales with viewport width so a full-screen
+      // swipe always produces the same angular travel regardless of DPR/size.
       if (lookRef?.current) {
         const { x, y } = lookRef.current
         if (x !== 0 || y !== 0) {
+          const viewportWidth = window.innerWidth || 1
           if (gyroRef?.current) {
             // Gyro ON: touch adds offset
-            const sensitivity = 0.003
+            const sensitivity = TOUCH_LOOK_GYRO_OFFSET_YAW / viewportWidth
             touchOffsetYaw += x * sensitivity
             touchOffsetPitch += y * sensitivity
             touchOffsetPitch = Math.max(-Math.PI / 4, Math.min(Math.PI / 4, touchOffsetPitch))
           } else {
             // Gyro OFF: touch controls camera directly
-            const sensitivity = 0.005
+            const sensitivity = TOUCH_LOOK_FULL_SCREEN_YAW / viewportWidth
             camera.rotation.y += x * sensitivity
             camera.rotation.x += y * sensitivity
             camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotation.x))

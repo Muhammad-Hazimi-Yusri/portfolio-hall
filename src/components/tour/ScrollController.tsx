@@ -55,9 +55,9 @@ export function ScrollController({ children, initialScrollProgress }: ScrollCont
     <div
       ref={scrollContainerRef}
       onScroll={handleScroll}
-      className="w-full h-full overflow-y-auto"
+      className="w-full h-full overflow-y-auto overflow-x-hidden"
     >
-      <div style={{ height: '500vh' }}>
+      <div style={{ height: '500dvh' }}>
         <div className="fixed inset-0 pointer-events-none">
           <div className="w-full h-full">
             <ScrollProvider scrollProgress={scrollProgress} activeSection={activeSection} scrollToProgress={scrollToProgress}>
