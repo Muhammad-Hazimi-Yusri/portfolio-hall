@@ -5,7 +5,7 @@
 > A grand royal hall or throne room; the ceremonial heart of a palace where audiences are received and important gatherings held.
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
-[![Version](https://img.shields.io/badge/version-3.2.2-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-3.2.3-blue.svg)]()
 [![Status](https://img.shields.io/badge/status-In_Progress-yellow.svg)]()
 
 <details>
@@ -246,6 +246,9 @@ Hardens the tour layout against horizontal overflow on small viewports (`overflo
 
 #### v3.2.2 — Mobile Clip Fix
 Stops tour content getting hidden under iOS Safari's URL bar and top nav on portrait phones. Content overlay switched from `fixed inset-0` (large-viewport height) to `fixed top-0 left-0 right-0 + height: 100dvh` (dynamic-viewport height). Every tour section anchors to the top on mobile (`items-start sm:items-center`), has internal `overflow-y-auto` so tall cards can be scrolled, carries `pt-12` to clear the 36 px `TourNavBar`, and honours `env(safe-area-inset-bottom)`. Viewport meta gains `viewport-fit=cover` so the safe-area envs actually resolve.
+
+#### v3.2.3 — Mobile Density
+Tightens typography, padding, and inter-block margins on `HeroProject` and `ImpactSection` at narrow breakpoints so each card fits the viewport without needing internal scroll (which doesn't capture touch anyway — the tour overlay is `pointer-events-none` so every gesture advances the tour). Title / body text drop one tier at `< sm`, panel padding goes `p-4 sm:p-6 md:p-8`, and inter-section margins collapse. Desktop (≥ 640 px) is visually unchanged.
 
 </details>
 

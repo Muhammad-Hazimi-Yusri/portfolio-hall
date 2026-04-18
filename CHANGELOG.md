@@ -13,6 +13,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - v3.3.0: Interactive web panels (stretch)
 - v3.4.0: VR hardening & enhancement
 
+## [3.2.3] - 2026-04-18
+
+### Fixed
+- `HeroProject` and `ImpactSection` content now fits within the mobile viewport without clipping. The `overflow-y-auto` added in v3.2.2 turned out to be dead code — the tour content overlay is `pointer-events-none` (so the 3D canvas can still receive free-roam input), which means internal scroll never captures touch and every gesture advances the outer tour. Instead, this patch tightens per-section density at `< sm` breakpoints so content fits the visible area
+
+### Changed
+- `HeroProject.tsx`: panel padding `p-6 md:p-8` → `p-4 sm:p-6 md:p-8`; title drops one tier on mobile (`text-3xl` → `text-2xl sm:text-3xl`); story hook (`text-base md:text-lg`) and body paragraphs gain `text-sm sm:text-base`; `mb-8` hook margin → `mb-4 sm:mb-6 md:mb-8`; story-block gaps `mb-4` → `mb-3 sm:mb-4`; `mt-6` tag-row → `mt-4 sm:mt-6`
+- `ImpactSection.tsx`: panel padding `py-8 px-6 md:px-8` → `py-5 sm:py-8 px-4 sm:px-6 md:px-8`; "Why It Matters" title `text-2xl md:text-3xl` → `text-xl sm:text-2xl md:text-3xl`; philosophy paragraph `text-base md:text-lg` → `text-sm sm:text-base md:text-lg`; section gaps `mb-10` → `mb-6 sm:mb-10`; timeline items `mb-6` → `mb-4 sm:mb-6`; timeline item title drops one tier; skill-callouts gain `text-sm sm:text-base` with `mb-2 sm:mb-3`
+- Desktop (≥ 640 px) is visually unchanged — all size changes are scoped to the sub-`sm` branch
+
 ## [3.2.2] - 2026-04-18
 
 ### Fixed
