@@ -50,64 +50,64 @@ export function HeroProject({ poi, scrollStart, scrollEnd, scrollProgress, reduc
         transform: `translateY(${translateY}px)`,
       }}
     >
-      <div className="max-w-2xl w-full glass-panel shadow-sm rounded-xl p-6 md:p-8">
-        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-['Space_Grotesk',sans-serif] text-hall-accent mb-2">
+      <div className="max-w-2xl w-full glass-panel shadow-sm rounded-xl p-4 sm:p-6 md:p-8">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold font-['Space_Grotesk',sans-serif] text-hall-accent mb-1 sm:mb-2">
           {content.title}
         </h2>
 
         {content.storyHook && (
-          <p className="text-base md:text-lg italic text-hall-accent/80 mb-8">
+          <p className="text-sm sm:text-base md:text-lg italic text-hall-accent/80 mb-4 sm:mb-6 md:mb-8">
             {content.storyHook}
           </p>
         )}
 
         {content.challenge && (
           <div
-            className="mb-4"
+            className="mb-3 sm:mb-4"
             style={{
               opacity: challengeOpacity,
               transform: `translateY(${staggerY(challengeOpacity)}px)`,
             }}
           >
-            <h3 className="text-xs font-semibold text-hall-muted uppercase tracking-wider mb-1">
+            <h3 className="text-xs font-semibold text-hall-muted uppercase tracking-wider mb-0.5 sm:mb-1">
               The Challenge
             </h3>
-            <p className="text-hall-text story-text">{content.challenge}</p>
+            <p className="text-sm sm:text-base text-hall-text story-text">{content.challenge}</p>
           </div>
         )}
 
         {content.approach && (
           <div
-            className="mb-4"
+            className="mb-3 sm:mb-4"
             style={{
               opacity: approachOpacity,
               transform: `translateY(${staggerY(approachOpacity)}px)`,
             }}
           >
-            <h3 className="text-xs font-semibold text-hall-muted uppercase tracking-wider mb-1">
+            <h3 className="text-xs font-semibold text-hall-muted uppercase tracking-wider mb-0.5 sm:mb-1">
               The Approach
             </h3>
-            <p className="text-hall-text story-text">{content.approach}</p>
+            <p className="text-sm sm:text-base text-hall-text story-text">{content.approach}</p>
           </div>
         )}
 
         {content.outcome && (
           <div
-            className="mb-4"
+            className="mb-3 sm:mb-4"
             style={{
               opacity: outcomeOpacity,
               transform: `translateY(${staggerY(outcomeOpacity)}px)`,
             }}
           >
-            <h3 className="text-xs font-semibold text-hall-muted uppercase tracking-wider mb-1">
+            <h3 className="text-xs font-semibold text-hall-muted uppercase tracking-wider mb-0.5 sm:mb-1">
               The Outcome
             </h3>
-            <p className="text-hall-text story-text">{content.outcome}</p>
+            <p className="text-sm sm:text-base text-hall-text story-text">{content.outcome}</p>
           </div>
         )}
 
         {content.tags && content.tags.length > 0 && (
-          <div className="flex flex-wrap gap-2 mt-6">
+          <div className="flex flex-wrap gap-2 mt-4 sm:mt-6">
             {content.tags.map(tag => (
               <span
                 key={tag}
@@ -120,7 +120,7 @@ export function HeroProject({ poi, scrollStart, scrollEnd, scrollProgress, reduc
         )}
 
         {content.links && content.links.length > 0 && (
-          <div className="flex flex-wrap gap-4 mt-4">
+          <div className="flex flex-wrap gap-4 mt-3 sm:mt-4">
             {content.links.map(link => (
               <a
                 key={link.label}
