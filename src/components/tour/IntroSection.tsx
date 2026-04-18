@@ -49,7 +49,7 @@ export function IntroSection({ scrollProgress, reducedMotion }: Props) {
   return (
     <div
       role="banner"
-      className="absolute inset-0 flex flex-col items-center justify-center px-6"
+      className="absolute inset-0 flex flex-col items-center justify-center px-6 pt-12 pb-[max(1.5rem,env(safe-area-inset-bottom))]"
       style={{ opacity: sectionOpacity }}
     >
       <h1
@@ -79,7 +79,7 @@ export function IntroSection({ scrollProgress, reducedMotion }: Props) {
 
       {indicatorOpacity > 0 && (
         <div
-          className="absolute bottom-16 md:bottom-20 flex flex-col items-center gap-3 bg-black/20 backdrop-blur-sm rounded-2xl px-8 py-5"
+          className="absolute bottom-[max(4rem,calc(4rem+env(safe-area-inset-bottom)))] md:bottom-20 flex flex-col items-center gap-3 bg-black/20 backdrop-blur-sm rounded-2xl px-8 py-5"
           style={{ opacity: indicatorOpacity }}
         >
           <div className="text-hall-accent">

@@ -5,7 +5,7 @@
 > A grand royal hall or throne room; the ceremonial heart of a palace where audiences are received and important gatherings held.
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
-[![Version](https://img.shields.io/badge/version-3.2.1-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-3.2.2-blue.svg)]()
 [![Status](https://img.shields.io/badge/status-In_Progress-yellow.svg)]()
 
 <details>
@@ -243,6 +243,9 @@ Observatory pedestals for physical project artifacts. New `custom` POI type with
 
 #### v3.2.1 — Mobile Polish
 Hardens the tour layout against horizontal overflow on small viewports (`overflow-x-hidden` on the scroll runway, ImpactSection, and `html/body`; `overscroll-behavior: none` to stop rubber-band; `500dvh` scroll runway so iOS URL-bar chrome doesn't distort the scroll range). Raises free-roam touch-look sensitivity with a viewport-relative formula — a full-screen swipe now turns ~1.5 full views regardless of DPR/device.
+
+#### v3.2.2 — Mobile Clip Fix
+Stops tour content getting hidden under iOS Safari's URL bar and top nav on portrait phones. Content overlay switched from `fixed inset-0` (large-viewport height) to `fixed top-0 left-0 right-0 + height: 100dvh` (dynamic-viewport height). Every tour section anchors to the top on mobile (`items-start sm:items-center`), has internal `overflow-y-auto` so tall cards can be scrolled, carries `pt-12` to clear the 36 px `TourNavBar`, and honours `env(safe-area-inset-bottom)`. Viewport meta gains `viewport-fit=cover` so the safe-area envs actually resolve.
 
 </details>
 

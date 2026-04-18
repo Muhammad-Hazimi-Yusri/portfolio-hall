@@ -30,7 +30,7 @@ export function CompactCluster({ pois, scrollStart, scrollEnd, scrollProgress, r
 
   return (
     <div
-      className="absolute inset-0 flex items-center justify-center p-6 md:p-12"
+      className="absolute inset-0 flex items-start sm:items-center justify-center overflow-y-auto overflow-x-hidden pt-12 pb-[max(1.5rem,env(safe-area-inset-bottom))] px-6 md:p-12"
       style={{
         opacity,
         transform: `translateY(${translateY}px)`,

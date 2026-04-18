@@ -13,6 +13,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - v3.3.0: Interactive web panels (stretch)
 - v3.4.0: VR hardening & enhancement
 
+## [3.2.2] - 2026-04-18
+
+### Fixed
+- Tour content no longer gets clipped behind iOS Safari's URL bar on portrait phones. The content overlay in `ScrollController` switched from `fixed inset-0` (which resolves to the large viewport on iOS and extends under the URL bar) to `fixed left-0 right-0 top-0` with inline `height: 100dvh`, so it always matches the dynamic visible viewport
+- Tall project cards on small viewports (e.g. PetBot, stereo-camera Challenge/Approach/Outcome + tags) are now fully reachable — every tour section outer wrapper switched from `flex items-center` to `flex items-start sm:items-center`, and `HeroProject`, `ContactSection`, `CompactCluster` gained `overflow-y-auto` so content taller than the viewport scrolls within the card
+- Top 12 px of tour text no longer hides behind the 36 px `TourNavBar` — every section's outer wrapper adds `pt-12` on mobile
+- Content at the bottom of sections respects the device safe area via `pb-[max(1.5rem,env(safe-area-inset-bottom))]`
+
+### Changed
+- `index.html` viewport meta gains `viewport-fit=cover` so `env(safe-area-inset-*)` actually resolves on iOS
+- `IntroSection` scroll-hint pill repositioned from `bottom-16` to `bottom-[max(4rem,calc(4rem+env(safe-area-inset-bottom)))]` so it sits above the URL bar on iOS
+
 ## [3.2.1] - 2026-04-18
 
 ### Fixed

@@ -35,7 +35,7 @@ export function ContactSection({ scrollProgress, reducedMotion }: Props) {
   return (
     <div
       role="contentinfo"
-      className="absolute inset-0 flex items-center justify-center p-6 md:p-12"
+      className="absolute inset-0 flex items-start sm:items-center justify-center overflow-y-auto overflow-x-hidden pt-12 pb-[max(1.5rem,env(safe-area-inset-bottom))] px-6 md:p-12"
       style={{ opacity: entryOpacity }}
     >
       <div
