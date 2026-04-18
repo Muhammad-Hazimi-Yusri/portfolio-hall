@@ -13,6 +13,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - v3.3.0: Interactive web panels (stretch)
 - v3.4.0: VR hardening & enhancement
 
+## [3.2.1] - 2026-04-18
+
+### Fixed
+- Tour layout no longer overflows horizontally on narrow mobile viewports — `overflow-x-hidden` added to the `ScrollController` outer scroll container and to `ImpactSection` (which already had `overflow-y-auto`)
+- `html, body, #root` now set an explicit `overflow-x: hidden` and `overscroll-behavior: none`, blocking iOS rubber-band and any child that accidentally breaches viewport width
+- Scroll runway switched from `500vh` to `500dvh` in `ScrollController` so iOS Safari's URL-bar chrome no longer distorts the scroll-progress range
+
+### Changed
+- Free-roam touch-look sensitivity in `src/3d/camera.ts` is now viewport-relative: a full screen-width swipe rotates the camera ~1.5 full views (was ~0.5 on a 400 px phone). Gyro-OFF and gyro-ON touch paths both scale with `window.innerWidth`
+- Extracted `TOUCH_LOOK_FULL_SCREEN_YAW` and `TOUCH_LOOK_GYRO_OFFSET_YAW` constants at the top of `camera.ts` for future tuning
+- Desktop mouse look unchanged (Babylon's `FreeCameraMouseInput` + `angularSensibility = 1000` path is untouched); VR input unchanged
+
 ## [3.2.0] - 2026-04-15
 
 ### Added

@@ -52,7 +52,7 @@ export function ImpactSection({ scrollProgress, reducedMotion }: Props) {
   return (
     <div
       aria-label="Experience and skills"
-      className="absolute inset-0 flex items-center justify-center p-6 md:p-12 overflow-y-auto"
+      className="absolute inset-0 flex items-center justify-center p-6 md:p-12 overflow-x-hidden overflow-y-auto"
       style={{ opacity: sectionOpacity }}
     >
       <div className="max-w-2xl w-full py-8 glass-panel shadow-sm rounded-xl px-6 md:px-8">
