@@ -13,6 +13,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - v3.3.0: Interactive web panels (stretch)
 - v3.4.0: VR hardening & enhancement
 
+## [3.2.4] - 2026-04-18
+
+### Fixed
+- Free-roam gyro no longer vibrates the view when the phone is held still. Raw `DeviceOrientationEvent` alpha/beta/gamma readings are now exponentially smoothed before they drive the camera (`GYRO_SMOOTH_ALPHA = 0.25` in `src/3d/camera.ts`), which kills ~75% of per-frame sensor noise while staying responsive to real motion
+- Yaw smoothing handles the 360°→0° wrap seam via a new `lerpAngleDeg(a, b, t)` helper — alpha values crossing the seam no longer snap the camera
+
+### Added
+- **Recenter** button in `MobileControls`, shown next to Gyro / Landscape toggles only when gyro is enabled. Pressing it re-zeros the gyro baseline, touch offsets, and smoothing state to whatever pose the phone is in at that moment — one-tap escape hatch for slow sensor drift without toggling Gyro off and on
+- `createFirstPersonCamera` gains an optional `recenterGyroRef?: React.MutableRefObject<boolean>` parameter; the render loop clears it after consuming
+
 ## [3.2.3] - 2026-04-18
 
 ### Fixed

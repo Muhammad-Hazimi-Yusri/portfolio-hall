@@ -19,6 +19,7 @@ type ActionButtonsProps = {
 type ToggleButtonsProps = {
   gyroEnabled: boolean
   onGyroToggle: () => void
+  onGyroRecenter: () => void
   landscapeMode: boolean
   onLandscapeModeToggle: () => void
   sprintEnabled: boolean
@@ -134,7 +135,7 @@ function DPad({ onMove, onMoveEnd }: DPadProps) {
   )
 }
 
-function ToggleButtons({ gyroEnabled, onGyroToggle, landscapeMode, onLandscapeModeToggle, sprintEnabled, onSprintToggle }: ToggleButtonsProps) {
+function ToggleButtons({ gyroEnabled, onGyroToggle, onGyroRecenter, landscapeMode, onLandscapeModeToggle, sprintEnabled, onSprintToggle }: ToggleButtonsProps) {
   const Toggle = ({ label, active, onToggle }: { label: string; active: boolean; onToggle: () => void }) => (
     <button
       onTouchEnd={(e) => { e.preventDefault(); onToggle() }}
@@ -152,11 +153,31 @@ function ToggleButtons({ gyroEnabled, onGyroToggle, landscapeMode, onLandscapeMo
     </button>
   )
 
+  const Recenter = () => (
+    <button
+      onTouchEnd={(e) => { e.preventDefault(); onGyroRecenter() }}
+      onClick={onGyroRecenter}
+      className="flex flex-col items-center -rotate-[25deg]"
+    >
+      <div className="w-12 h-6 rounded-full bg-hall-frame-light shadow-inner flex items-center justify-center active:bg-hall-accent/40 transition-colors">
+        <span className="text-[11px] text-hall-text font-semibold">⌾</span>
+      </div>
+      <span className="text-[9px] text-hall-muted mt-1 uppercase tracking-wide font-medium"
+        style={{ textShadow: '1px 1px 0 rgba(232,223,208,0.3), -1px -1px 0 rgba(28,20,16,0.4)' }}
+      >
+        Recenter
+      </span>
+    </button>
+  )
+
   return (
     <div className="flex gap-6">
       <Toggle label="Gyro" active={gyroEnabled} onToggle={onGyroToggle} />
       {gyroEnabled && (
-        <Toggle label="Landscape" active={landscapeMode} onToggle={onLandscapeModeToggle} />
+        <>
+          <Toggle label="Landscape" active={landscapeMode} onToggle={onLandscapeModeToggle} />
+          <Recenter />
+        </>
       )}
       <Toggle label="Run" active={sprintEnabled} onToggle={onSprintToggle} />
     </div>
@@ -301,6 +322,7 @@ type MobileControlsProps = {
   onSwitchMode?: () => void
   gyroEnabled: boolean
   onGyroToggle: () => void
+  onGyroRecenter: () => void
   sprintEnabled: boolean
   onSprintToggle: () => void
   landscapeMode: boolean
@@ -324,6 +346,7 @@ export function MobileControls({
   onSwitchMode,
   gyroEnabled,
   onGyroToggle,
+  onGyroRecenter,
   sprintEnabled,
   onSprintToggle,
   landscapeMode,
@@ -534,6 +557,7 @@ export function MobileControls({
             <ToggleButtons
               gyroEnabled={gyroEnabled}
               onGyroToggle={onGyroToggle}
+              onGyroRecenter={onGyroRecenter}
               landscapeMode={landscapeMode}
               onLandscapeModeToggle={onLandscapeModeToggle}
               sprintEnabled={sprintEnabled}
@@ -596,6 +620,15 @@ export function MobileControls({
             className={`px-3 py-2 rounded text-sm font-medium ${landscapeMode ? 'bg-hall-accent text-hall-bg' : 'bg-hall-surface/80 text-hall-text'}`}
           >
             Landscape
+          </button>
+        )}
+        {gyroEnabled && (
+          <button
+            onTouchEnd={(e) => { e.preventDefault(); onGyroRecenter() }}
+            onClick={onGyroRecenter}
+            className="px-3 py-2 rounded text-sm font-medium bg-hall-surface/80 text-hall-text active:bg-hall-accent/40"
+          >
+            Recenter
           </button>
         )}
         <button

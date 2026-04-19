@@ -13,6 +13,17 @@ const TOUCH_LOOK_FULL_SCREEN_YAW = Math.PI * 1.5
 // Gyro-ON touch offset is a nudge on top of gyro, so ~1/3 the yaw per swipe.
 const TOUCH_LOOK_GYRO_OFFSET_YAW = Math.PI * 0.5
 
+// Exponential smoothing for noisy device-orientation sensors.
+// α closer to 1 = more responsive, less smoothing; 0.25 kills ~75% of frame noise
+// while staying responsive to real motion. Tuned for typical 60 Hz orientation feed.
+const GYRO_SMOOTH_ALPHA = 0.25
+
+// Shortest-path angular lerp in degrees, handling the 360°→0° wrap seam.
+function lerpAngleDeg(a: number, b: number, t: number): number {
+  const diff = ((b - a + 540) % 360) - 180
+  return a + diff * t
+}
+
 export function createFirstPersonCamera(
   scene: Scene,
   canvas: HTMLCanvasElement,
@@ -25,6 +36,7 @@ export function createFirstPersonCamera(
   cameraRef?: CameraRef,
   initialPosition?: { x: number; y: number; z: number },
   initialTarget?: { x: number; y: number; z: number },
+  recenterGyroRef?: React.MutableRefObject<boolean>,
 ) {
   // Always start at arrival platform — ensures all geometry and shaders
   // render at a content-rich position while the transition overlay is visible.
@@ -112,6 +124,11 @@ export function createFirstPersonCamera(
   let lastAlpha: number | null = null
   const MAX_ALPHA_DELTA = 30 // degrees per event — reject sensor glitches
 
+  // Low-pass smoothed sensor readings — survives jittery / drifting phone gyros.
+  let smoothedAlpha: number | null = null
+  let smoothedBeta: number | null = null
+  let smoothedGamma: number | null = null
+
   const getGyroPitch = (beta: number, gamma: number, isLandscape: boolean): number => {
     if (isLandscape) {
       return (gamma * Math.PI) / 180 * 0.5
@@ -125,39 +142,48 @@ export function createFirstPersonCamera(
     if (e.alpha === null || e.beta === null || e.gamma === null) return
 
     const isLandscape = landscapeModeRef?.current ?? false
-    const gyroPitch = getGyroPitch(e.beta, e.gamma, isLandscape)
 
     // Recalibrate when landscape mode changes
     if (lastLandscapeMode !== null && lastLandscapeMode !== isLandscape) {
       initialAlpha = null
+      smoothedAlpha = null
+      smoothedBeta = null
+      smoothedGamma = null
     }
     lastLandscapeMode = isLandscape
 
+    // Low-pass filter raw sensor readings to soak up jitter before they drive the camera
+    smoothedAlpha = smoothedAlpha === null ? e.alpha : lerpAngleDeg(smoothedAlpha, e.alpha, GYRO_SMOOTH_ALPHA)
+    smoothedBeta = smoothedBeta === null ? e.beta : smoothedBeta + (e.beta - smoothedBeta) * GYRO_SMOOTH_ALPHA
+    smoothedGamma = smoothedGamma === null ? e.gamma : smoothedGamma + (e.gamma - smoothedGamma) * GYRO_SMOOTH_ALPHA
+
+    const gyroPitch = getGyroPitch(smoothedBeta, smoothedGamma, isLandscape)
+
     // Initialize on first read or after recalibration
     if (initialAlpha === null) {
-      initialAlpha = e.alpha
-      lastAlpha = e.alpha
+      initialAlpha = smoothedAlpha
+      lastAlpha = smoothedAlpha
       touchOffsetYaw = camera.rotation.y
       touchOffsetPitch = camera.rotation.x - gyroPitch
       return
     }
 
     // Reject sudden alpha jumps (sensor glitch / gimbal lock)
-    let alphaDelta = e.alpha - (lastAlpha ?? e.alpha)
+    let alphaDelta = smoothedAlpha - (lastAlpha ?? smoothedAlpha)
     if (alphaDelta > 180) alphaDelta -= 360
     if (alphaDelta < -180) alphaDelta += 360
-    lastAlpha = e.alpha
+    lastAlpha = smoothedAlpha
 
     if (Math.abs(alphaDelta) > MAX_ALPHA_DELTA) {
       // Recalibrate instead of snapping camera
-      initialAlpha = e.alpha
+      initialAlpha = smoothedAlpha
       touchOffsetYaw = camera.rotation.y
       touchOffsetPitch = camera.rotation.x - gyroPitch
       return
     }
 
     // Yaw from alpha only — no roll influence
-    let yaw = ((e.alpha - initialAlpha) * Math.PI) / 180
+    let yaw = ((smoothedAlpha - initialAlpha) * Math.PI) / 180
     while (yaw > Math.PI) yaw -= 2 * Math.PI
     while (yaw < -Math.PI) yaw += 2 * Math.PI
 
@@ -170,6 +196,20 @@ export function createFirstPersonCamera(
   scene.onBeforeRenderObservable.add(() => {
     // Skip all input while in VR — XR camera takes over
     if (cameraRef?.current.isInVR) return
+
+    // User-triggered recenter: re-zero the gyro baseline to the current phone pose
+    if (recenterGyroRef?.current) {
+      initialAlpha = null
+      lastAlpha = null
+      touchOffsetYaw = 0
+      touchOffsetPitch = 0
+      smoothedAlpha = null
+      smoothedBeta = null
+      smoothedGamma = null
+      camera.rotation.y = 0
+      camera.rotation.x = 0
+      recenterGyroRef.current = false
+    }
 
     // Skip movement during fly-to animation
     if (!cameraRef?.current.isFlyingTo) {
