@@ -56,6 +56,7 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress, initialC
   const [sprintEnabled, setSprintEnabled] = useState(false)
   const [gyroEnabled, setGyroEnabled] = useState(false)
   const gyroRef = useRef(false)
+  const recenterGyroRef = useRef(false)
   const [landscapeMode, setLandscapeMode] = useState(false)
   const landscapeModeRef = useRef(false)
   const [showControlsHint, setShowControlsHint] = useState<'portrait' | 'landscape-confirm' | null>(null)
@@ -232,6 +233,7 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress, initialC
       scene, canvas, joystickRef, lookRef, jumpRef, sprintRef,
       gyroRef, landscapeModeRef, cameraRef,
       initialCameraPosition, initialCameraTarget,
+      recenterGyroRef,
     )
     babylonCameraRef.current = camera
     sceneRef.current = scene
@@ -463,6 +465,7 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress, initialC
           onTeleport={handleTeleport}
           onSwitchMode={onSwitchMode}
           gyroEnabled={gyroEnabled}
+          onGyroRecenter={() => { recenterGyroRef.current = true }}
           onGyroToggle={async () => {
             if (!gyroEnabled) {
               // Request permission on iOS

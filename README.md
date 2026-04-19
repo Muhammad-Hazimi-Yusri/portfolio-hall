@@ -5,7 +5,7 @@
 > A grand royal hall or throne room; the ceremonial heart of a palace where audiences are received and important gatherings held.
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
-[![Version](https://img.shields.io/badge/version-3.2.3-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-3.2.4-blue.svg)]()
 [![Status](https://img.shields.io/badge/status-In_Progress-yellow.svg)]()
 
 <details>
@@ -249,6 +249,9 @@ Stops tour content getting hidden under iOS Safari's URL bar and top nav on port
 
 #### v3.2.3 — Mobile Density
 Tightens typography, padding, and inter-block margins on `HeroProject` and `ImpactSection` at narrow breakpoints so each card fits the viewport without needing internal scroll (which doesn't capture touch anyway — the tour overlay is `pointer-events-none` so every gesture advances the tour). Title / body text drop one tier at `< sm`, panel padding goes `p-4 sm:p-6 md:p-8`, and inter-section margins collapse. Desktop (≥ 640 px) is visually unchanged.
+
+#### v3.2.4 — Gyro Robustness
+Makes the free-roam gyro tolerant of flaky phone sensors. Exponential low-pass smoothing on alpha/beta/gamma (`GYRO_SMOOTH_ALPHA = 0.25`) soaks up jitter while staying responsive to real motion; the seam-aware `lerpAngleDeg` helper handles the 360°→0° wrap so yaw smoothing doesn't snap. Adds a **Recenter** button (shown next to Gyro/Landscape only when gyro is on) that re-zeros the baseline to the current phone pose — escape hatch for slow drift without toggling Gyro off and on. Touch-drag sensitivity, VR, and desktop input paths unchanged.
 
 </details>
 
