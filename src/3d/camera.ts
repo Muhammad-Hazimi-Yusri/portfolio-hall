@@ -9,9 +9,11 @@ import '@babylonjs/core/Cameras/Inputs/freeCameraMouseInput'
 
 // Touch-look yaw: a full screen-width swipe turns ~1.5 full views.
 // Viewport-relative so dense-DPI phones and tablets feel the same.
+// Gyro-ON and gyro-OFF paths use the same value so drag feels identical
+// regardless of whether gyro is active — touch offset accumulates on top
+// of gyro rotation, the final camera.rotation pitch is clamped separately.
 const TOUCH_LOOK_FULL_SCREEN_YAW = Math.PI * 1.5
-// Gyro-ON touch offset is a nudge on top of gyro, so ~1/3 the yaw per swipe.
-const TOUCH_LOOK_GYRO_OFFSET_YAW = Math.PI * 0.5
+const TOUCH_LOOK_GYRO_OFFSET_YAW = TOUCH_LOOK_FULL_SCREEN_YAW
 
 // Exponential smoothing for noisy device-orientation sensors.
 // α closer to 1 = more responsive, less smoothing; 0.25 kills ~75% of frame noise

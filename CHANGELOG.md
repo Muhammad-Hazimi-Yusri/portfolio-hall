@@ -13,6 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - v3.3.0: Interactive web panels (stretch)
 - v3.4.0: VR hardening & enhancement
 
+## [3.2.5] - 2026-04-18
+
+### Changed
+- Touch-drag yaw sensitivity is now identical whether gyro is ON or OFF. `TOUCH_LOOK_GYRO_OFFSET_YAW` is aliased to `TOUCH_LOOK_FULL_SCREEN_YAW` (both `Math.PI * 1.5` per `window.innerWidth`). Previously the gyro-ON path used `Math.PI * 0.5` (1/3 strength) based on a "touch is a nudge on top of gyro" rationale that didn't match user expectation — a full-screen swipe now turns ~1.5 views in both modes
+- `touchOffsetPitch` clamp at ±π/4 on the gyro-ON branch unchanged (final camera pitch is still hard-clamped to ±π/2 via the gyro handler)
+
 ## [3.2.4] - 2026-04-18
 
 ### Fixed

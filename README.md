@@ -5,7 +5,7 @@
 > A grand royal hall or throne room; the ceremonial heart of a palace where audiences are received and important gatherings held.
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
-[![Version](https://img.shields.io/badge/version-3.2.4-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-3.2.5-blue.svg)]()
 [![Status](https://img.shields.io/badge/status-In_Progress-yellow.svg)]()
 
 <details>
@@ -252,6 +252,9 @@ Tightens typography, padding, and inter-block margins on `HeroProject` and `Impa
 
 #### v3.2.4 — Gyro Robustness
 Makes the free-roam gyro tolerant of flaky phone sensors. Exponential low-pass smoothing on alpha/beta/gamma (`GYRO_SMOOTH_ALPHA = 0.25`) soaks up jitter while staying responsive to real motion; the seam-aware `lerpAngleDeg` helper handles the 360°→0° wrap so yaw smoothing doesn't snap. Adds a **Recenter** button (shown next to Gyro/Landscape only when gyro is on) that re-zeros the baseline to the current phone pose — escape hatch for slow drift without toggling Gyro off and on. Touch-drag sensitivity, VR, and desktop input paths unchanged.
+
+#### v3.2.5 — Unified Touch-Drag Sensitivity
+Gyro-ON touch-drag sensitivity now matches gyro-OFF (`TOUCH_LOOK_GYRO_OFFSET_YAW = TOUCH_LOOK_FULL_SCREEN_YAW`). The v3.2.1 "nudge on top of gyro" philosophy (1/3 the strength) felt sluggish in practice — users expect drag to feel the same regardless of whether gyro is active.
 
 </details>
 
