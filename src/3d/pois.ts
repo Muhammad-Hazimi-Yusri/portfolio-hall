@@ -39,7 +39,62 @@ function createSharedMaterials(scene: Scene) {
 
 type PaintingResult = {
   group: Mesh
-  slideshowTarget?: { mesh: Mesh; images: string[] }
+  slideshowTarget?: { mesh: Mesh; images: string[]; captionMesh?: Mesh; captions?: string[] }
+}
+
+const CAPTION_TEX_WIDTH = 768
+const CAPTION_TEX_HEIGHT = 96
+
+function createCaptionStrip(poiId: string, scene: Scene): { mesh: Mesh; tex: DynamicTexture } {
+  // Strip lives just under the painting frame, same width as the canvas.
+  const strip = MeshBuilder.CreatePlane(
+    `${poiId}-caption`,
+    { width: 1.5, height: 0.18, sideOrientation: Mesh.DOUBLESIDE },
+    scene,
+  )
+
+  const tex = new DynamicTexture(
+    `${poiId}-caption-tex`,
+    { width: CAPTION_TEX_WIDTH, height: CAPTION_TEX_HEIGHT },
+    scene,
+    false,
+  )
+  tex.hasAlpha = true
+  tex.uScale = -1
+
+  const mat = new StandardMaterial(`${poiId}-caption-mat`, scene)
+  mat.diffuseTexture = tex
+  mat.opacityTexture = tex
+  mat.useAlphaFromDiffuseTexture = true
+  mat.specularColor = new Color3(0, 0, 0)
+  mat.emissiveColor = new Color3(0.85, 0.85, 0.85)
+  mat.backFaceCulling = false
+  mat.alpha = 0
+  strip.material = mat
+
+  return { mesh: strip, tex }
+}
+
+export function renderCaptionToTexture(tex: DynamicTexture, text: string) {
+  const ctx = tex.getContext() as unknown as CanvasRenderingContext2D
+  ctx.clearRect(0, 0, CAPTION_TEX_WIDTH, CAPTION_TEX_HEIGHT)
+
+  if (!text) {
+    tex.update()
+    return
+  }
+
+  // Semi-transparent dark plate for readability against the museum walls.
+  ctx.fillStyle = 'rgba(15, 18, 28, 0.78)'
+  ctx.fillRect(0, 0, CAPTION_TEX_WIDTH, CAPTION_TEX_HEIGHT)
+
+  ctx.fillStyle = 'rgba(245, 246, 250, 0.96)'
+  ctx.font = '500 38px serif'
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.fillText(text, CAPTION_TEX_WIDTH / 2, CAPTION_TEX_HEIGHT / 2, CAPTION_TEX_WIDTH - 32)
+
+  tex.update()
 }
 
 function createPaintingMesh(poi: POI, scene: Scene, mats: ReturnType<typeof createSharedMaterials>): PaintingResult {
@@ -103,10 +158,26 @@ function createPaintingMesh(poi: POI, scene: Scene, mats: ReturnType<typeof crea
   // Collision box for the whole painting
   group.checkCollisions = true
 
+  // Optional caption strip — only built when at least one caption is non-empty.
+  // Placed just below the bottom frame bar, parented to the group so it
+  // inherits painting rotation.
+  const captions = poi.content.captions
+  const wantsCaptions = !!(captions && captions.some(Boolean))
+  let captionMesh: Mesh | undefined
+  if (wantsCaptions) {
+    const strip = createCaptionStrip(poi.id, scene)
+    strip.mesh.parent = group
+    // Bottom of canvas at y = -fh/2; bottom frame bar centre at y = -(fh/2 + t/2)
+    // and is `t` tall, so its bottom edge is at -(fh/2 + t). Sit the strip
+    // just under that with a small gap.
+    strip.mesh.position = new Vector3(0, -(fh / 2 + t + 0.18 / 2 + 0.02), -0.06)
+    captionMesh = strip.mesh
+  }
+
   // Return slideshow target if multiple thumbnails are available
   const thumbnails = poi.content.thumbnails
   const slideshowTarget = thumbnails && thumbnails.length >= 2
-    ? { mesh: canvas, images: thumbnails }
+    ? { mesh: canvas, images: thumbnails, captionMesh, captions }
     : undefined
 
   return { group, slideshowTarget }
@@ -234,7 +305,13 @@ function createPedestalMesh(poi: POI, scene: Scene, mats: ReturnType<typeof crea
   return group
 }
 
-export type SlideshowTarget = { poi: POI; mesh: Mesh; images: string[] }
+export type SlideshowTarget = {
+  poi: POI
+  mesh: Mesh
+  images: string[]
+  captionMesh?: Mesh
+  captions?: string[]
+}
 
 export type SplatTarget = { poi: POI; pedestalGroup: Mesh }
 

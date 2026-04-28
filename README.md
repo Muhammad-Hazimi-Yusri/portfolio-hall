@@ -256,17 +256,21 @@ Makes the free-roam gyro tolerant of flaky phone sensors. Exponential low-pass s
 #### v3.2.5 — Unified Touch-Drag Sensitivity
 Gyro-ON touch-drag sensitivity now matches gyro-OFF (`TOUCH_LOOK_GYRO_OFFSET_YAW = TOUCH_LOOK_FULL_SCREEN_YAW`). The v3.2.1 "nudge on top of gyro" philosophy (1/3 the strength) felt sluggish in practice — users expect drag to feel the same regardless of whether gyro is active.
 
+#### v3.3.0 — Painting Captions
+Adds an optional caption strip beneath each gallery painting that fades in lockstep with the v3.0.0 slideshow. New `content.captions: string[]` field on POIs (parallel to `thumbnails`, optional and backwards-compatible) drives a `DynamicTexture`-backed plane parented to the painting group; the existing `'showing' → 'fading-out' → 'fading-in'` state machine in `paintingSlideshow.ts` now also drives the caption material's alpha and re-renders the caption text at the swap moment, so visitors read "Topic graph view → Progress dashboard → Cross-device sync" alongside the slides. Paintings without `captions` are visually unchanged. The iframe-on-3D-plane stretch from the v3.3.0 spec is deferred to a future release — see `docs/V3.3.0_PLAN.md` for the tradeoffs (cross-origin texture sampling, CSP `frame-ancestors`, pointer-event handoff, no-occlusion DOM overlay).
+
 </details>
 
 ### Upcoming
 
 #### v3.x — Gallery Content + Advanced Displays
 
-##### v3.3.0 — Interactive Web Panels (Stretch)
-- [ ] Screenshot slideshow on 3D plane for website projects (v3.0.0 foundation extended with more frames and captions)
+##### v3.3.1 — Iframe Web Panels (Deferred Stretch)
 - [ ] Iframe-on-3D-plane for live website browsing (desktop only, stretch goal)
-- [ ] DOM overlay positioned to match 3D plane projection
-- [ ] VR fallback to slideshow mode
+- [ ] DOM overlay positioned to match 3D plane projection via `Vector3.Project` + `matrix3d`
+- [ ] Browse / Stop-browsing toggle to coordinate pointer-lock vs. iframe focus
+- [ ] VR fallback to slideshow mode (iframes don't render in WebXR)
+- [ ] Per-site `Content-Security-Policy: frame-ancestors` config on the two author-owned Live URLs
 
 ##### v3.4.0 — VR Hardening
 - [ ] End-to-end VR playtest on Quest Pro
