@@ -13,6 +13,7 @@ export type POIContent = {
   title: string
   thumbnail: string
   thumbnails?: string[]
+  captions?: string[]
   description: string
   storyHook?: string
   challenge?: string

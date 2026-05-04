@@ -2,9 +2,10 @@ import { Scene } from '@babylonjs/core/scene'
 import { Mesh } from '@babylonjs/core/Meshes/mesh'
 import { Texture } from '@babylonjs/core/Materials/Textures/texture'
 import { StandardMaterial } from '@babylonjs/core/Materials/standardMaterial'
+import { DynamicTexture } from '@babylonjs/core/Materials/Textures/dynamicTexture'
 import type { Observer } from '@babylonjs/core/Misc/observable'
 import type { Camera } from '@babylonjs/core/Cameras/camera'
-import { applyFallbackTexture } from './pois'
+import { applyFallbackTexture, renderCaptionToTexture } from './pois'
 
 export interface SlideshowConfig {
   poiId: string
@@ -16,6 +17,8 @@ export interface SlideshowConfig {
   delayMs?: number
   camera?: Camera
   pauseDistance?: number
+  captionMesh?: Mesh
+  captions?: string[]
 }
 
 export interface SlideshowInstance {
@@ -39,10 +42,20 @@ export function createSlideshow(config: SlideshowConfig): SlideshowInstance {
     delayMs = 0,
     camera,
     pauseDistance = DEFAULT_PAUSE_DISTANCE,
+    captionMesh,
+    captions,
   } = config
 
   const mat = canvasMesh.material as StandardMaterial
   if (!mat) return { dispose: () => {} }
+
+  // Caption material is optional — only present when the painting opted into
+  // a caption strip and at least one caption is non-empty. We drive its alpha
+  // in lockstep with the canvas fade below; the texture itself is rebuilt
+  // (not crossfaded) at the swap moment when alpha hits 0.
+  const captionMat = captionMesh?.material as StandardMaterial | undefined
+  const captionTex = captionMat?.diffuseTexture as DynamicTexture | undefined
+  const hasCaptions = !!(captionMesh && captionMat && captionTex && captions && captions.some(Boolean))
 
   let disposed = false
   let delayTimer: ReturnType<typeof setTimeout> | null = null
@@ -55,12 +68,21 @@ export function createSlideshow(config: SlideshowConfig): SlideshowInstance {
   let elapsed = 0
   const halfFade = crossfadeDurationMs / 2
 
+  function captionForIndex(i: number): string {
+    if (!hasCaptions || !captions) return ''
+    return captions[i] ?? ''
+  }
+
   function startCycle() {
     if (disposed || loadedTextures.length < 2) return
 
     // Set initial texture
     mat.diffuseTexture = loadedTextures[0]
     mat.alpha = 1
+    if (hasCaptions && captionMat && captionTex) {
+      renderCaptionToTexture(captionTex, captionForIndex(0))
+      captionMat.alpha = captionForIndex(0) ? 1 : 0
+    }
 
     observer = scene.onBeforeRenderObservable.add(() => {
       if (disposed) return
@@ -85,18 +107,26 @@ export function createSlideshow(config: SlideshowConfig): SlideshowInstance {
       } else if (phase === 'fading-out') {
         const t = Math.min(elapsed / halfFade, 1)
         mat.alpha = 1 - t
+        if (hasCaptions && captionMat) captionMat.alpha = (1 - t) * (captionForIndex(currentIndex) ? 1 : 0)
         if (t >= 1) {
-          // Swap texture
+          // Swap texture + caption text at the moment the canvas is fully
+          // faded out — re-rendering the caption now means the fade-in
+          // reveals the new caption in lockstep with the new image.
           currentIndex = (currentIndex + 1) % loadedTextures.length
           mat.diffuseTexture = loadedTextures[currentIndex]
+          if (hasCaptions && captionMat && captionTex) {
+            renderCaptionToTexture(captionTex, captionForIndex(currentIndex))
+          }
           phase = 'fading-in'
           elapsed = 0
         }
       } else if (phase === 'fading-in') {
         const t = Math.min(elapsed / halfFade, 1)
         mat.alpha = t
+        if (hasCaptions && captionMat) captionMat.alpha = t * (captionForIndex(currentIndex) ? 1 : 0)
         if (t >= 1) {
           mat.alpha = 1
+          if (hasCaptions && captionMat) captionMat.alpha = captionForIndex(currentIndex) ? 1 : 0
           phase = 'showing'
           elapsed = 0
         }
@@ -142,6 +172,10 @@ export function createSlideshow(config: SlideshowConfig): SlideshowInstance {
       // Single image — static display
       mat.diffuseTexture = loadedTextures[0]
       mat.alpha = 1
+      if (hasCaptions && captionMat && captionTex) {
+        renderCaptionToTexture(captionTex, captionForIndex(0))
+        captionMat.alpha = captionForIndex(0) ? 1 : 0
+      }
       return
     }
 
