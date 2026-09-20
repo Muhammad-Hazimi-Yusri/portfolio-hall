@@ -7,7 +7,9 @@ export function createEngine(canvas: HTMLCanvasElement): Engine {
     stencil: true,
   })
 
-  window.addEventListener('resize', () => engine.resize())
+  const onResize = () => engine.resize()
+  window.addEventListener('resize', onResize)
+  engine.onDisposeObservable.addOnce(() => window.removeEventListener('resize', onResize))
 
   return engine
 }

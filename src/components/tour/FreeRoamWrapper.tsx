@@ -100,8 +100,8 @@ export function FreeRoamWrapper({
                   <a
                     key={link.label}
                     href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    target={link.url.startsWith('#') ? undefined : '_blank'}
+                    rel={link.url.startsWith('#') ? undefined : 'noopener noreferrer'}
                     className="px-3 py-1 bg-hall-accent text-white rounded text-sm hover:opacity-90"
                   >
                     {link.label}

@@ -14,7 +14,7 @@ import { getCameraStateAtProgress } from '@/3d/tourPath'
 import { useScrollProgress } from '@/contexts/ScrollContext'
 import { isMobile } from '@/utils/detection'
 import { UniversalCamera } from '@babylonjs/core/Cameras/universalCamera'
-import poisData from '@/data/pois.json'
+import poisData from '@/data/pois'
 import type { POI } from '@/types/poi'
 
 export function TourCanvas() {

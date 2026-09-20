@@ -1,0 +1,15 @@
+{
+  "reviewedOn": "2026-09-20",
+  "revision": "hall-browser-v2",
+  "branch": "codex/portfolio-career-refresh",
+  "base": "87573b3",
+  "productionEntry": "assets/index-CfL6Sq0r.js",
+  "contentEntries": 10,
+  "lint": "pass",
+  "typecheck": "pass",
+  "build": "pass",
+  "browserReview": "pass: desktop/mobile; direct exhibit click; routing and Back; map and force2d; CV/contact; free-roam return",
+  "userReview": "Visual direction accepted; user explicitly requested commit and merge to main on 2026-09-20. Individual manual checks are not inferred.",
+  "publication": "Merge to main authorized; Pages deploys automatically on main pushes.",
+  "printPdf": "not visually verified"
+}

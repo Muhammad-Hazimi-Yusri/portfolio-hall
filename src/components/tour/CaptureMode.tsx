@@ -11,7 +11,7 @@ import type { LoadAssetsOptions } from '@/3d/assetLoader'
 import { getCameraStateAtProgress } from '@/3d/tourPath'
 import { CAPTURE_POINTS } from '@/3d/tourCaptures'
 import { UniversalCamera } from '@babylonjs/core/Cameras/universalCamera'
-import poisData from '@/data/pois.json'
+import poisData from '@/data/pois'
 import type { POI } from '@/types/poi'
 
 const CAPTURE_WIDTH = 1920

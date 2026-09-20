@@ -15,7 +15,7 @@ export const usePOIs = (): POIState => {
   })
 
   useEffect(() => {
-    import('@/data/pois.json')
+    import('@/data/pois')
       .then((module) => {
         setState({
           pois: module.pois as POI[],

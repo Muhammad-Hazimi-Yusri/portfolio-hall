@@ -1,3 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <text y=".9em" font-size="90">🏰</text>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" rx="5" fill="#174c64"/><path d="M8 31V11L20 5L32 11V31M8 11L20 17L32 11M20 17V34M13 14V28M27 14V28" fill="none" stroke="#eaf6fc" stroke-width="1.5"/></svg>

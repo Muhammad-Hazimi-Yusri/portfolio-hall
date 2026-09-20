@@ -25,6 +25,7 @@ function assetMimePlugin(): Plugin {
 
 export default defineConfig({
   plugins: [react(), assetMimePlugin()],
+  build: { manifest: true },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

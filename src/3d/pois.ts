@@ -67,7 +67,7 @@ function createPaintingMesh(poi: POI, scene: Scene, mats: ReturnType<typeof crea
     })
     // Fallback if texture fails — check after a delay
     setTimeout(() => {
-      if (!tex.isReady()) {
+      if (!scene.isDisposed && !tex.isReady()) {
         applyFallbackTexture(canvasMat, poi.content.title, scene)
       }
     }, 5000)
@@ -112,66 +112,38 @@ function createPaintingMesh(poi: POI, scene: Scene, mats: ReturnType<typeof crea
   return { group, slideshowTarget }
 }
 
-const FALLBACK_COLORS = [
-  '#38BDF8', // sky blue
-  '#818CF8', // indigo-violet
-  '#34D399', // emerald
-  '#F472B6', // pink
-  '#60A5FA', // blue
-  '#A78BFA', // purple
-]
-
-function hashTitle(title: string): number {
-  let hash = 0
-  for (let i = 0; i < title.length; i++) {
-    hash = ((hash << 5) - hash) + title.charCodeAt(i)
-    hash |= 0
-  }
-  return Math.abs(hash)
-}
-
-function getInitials(title: string): string {
-  const words = title.replace(/[^\w\s]/g, '').split(/\s+/).filter(Boolean)
-  if (words.length === 1) return words[0].substring(0, 2).toUpperCase()
-  return words.slice(0, 3).map(w => w[0]).join('').toUpperCase()
-}
-
 export function applyFallbackTexture(mat: StandardMaterial, title: string, scene: Scene) {
   const fallback = new DynamicTexture(`fallback-${title}`, { width: 512, height: 340 }, scene)
   const ctx = fallback.getContext() as unknown as CanvasRenderingContext2D
-
-  const colorIdx = hashTitle(title) % FALLBACK_COLORS.length
-  const bgColor = FALLBACK_COLORS[colorIdx]
-
-  // Fill background
-  ctx.fillStyle = bgColor
+  ctx.fillStyle = '#eaf3f8'
   ctx.fillRect(0, 0, 512, 340)
-
-  // Gradient overlay for depth
-  const gradient = ctx.createLinearGradient(0, 0, 0, 340)
-  gradient.addColorStop(0, 'rgba(255,255,255,0.08)')
-  gradient.addColorStop(0.5, 'rgba(0,0,0,0)')
-  gradient.addColorStop(1, 'rgba(0,0,0,0.15)')
-  ctx.fillStyle = gradient
-  ctx.fillRect(0, 0, 512, 340)
-
-  // Draw large initials
-  const initials = getInitials(title)
-  ctx.fillStyle = 'rgba(255,255,255,0.85)'
-  ctx.font = 'bold 96px serif'
-  ctx.textAlign = 'center'
-  ctx.textBaseline = 'middle'
-  ctx.fillText(initials, 256, 150)
-
-  // Draw title below
-  ctx.fillStyle = 'rgba(255,255,255,0.6)'
-  ctx.font = '24px serif'
-  ctx.fillText(title, 256, 250)
-
+  ctx.strokeStyle = '#98bacb'
+  ctx.strokeRect(24, 24, 464, 292)
+  ctx.textAlign = 'left'
+  ctx.fillStyle = '#416e84'
+  ctx.font = '16px sans-serif'
+  ctx.fillText('PROJECT NOTES', 44, 66)
+  ctx.fillStyle = '#193f52'
+  ctx.font = '500 34px sans-serif'
+  let line = ''
+  let y = 142
+  for (const word of title.split(' ')) {
+    const next = `${line} ${word}`.trim()
+    if (ctx.measureText(next).width > 424 && line) {
+      ctx.fillText(line, 44, y)
+      y += 44
+      line = word
+    } else line = next
+  }
+  ctx.fillText(line, 44, y)
+  ctx.fillStyle = '#416e84'
+  ctx.font = '16px sans-serif'
+  ctx.fillText('BALAIRUNG', 44, 286)
   fallback.update()
+  fallback.uScale = -1
+  fallback.uOffset = 1
   mat.diffuseTexture = fallback
 }
-
 function createDisplayCaseMesh(poi: POI, scene: Scene, mats: ReturnType<typeof createSharedMaterials>): Mesh {
   const rad = (poi.rotation * Math.PI) / 180
   const group = new Mesh(`${poi.id}-group`, scene)

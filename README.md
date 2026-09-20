@@ -1,4 +1,23 @@
-# Balairung | 3D Portfolio Hall
+# Balairung — Hazimi Yusri
+
+Balairung is a hall for my work. The gallery sits beside readable project notes,
+professional experience and a printable CV. Direct navigation moves the camera
+to a section or project; visitors can also enter the existing free-roam mode.
+The content renders before the lazy-loaded scene, with a hall map available
+when graphics are disabled or unavailable.
+
+**Start here:** [content and update guide](docs/PORTFOLIO_CONTENT.md).
+Edit `src/data/portfolio.ts` to update projects and experience. Run
+`npm run check:portfolio`, `npm run lint` and `npm run build` to check changes.
+`npm run dev` starts the local preview.
+
+Routes: home, `#work`, `#projects`, `#about`, `#contact`, `#cv`,
+`#project/<id>` and `#explore` for walking around.
+
+The material below describes the original 3D implementation and its history;
+the scroll-driven tour has been replaced with direct gallery navigation.
+
+## Balairung — original 3D portfolio
 
 > **Balairung** /bə-ˈlaɪ-ruŋ/ — *noun, Malay*
 >

@@ -1,111 +1,54 @@
-import { useState, useCallback, useEffect, useRef } from 'react'
-import { ScrollController } from '@/components/tour/ScrollController'
-import { TourNavBar } from '@/components/tour/TourNavBar'
-import { TourContent } from '@/components/tour/TourContent'
-import { TourCanvas } from '@/components/tour/TourCanvas'
-import { TourFallback } from '@/components/tour/TourFallback'
-import { CaptureMode } from '@/components/tour/CaptureMode'
-import { TransitionOverlay } from '@/components/tour/TransitionOverlay'
-import { FreeRoamWrapper } from '@/components/tour/FreeRoamWrapper'
-import { getCameraStateAtProgress } from '@/3d/tourPath'
-import { hasWebGL } from '@/utils/detection'
+import { Component, lazy, Suspense, useEffect, useState } from 'react'
+import type { ReactNode } from 'react'
+import { Resume, SiteHeader, SiteFooter } from '@/components/portfolio/Portfolio'
+import HallPortfolio from '@/components/portfolio/HallPortfolio'
+import { projects, professionalWork, profile } from '@/data/portfolio'
+import '@/components/portfolio/portfolio.css'
 
-const params = new URLSearchParams(window.location.search)
-const isCapture = params.get('capture') === 'true'
-const force2d = params.get('force2d') === 'true'
+const HallExperience = lazy(() => import('@/components/portfolio/HallExperience'))
+const CaptureMode = lazy(() => import('@/components/tour/CaptureMode').then(m => ({ default: m.CaptureMode })))
 
-const webGLSupported = hasWebGL()
-
-type AppView = 'tour' | 'explore'
-const initialHash = window.location.hash.replace('#', '')
-
-const TRANSITION_MS = 500
-
-function App() {
-  if (isCapture) {
-    return <CaptureMode />
+class HallBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
+  state = { failed: false }
+  static getDerivedStateFromError() { return { failed: true } }
+  render() {
+    return this.state.failed ? (
+      <main className="portfolio-status"><h1>The hall couldn’t load.</h1><p>You can still read all the project notes.</p><a href="#projects">Back to projects →</a></main>
+    ) : this.props.children
   }
-
-  return <TourApp />
 }
 
-function TourApp() {
-  const [appView, setAppView] = useState<AppView>(
-    initialHash === 'explore' ? 'explore' : 'tour',
-  )
-  const [overlayVisible, setOverlayVisible] = useState(false)
-  const [exploreOrigin, setExploreOrigin] = useState<{
-    position: { x: number; y: number; z: number }
-    target: { x: number; y: number; z: number }
-    scrollProgress: number
-  } | null>(null)
-  const transitioningRef = useRef(false)
+export default function App() {
+  const [hash, setHash] = useState(window.location.hash)
+  const capture = import.meta.env.DEV && new URLSearchParams(window.location.search).get('capture') === 'true'
+  const exploring = hash === '#explore'
+  const resume = hash === '#cv'
+  const project = [...professionalWork, ...projects].find(item => hash === `#project/${item.id}`)
+  const active = project ? professionalWork.includes(project) ? 'work' : 'projects' : hash.slice(1)
 
-  // Sync hash with appView
   useEffect(() => {
-    if (appView === 'explore') {
-      window.location.hash = '#explore'
-    } else {
-      history.replaceState(null, '', window.location.pathname + window.location.search)
-    }
-  }, [appView])
+    const sync = () => { if (window.location.hash !== '#main') setHash(window.location.hash) }
+    window.addEventListener('hashchange', sync)
+    return () => window.removeEventListener('hashchange', sync)
+  }, [])
 
-  // Tour → Explore transition
-  const handleExplore = useCallback((scrollProgress: number) => {
-    if (transitioningRef.current) return
-    transitioningRef.current = true
-
-    const { position, target } = getCameraStateAtProgress(scrollProgress)
-    setExploreOrigin({
-      position: { x: position.x, y: position.y, z: position.z },
-      target: { x: target.x, y: target.y, z: target.z },
-      scrollProgress,
+  useEffect(() => {
+    document.title = `${project ? project.title : resume ? 'CV' : 'Balairung'} — ${profile.name}`
+    const frame = requestAnimationFrame(() => {
+      window.scrollTo(0, 0)
+      if (hash) document.querySelector<HTMLElement>('main h1')?.focus({ preventScroll: true })
     })
-    setOverlayVisible(true)
-    setTimeout(() => setAppView('explore'), TRANSITION_MS)
-  }, [])
+    return () => cancelAnimationFrame(frame)
+  }, [hash, project, resume])
 
-  // Called by FreeRoamWrapper when BabylonScene signals ready
-  const handleExploreReady = useCallback(() => {
-    setOverlayVisible(false)
-    transitioningRef.current = false
-  }, [])
-
-  // Explore → Tour transition
-  const handleReturnToTour = useCallback(() => {
-    if (transitioningRef.current) return
-    transitioningRef.current = true
-
-    setOverlayVisible(true)
-    setTimeout(() => {
-      setAppView('tour')
-      setTimeout(() => {
-        setOverlayVisible(false)
-        transitioningRef.current = false
-      }, 100)
-    }, TRANSITION_MS)
-  }, [])
+  if (capture) return <div className="hall-experience"><Suspense fallback={<p>Loading capture tools…</p>}><CaptureMode /></Suspense></div>
+  if (exploring) return <HallBoundary><Suspense fallback={<main className="portfolio-status"><p>Loading the hall…</p><a href="#projects">Back to projects →</a></main>}><HallExperience /></Suspense></HallBoundary>
 
   return (
-    <>
-      {appView === 'tour' && (
-        <ScrollController initialScrollProgress={exploreOrigin?.scrollProgress}>
-          {webGLSupported && !force2d ? <TourCanvas /> : <TourFallback />}
-          <TourNavBar />
-          <TourContent onExplore={handleExplore} />
-        </ScrollController>
-      )}
-      {appView === 'explore' && (
-        <FreeRoamWrapper
-          initialPosition={exploreOrigin?.position ?? { x: 0, y: 1.6, z: 2 }}
-          initialTarget={exploreOrigin?.target ?? { x: 0, y: 1.6, z: 15 }}
-          onReturnToTour={handleReturnToTour}
-          onReady={handleExploreReady}
-        />
-      )}
-      <TransitionOverlay visible={overlayVisible} />
-    </>
+    <div className={`portfolio${resume ? ' resume-view' : ''}`}>
+      <a className="skip-link" href="#main" onClick={event => { event.preventDefault(); document.getElementById('main')?.focus() }}>Skip to content</a>
+      <SiteHeader active={active} />
+      {resume ? <><Resume /><SiteFooter /></> : <HallPortfolio hash={hash} project={project} />}
+    </div>
   )
 }
-
-export default App

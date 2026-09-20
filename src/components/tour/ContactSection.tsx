@@ -1,4 +1,4 @@
-import poisData from '@/data/pois.json'
+import poisData from '@/data/pois'
 import type { POI } from '@/types/poi'
 
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v))

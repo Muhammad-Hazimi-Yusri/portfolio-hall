@@ -1,0 +1,13 @@
+{
+  "reviewedOn": "2026-09-20",
+  "branch": "codex/portfolio-career-refresh",
+  "base": "87573b3",
+  "productionEntry": "assets/index-BmSZbb4f.js",
+  "contentEntries": 10,
+  "lint": "pass",
+  "typecheck": "pass",
+  "build": "pass",
+  "browserReview": "desktop and mobile reviewed",
+  "userReview": "pending",
+  "publication": "not published"
+}

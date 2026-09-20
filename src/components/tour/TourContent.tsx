@@ -7,7 +7,7 @@ import { ImpactSection } from './ImpactSection'
 import { ContactSection } from './ContactSection'
 import { ExploreHint } from './ExploreHint'
 import { hasWebGL } from '@/utils/detection'
-import poisData from '@/data/pois.json'
+import poisData from '@/data/pois'
 import type { POI } from '@/types/poi'
 
 const webGLSupported = hasWebGL()
