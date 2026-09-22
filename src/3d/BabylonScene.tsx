@@ -285,6 +285,8 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress, initialC
         scene,
         delayMs: i * 400,
         camera,
+        captionMesh: target.captionMesh,
+        captions: target.captions,
       })
     )
 

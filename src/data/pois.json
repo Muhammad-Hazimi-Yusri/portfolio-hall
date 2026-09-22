@@ -130,6 +130,11 @@
           "/thumbnails/eee-roadmap-2.webp",
           "/thumbnails/eee-roadmap-3.webp"
         ],
+        "captions": [
+          "Topic graph view",
+          "Progress dashboard",
+          "Cross-device sync"
+        ],
         "description": "Open-source learning platform for EEE students with progress tracking across 50+ topics. Built with Astro and interactive graph visualisation (Cytoscape.js) showing topic connections. Features cross-device sync with Google OAuth via Supabase, 43+ unit tests and E2E tests.",
         "storyHook": "When the degree map lives in a lecturer's head, someone has to build it.",
         "challenge": "EEE students at Southampton had no clear visual map of how 50+ topics connected across years. Module guides were scattered PDFs. I built the tool I wished I'd had in year one.",
@@ -173,6 +178,11 @@
           "/thumbnails/food-wars-2.webp",
           "/thumbnails/food-wars-3.webp"
         ],
+        "captions": [
+          "Pantry dashboard",
+          "Drag-and-drop tables",
+          "Mobile-friendly inventory"
+        ],
         "description": "Cloud-first kitchen inventory app — modern alternative to Grocy. Designed Grocy-compatible PostgreSQL schema (40+ fields) with Supabase RLS. Features dual auth, drag-and-drop tables, product image uploads, and a Japanese diner aesthetic.",
         "storyHook": "Because spreadsheets shouldn't be the future of kitchen management.",
         "challenge": "Existing kitchen inventory tools are either desktop-only, ugly, or overkill for a shared household. I wanted something that felt like a real product — fast, mobile-friendly, and actually pleasant to use.",
@@ -215,6 +225,11 @@
           "/thumbnails/portfolio-hall-1.webp",
           "/thumbnails/portfolio-hall-2.webp",
           "/thumbnails/portfolio-hall-3.webp"
+        ],
+        "captions": [
+          "Boardwalk approach",
+          "Painting gallery",
+          "Observatory platform"
         ],
         "description": "Immersive 3D portfolio website — the very museum you're exploring right now! Built interactive 3D boardwalk with Babylon.js, procedural environment generation, collision detection, and three cross-platform control schemes. Features gyroscope camera, minimap, cinematic fly-to, and 2D fallback.",
         "storyHook": "What if your portfolio was a museum you could walk through?",
@@ -288,6 +303,10 @@
           "/thumbnails/home-server-1.webp",
           "/thumbnails/home-server-2.webp"
         ],
+        "captions": [
+          "Containerised media stack",
+          "20 TB household storage"
+        ],
         "description": "Personal media and photo management serving a household of 4 with 20TB storage. Deployed containerised apps (Plex, Immich, JellyFin) on Linux with DLNA streaming to VR headsets and various devices.",
         "tags": [
           "Docker",
@@ -316,6 +335,11 @@
           "/thumbnails/petbot-1.webp",
           "/thumbnails/petbot-2.webp",
           "/thumbnails/petbot-3.webp"
+        ],
+        "captions": [
+          "Assembled chassis",
+          "Local LLM on Pi 5",
+          "Voice + motor control"
         ],
         "description": "Social companion robot with local LLM for privacy-focused users. Integrated Ollama LLM on Raspberry Pi 5, developed Flask server with Socket.IO for real-time communication. Created 3D chassis design and programmed servo/DC motor control. Integrated TTS (Piper) and STT (Vosk).",
         "storyHook": "A robot that knows your name and doesn't phone home to a server farm.",
@@ -355,6 +379,11 @@
           "/thumbnails/avvr-1.webp",
           "/thumbnails/avvr-2.webp",
           "/thumbnails/avvr-3.webp"
+        ],
+        "captions": [
+          "Reconstructed VR scene",
+          "Steam Audio reverb",
+          "ML pipeline GUI"
         ],
         "description": "VR app reconstructing real scenes with accurate spatial audio. Led technical development across Unity VR, ML pipeline, and evaluation workstreams. Developed real-time spatial audio VR app with Steam Audio, redesigned ML pipeline GUI using PyQt6. Team of 6, scored 84%.",
         "storyHook": "What would it feel like to stand inside a room you've never set foot in?",
@@ -398,6 +427,12 @@
           "/thumbnails/diy-stereo-camera-2.webp",
           "/thumbnails/diy-stereo-camera-3.webp",
           "/thumbnails/diy-stereo-camera-4.webp"
+        ],
+        "captions": [
+          "Dual-camera Pi 5 rig",
+          "Stereo processing pipeline",
+          "VR 6DOF playback",
+          "Field test footage"
         ],
         "description": "Low-cost stereoscopic camera for 3D video capture with VR viewer. Designed hardware with Raspberry Pi 5 and dual cameras, developed stereo processing pipeline, and created VR 6DOF viewing app in Godot 4.",
         "storyHook": "Building eyes that see in 3D for under £100.",
@@ -444,6 +479,10 @@
           "/thumbnails/medical-emg-1.webp",
           "/thumbnails/medical-emg-2.webp"
         ],
+        "captions": [
+          "EMG signal acquisition",
+          "Robotic hand control"
+        ],
         "description": "EMG signal processing for robotic hand control. Developed processing pipeline for finger control, integrated Delsys Trigno sensors with real-time acquisition. Created Random Forest classifier (72% accuracy). Extended with wheelchair integration for assistive robotics. Scored 84%.",
         "tags": [
           "Python",
@@ -469,6 +508,10 @@
         "thumbnails": [
           "/thumbnails/stormed-1.webp",
           "/thumbnails/stormed-2.webp"
+        ],
+        "captions": [
+          "Smart meter prototype",
+          "LabVIEW simulation"
         ],
         "description": "Autonomous smart electricity meter managing renewable power sources for disaster recovery field hospital. Led system integration and ran LabVIEW simulation achieving 71.8% score. Team of 6, scored 71%.",
         "tags": [

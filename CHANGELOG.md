@@ -10,8 +10,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- v3.3.0: Interactive web panels (stretch)
+- v3.3.1: Iframe-on-3D-plane (deferred stretch from v3.3.0)
 - v3.4.0: VR hardening & enhancement
+
+## [3.3.0] - 2026-04-28
+
+### Added
+- Optional caption strip beneath each gallery painting that fades in lockstep with the v3.0.0 slideshow. Painting POIs gain a new optional `content.captions: string[]` field (parallel to `thumbnails`, index-aligned); when at least one entry is non-empty, `createPaintingMesh` builds a 1.5 × 0.18 m `DynamicTexture`-backed plane parented to the painting group and just under the bottom frame bar
+- `renderCaptionToTexture(tex, text)` helper in `src/3d/pois.ts` — clears the texture, fills a semi-transparent dark plate (`rgba(15, 18, 28, 0.78)`), and renders centred 38 px serif text with horizontal max-width clamp. Mirrors the canvas-2D pattern from `applyFallbackTexture`
+- Captions for the 9 multi-frame project paintings (`eee-roadmap`, `food-wars`, `portfolio-hall`, `home-server`, `petbot`, `avvr`, `diy-stereo-camera`, `medical-emg`, `stormed`) — 2-4 captions each, 4-7 words per caption
+- `docs/V3.3.0_PLAN.md` — implementation plan documenting why the iframe-on-3D-plane stretch was deferred (cross-origin texture sampling, CSP `frame-ancestors`, pointer-event handoff, no-occlusion DOM overlay) and a sketch for v3.3.1
+
+### Changed
+- `paintingSlideshow.ts` `SlideshowConfig` accepts optional `captionMesh: Mesh` and `captions: string[]`. The existing `'showing' → 'fading-out' → 'fading-in'` state machine now also drives the caption material's alpha — fade-out reaches 0 alpha, the canvas swaps texture *and* `renderCaptionToTexture` is called for the new index, then fade-in reveals image + caption together. No new timer; the caption rides the same single observer that already powers the image fade
+- `SlideshowTarget` type in `src/3d/pois.ts` exposes optional `captionMesh` and `captions` so `BabylonScene.tsx` can thread them into `createSlideshow` without re-discovering them
+- Paintings with no `captions` key, an empty array, or all-empty strings render identically to v3.2.5 — no caption mesh is created, no extra material
+
+### Notes
+- Caption strip is a regular Babylon mesh, so it renders correctly in WebXR by construction (no DOM, no iframe)
+- Distance-pause behaviour unchanged: when the camera is beyond `pauseDistance`, both image and caption freeze together because they share the same observer
 
 ## [3.2.5] - 2026-04-18
 
