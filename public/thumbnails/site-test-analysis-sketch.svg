@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+  <title id="title">Site-test analysis — illustrative response trace</title>
+  <desc id="desc">A synthetic response rises toward a step target, with an illustrative band and a chosen test window. Datalogs, configured parameters and test windows lead to reviewable figures and calculation workbooks. No site-test data, compliance limits or actual results are shown.</desc>
+  <rect width="1200" height="720" fill="#ece7d8"/>
+  <g fill="#2a4542" font-family="Arial, Helvetica, sans-serif">
+    <text x="48" y="52" font-size="21" letter-spacing="2">ENGINEERING ANALYSIS / 02</text>
+    <text x="1152" y="52" font-size="19" text-anchor="end" fill="#53675a">SYNTHETIC DATA</text>
+    <text x="48" y="114" font-size="46" font-family="Georgia, serif">Response, target and test window</text>
+    <text x="100" y="177" font-size="22" fill="#53675a">Normalised response</text>
+  </g>
+  <rect x="250" y="203" width="632" height="251" fill="#587b6b" opacity=".045"/>
+  <g stroke="#cbcaba" stroke-width="1" fill="none">
+    <path d="M100 223H914M100 300H914M100 377H914M100 454H914"/>
+    <path d="M100 203V454M296 203V454M492 203V454M688 203V454M884 203V454"/>
+  </g>
+  <rect x="250" y="284" width="664" height="32" fill="#587b6b" opacity=".18"/>
+  <path d="M100 454H250V300H914" fill="none" stroke="#6c8175" stroke-width="2.5" stroke-dasharray="10 8"/>
+  <path d="M100 454H250C270 450 274 300 309 247S363 241 389 289S432 345 465 325S501 287 528 302S563 323 600 311S643 305 675 311S710 312 750 309S829 311 914 310" fill="none" stroke="#a25b3a" stroke-width="4" stroke-linecap="round"/>
+  <g fill="#53675a" font-family="Arial, Helvetica, sans-serif" font-size="23" font-variant-numeric="tabular-nums">
+    <text x="79" y="231" text-anchor="end">1.5</text>
+    <text x="79" y="308" text-anchor="end">1.0</text>
+    <text x="79" y="385" text-anchor="end">0.5</text>
+    <text x="79" y="462" text-anchor="end">0.0</text>
+    <text x="100" y="486" text-anchor="middle">0</text>
+    <text x="296" y="486" text-anchor="middle">3</text>
+    <text x="492" y="486" text-anchor="middle">6</text>
+    <text x="688" y="486" text-anchor="middle">9</text>
+    <text x="884" y="486" text-anchor="middle">12</text>
+    <text x="102" y="523">Time (s)</text>
+  </g>
+  <path d="M250 506V516H884V506" stroke="#7e9080" fill="none" stroke-width="1.5"/>
+  <text x="567" y="548" text-anchor="middle" fill="#53675a" font-family="Arial, Helvetica, sans-serif" font-size="22">Chosen test window</text>
+  <g font-family="Arial, Helvetica, sans-serif" font-size="23" fill="#2a4542">
+    <path d="M954 248H986" stroke="#a25b3a" stroke-width="4"/>
+    <text x="1000" y="256">Response</text>
+    <text x="1000" y="284" font-size="20" fill="#53675a">synthetic trace</text>
+    <path d="M954 337H986" stroke="#6c8175" stroke-width="2.5" stroke-dasharray="9 5"/>
+    <text x="1000" y="345">Target</text>
+    <rect x="954" y="406" width="32" height="20" fill="#587b6b" opacity=".18"/>
+    <text x="1000" y="424">Illustrative</text>
+    <text x="1000" y="452">band</text>
+  </g>
+  <path d="M48 582H1152" stroke="#bdbfaf"/>
+  <g font-family="Arial, Helvetica, sans-serif" font-size="24" fill="#2a4542">
+    <text x="48" y="629">Datalogs</text>
+    <text x="210" y="629" fill="#a25b3a">→</text>
+    <text x="262" y="629">Parameters &amp; windows</text>
+    <text x="571" y="629" fill="#a25b3a">→</text>
+    <text x="621" y="629">Figures &amp; calculation workbooks</text>
+    <text x="48" y="683" font-size="21" fill="#53675a">Synthetic illustration · no site data or compliance limits</text>
+  </g>
+</svg>

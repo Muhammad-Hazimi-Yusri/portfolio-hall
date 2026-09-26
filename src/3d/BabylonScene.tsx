@@ -11,7 +11,7 @@ import { loadProjectSplat } from './projectSplatLoader'
 import type { ProjectSplatInstance } from './projectSplatLoader'
 import { setupInteraction } from './interaction'
 import { createCameraRefDefault } from './cameraRef'
-import { flyToCinematic, getApproachPosition } from './flyTo'
+import { flyTo, getApproachPosition } from './flyTo'
 import { checkVRSupport, createXRExperience, setupVRLocomotion, setupVRMenuButton, setupSeatedMode } from './webxr'
 import { setupHandTracking } from './vrInteraction'
 import { createVRFpsCounter } from './vrUI'
@@ -35,20 +35,33 @@ import { ProgressStrip } from '@/components/ProgressStrip'
 import { ThreeDSidebar } from '@/components/ThreeDSidebar'
 import { AvatarToggle } from '@/components/AvatarToggle'
 import { SplatLoadIndicator } from '@/components/SplatLoadIndicator'
+import { createVisitorDisplay } from './visitorDisplay'
+import type { Community, VisitorZone } from '@/data/community'
+import { PointerEventTypes } from '@babylonjs/core/Events/pointerEvents'
+import type { HallPose } from '@/components/portfolio/hallNavigation'
 
 type BabylonSceneProps = {
+  community: Community
+  onVisitorZoneChange: (zone: VisitorZone) => void
   onInspect: (poi: POI) => void
+  onVisitorLog?: (intent: 'visitors' | 'analytics') => void
   onSwitchMode?: () => void
   onLoadProgress?: (progress: number, stage: string) => void
   initialCameraPosition?: { x: number; y: number; z: number }
   initialCameraTarget?: { x: number; y: number; z: number }
+  inputPaused?: boolean
+  onPose?: (pose: HallPose) => void
 }
 
-export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress, initialCameraPosition, initialCameraTarget }: BabylonSceneProps) {
+export function BabylonScene({ community, onVisitorZoneChange, onInspect, onVisitorLog, onSwitchMode, onLoadProgress, initialCameraPosition, initialCameraTarget, inputPaused = false, onPose }: BabylonSceneProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [nearbyPOI, setNearbyPOI] = useState<POI | null>(null)
+  const [visitorZone, setVisitorZone] = useState<VisitorZone>('entrance')
+  useEffect(() => { onVisitorZoneChange(visitorZone) }, [visitorZone, onVisitorZoneChange])
+  const communityRef = useRef(community)
+  useEffect(() => { communityRef.current = community }, [community])
   const joystickRef = useRef({ x: 0, y: 0 })
-  const showMobileControls = isMobile()
+  const [showMobileControls, setShowMobileControls] = useState(() => isMobile() || window.innerWidth <= 760 || window.matchMedia('(pointer: coarse)').matches)
   const lookRef = useRef({ x: 0, y: 0 })
   const jumpRef = useRef(false)
   const [isPortrait, setIsPortrait] = useState(window.innerHeight > window.innerWidth)
@@ -57,9 +70,10 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress, initialC
   const [gyroEnabled, setGyroEnabled] = useState(false)
   const gyroRef = useRef(false)
   const recenterGyroRef = useRef(false)
-  const [landscapeMode, setLandscapeMode] = useState(false)
-  const landscapeModeRef = useRef(false)
-  const [showControlsHint, setShowControlsHint] = useState<'portrait' | 'landscape-confirm' | null>(null)
+  const landscapeModeRef = useRef(window.innerWidth > window.innerHeight)
+  const [pointerLocked, setPointerLocked] = useState(false)
+  const [pointerError, setPointerError] = useState(false)
+  const pointerReleasedAt = useRef(-Infinity)
 
   // Asset dev tooling (refs are stable — dev keyboard handler and overlay callbacks use them)
   const loadAssetsOptionsRef = useRef<LoadAssetsOptions>({})
@@ -69,7 +83,7 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress, initialC
   const cameraRef = useRef(createCameraRefDefault())
   const babylonCameraRef = useRef<UniversalCamera | null>(null)
   const sceneRef = useRef<BabylonScene_ | null>(null)
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   // WebXR state
   const [isVRSupported, setIsVRSupported] = useState(false)
@@ -89,7 +103,12 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress, initialC
   const [loadingSplatTitle, setLoadingSplatTitle] = useState<string | null>(null)
 
   useEffect(() => {
-    const handleResize = () => setIsPortrait(window.innerHeight > window.innerWidth)
+    const handleResize = () => {
+      setIsPortrait(window.innerHeight > window.innerWidth)
+      landscapeModeRef.current = window.innerWidth > window.innerHeight
+      setShowMobileControls(isMobile() || window.innerWidth <= 760 || window.matchMedia('(pointer: coarse)').matches)
+      joystickRef.current = { x: 0, y: 0 }; lookRef.current = { x: 0, y: 0 }
+    }
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [])
@@ -98,20 +117,43 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress, initialC
   useEffect(() => {
     if (showMobileControls) return
     const onLockChange = () => {
-      setSidebarOpen(!document.pointerLockElement)
+      const locked = document.pointerLockElement === canvasRef.current
+      setPointerLocked(locked)
+      if (locked) { setSidebarOpen(false); setPointerError(false) }
+      else pointerReleasedAt.current = performance.now()
     }
     document.addEventListener('pointerlockchange', onLockChange)
     return () => document.removeEventListener('pointerlockchange', onLockChange)
   }, [showMobileControls])
 
-  // Show portrait hint on first mobile load
   useEffect(() => {
-    if (showMobileControls) {
-      setShowControlsHint('portrait')
-      const timer = setTimeout(() => setShowControlsHint(null), 4000)
-      return () => clearTimeout(timer)
+    const key = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape' || event.defaultPrevented || event.repeat || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || inputPaused || isInVR || !sceneRef.current || document.querySelector('dialog[open]')) return
+      // Escape belongs to mouse capture first. Some browsers dispatch its
+      // keydown after pointerlockchange; do not leave the hall on that press.
+      if (document.pointerLockElement || performance.now() - pointerReleasedAt.current < 350) return
+      event.preventDefault()
+      if (sidebarOpen) {
+        setSidebarOpen(false)
+        document.querySelector<HTMLButtonElement>('.walk-directory-toggle')?.focus({ preventScroll: true })
+      } else onSwitchMode?.()
     }
-  }, [showMobileControls])
+    const released = (event: KeyboardEvent) => { if (event.key === 'Escape') pointerReleasedAt.current = -Infinity }
+    window.addEventListener('keydown', key)
+    window.addEventListener('keyup', released)
+    return () => { window.removeEventListener('keydown', key); window.removeEventListener('keyup', released) }
+  }, [inputPaused, isInVR, sidebarOpen, onSwitchMode])
+
+  useEffect(() => {
+    if (sceneRef.current) {
+      sceneRef.current.metadata.inputPaused = inputPaused
+      sceneRef.current.metadata.needsRender = true
+    }
+    if (inputPaused) {
+      joystickRef.current = { x: 0, y: 0 }; lookRef.current = { x: 0, y: 0 }; jumpRef.current = false
+      babylonCameraRef.current?.cameraDirection.setAll(0)
+    }
+  }, [inputPaused])
 
   // Dev-only: backtick toggles debug overlay; Ctrl+Shift+R reloads assets only
   useEffect(() => {
@@ -132,28 +174,12 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress, initialC
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, []) // empty deps: refs are stable; import.meta.env.DEV is a compile-time constant
 
-  // Lock portrait orientation when landscape mode is off
-  useEffect(() => {
-    if (!showMobileControls) return
-    const orient = screen.orientation as ScreenOrientation & { lock?: (o: string) => Promise<void> }
-    try {
-      if (landscapeMode) {
-        orient.lock?.('landscape')?.catch(() => {})
-      } else {
-        orient.lock?.('portrait')?.catch(() => {})
-      }
-    } catch { /* API not supported */ }
-    return () => {
-      try { orient.unlock() } catch { /* ignore */ }
-    }
-  }, [landscapeMode, showMobileControls])
-
   const handleJump = useCallback(() => {
     jumpRef.current = true
   }, [])
 
   const handleLook = useCallback((deltaX: number, deltaY: number) => {
-    lookRef.current = { x: deltaX, y: deltaY }
+    lookRef.current.x += deltaX; lookRef.current.y += deltaY
   }, [])
 
   const handleMove = useCallback((x: number, y: number) => {
@@ -169,22 +195,32 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress, initialC
     const scene = sceneRef.current
     if (!camera || !scene) return
 
-    cameraRef.current.isFlyingTo = true
+    // Track clicks select a real nearby display, instead of an arbitrary point
+    // with the previous (possibly sky-facing) camera orientation.
+    if (lookAtX === undefined || lookAtZ === undefined) {
+      const nearest = poisData.pois.reduce((best, poi) => Math.abs(poi.position.z - z) < Math.abs(best.position.z - z) ? poi : best)
+      const approach = getApproachPosition(nearest, camera.fov, scene.getEngine().getAspectRatio(camera), Boolean(scene.metadata?.guestbookActive))
+      x = approach.x; z = approach.z; lookAtX = nearest.position.x; lookAtZ = nearest.position.z
+    }
 
-    flyToCinematic(
+    joystickRef.current = { x: 0, y: 0 }; lookRef.current = { x: 0, y: 0 }
+    flyTo(
       scene,
       camera,
       { x, z, lookAtX, lookAtZ },
-      () => { camera.checkCollisions = false },
+      () => { camera.checkCollisions = false; cameraRef.current.isFlyingTo = true; scene.metadata.travelActive = true },
       () => {
         camera.checkCollisions = true
         cameraRef.current.isFlyingTo = false
+        scene.metadata.travelActive = false
       },
     )
   }, [])
 
   const handleTeleportToPOI = useCallback((poi: POI) => {
-    const approach = getApproachPosition(poi)
+    const camera = babylonCameraRef.current, scene = sceneRef.current
+    if (!camera || !scene) return
+    const approach = getApproachPosition(poi, camera.fov, scene.getEngine().getAspectRatio(camera), Boolean(scene.metadata?.guestbookActive))
     handleTeleport(approach.x, approach.z, poi.position.x, poi.position.z)
   }, [handleTeleport])
 
@@ -223,13 +259,25 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress, initialC
     onLoadProgress?.(0, 'engine')
     const engine = createEngine(canvas)
     const scene = createScene(engine)
+    scene.metadata = { inputPaused, waterRefreshMs: 1000 / 30 }
+    const wake = () => { if (!unmounted && !scene.isDisposed && scene.metadata) scene.metadata.needsRender = true }
+    scene.onNewMeshAddedObservable.add(wake)
+    scene.onMeshRemovedObservable.add(wake)
+    scene.onDataLoadedObservable.add(() => {
+      if (unmounted) return
+      wake()
+      scene.executeWhenReady(wake)
+    })
+    const resizeObserver = engine.onResizeObservable.add(wake)
+    document.addEventListener('visibilitychange', wake)
     onLoadProgress?.(15, 'scene')
 
     const mats = createSceneMaterials(scene)
     const castle = createEnvironment(scene, mats)
+    const visitors = createVisitorDisplay(scene)
     onLoadProgress?.(40, 'scene')
 
-    const camera = createFirstPersonCamera(
+    const { camera, hasPendingInput } = createFirstPersonCamera(
       scene, canvas, joystickRef, lookRef, jumpRef, sprintRef,
       gyroRef, landscapeModeRef, cameraRef,
       initialCameraPosition, initialCameraTarget,
@@ -254,25 +302,35 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress, initialC
     loadAssetsOptionsRef.current = loadOpts
     loadAssets(scene, loadOpts)
 
-    // Load avatar on arrival platform
-    loadAvatar(scene, mats, {
-      onModeChange: (mode) => {
-        if (!unmounted) setAvatarState(prev => ({ ...prev, mode }))
-      },
-      onSplatLoadStart: () => {
-        if (!unmounted) setAvatarState(prev => ({ ...prev, splatLoading: true }))
-      },
-      onSplatLoadEnd: () => {
-        if (!unmounted) setAvatarState(prev => ({ ...prev, splatLoading: false }))
-      },
-    }).then(instance => {
-      if (unmounted) { instance?.dispose(); return }
-      avatarRef.current = instance
-      setAvatarState({
-        loaded: true,
-        mode: instance?.getMode() ?? 'mesh',
-        splatAvailable: instance?.isSplatAvailable() ?? false,
-        splatLoading: false,
+    // The arrival portrait is irrelevant when entering beside a distant project.
+    // Defer its assets until the visitor actually reaches the first platform.
+    let avatarRequested = false
+    const avatarObserver = scene.onBeforeRenderObservable.add(() => {
+      if (avatarRequested || camera.position.z > 8) return
+      avatarRequested = true
+      scene.onBeforeRenderObservable.remove(avatarObserver)
+      void loadAvatar(scene, {
+        onModeChange: (mode) => {
+          wake()
+          if (!unmounted) setAvatarState(prev => ({ ...prev, mode }))
+        },
+        onSplatLoadStart: () => {
+          if (!unmounted) setAvatarState(prev => ({ ...prev, splatLoading: true }))
+        },
+        onSplatLoadEnd: () => {
+          wake()
+          if (!unmounted) setAvatarState(prev => ({ ...prev, splatLoading: false }))
+        },
+      }).then(instance => {
+        if (unmounted) { instance?.dispose(); return }
+        wake()
+        avatarRef.current = instance
+        setAvatarState({
+          loaded: true,
+          mode: instance?.getMode() ?? 'mesh',
+          splatAvailable: instance?.isSplatAvailable() ?? false,
+          splatLoading: false,
+        })
       })
     })
 
@@ -299,6 +357,7 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress, initialC
         },
         onLoadEnd: () => {
           if (unmounted) return
+          wake()
           loadingTitles.shift()
           setLoadingSplatTitle(loadingTitles.length > 0 ? loadingTitles[loadingTitles.length - 1] : null)
         },
@@ -312,7 +371,7 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress, initialC
 
     onLoadProgress?.(90, 'textures')
 
-    const cleanupPointerLock = setupPointerLock(canvas)
+    const cleanupPointerLock = setupPointerLock(canvas, () => setPointerError(true), () => !cameraRef.current.isFlyingTo && !scene.metadata.inputPaused)
     const cleanupInteraction = setupInteraction(
       scene,
       camera,
@@ -321,8 +380,48 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress, initialC
       setNearbyPOI
     )
 
-    onLoadProgress?.(100, 'ready')
-    engine.runRenderLoop(() => scene.render())
+    scene.executeWhenReady(() => { if (!unmounted) { wake(); onLoadProgress?.(100, 'ready') } })
+    let lastPoseAt = -Infinity
+    let lastVisitorZone: VisitorZone = 'entrance'
+    let settleUntil = performance.now() + 1200
+    const drawnPosition = camera.position.clone(), drawnRotation = camera.rotation.clone()
+    scene.onPointerObservable.add(event => {
+      if (event.type !== PointerEventTypes.POINTERPICK) return
+      const route = event.pickInfo?.pickedMesh?.metadata?.portfolioRoute
+      const visitorIntent = route === '#guestbook/analytics' ? 'analytics' : route === '#guestbook/visitors' ? 'visitors' : null
+      if (visitorIntent && onVisitorLog) {
+        // The click that selected the data must not also lock the mouse behind
+        // the dialog. Set this before the canvas click listener runs.
+        scene.metadata.inputPaused = true
+        onVisitorLog(visitorIntent)
+      } else if (route === '#contact' || visitorIntent) window.location.hash = route
+    })
+    const render = () => {
+      if (document.hidden || (scene.metadata.inputPaused && !cameraRef.current.isInVR)) return
+      visitors.update(communityRef.current)
+      const now = performance.now()
+      const moving = hasPendingInput() || cameraRef.current.isFlyingTo ||
+        !drawnPosition.equals(camera.position) || !drawnRotation.equals(camera.rotation)
+      if (moving || scene.metadata.needsRender) settleUntil = now + 200
+      // Polling input stays cheap; scene traversal, draw calls and water passes
+      // stop once the view settles. XR keeps its headset-driven frame cadence.
+      if (!cameraRef.current.isInVR && !moving && !scene.metadata.needsRender &&
+          !scene.metadata.profileContinuous && now < (scene.metadata.logoFrameAt ?? Infinity) &&
+          !slideshows.some(slideshow => slideshow.needsFrame()) && now > settleUntil) return
+      scene.metadata.needsRender = false
+      scene.metadata.logoFrameAt = Infinity
+      scene.render()
+      drawnPosition.copyFrom(camera.position); drawnRotation.copyFrom(camera.rotation)
+      const z = camera.position.z
+      const zone: VisitorZone = z > 79 ? 'contact' : z > 59 ? 'about' : z > 20 ? 'projects' : z > 7 ? 'work' : 'entrance'
+      if (zone !== lastVisitorZone) { lastVisitorZone = zone; setVisitorZone(zone) }
+      if (onPose && performance.now() - lastPoseAt > 100) {
+        lastPoseAt = performance.now()
+        const position = camera.position, target = camera.getTarget()
+        onPose({ position: { x: position.x, y: position.y, z: position.z }, target: { x: target.x, y: target.y, z: target.z } })
+      }
+    }
+    engine.runRenderLoop(render)
 
     // WebXR — check support and set up experience helper
     const pendingLinks: string[] = []
@@ -351,6 +450,7 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress, initialC
         )
 
         xr.baseExperience.onStateChangedObservable.add((state) => {
+          wake()
           if (state === WebXRState.IN_XR) {
             setIsInVR(true)
             cameraRef.current.isInVR = true
@@ -385,31 +485,29 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress, initialC
       xrExperienceRef.current = null
       cleanupPointerLock()
       cleanupInteraction()
+      document.removeEventListener('visibilitychange', wake)
+      engine.onResizeObservable.remove(resizeObserver)
+      engine.stopRenderLoop(render)
+      visitors.dispose()
       scene.dispose()
       engine.dispose()
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps -- initialCamera props are read once on mount, not reactive
-  }, [onInspect, onLoadProgress])
-
-  // Counter-rotate layout to stay portrait when device is physically in landscape
-  const needsRotation = showMobileControls && !landscapeMode && !isPortrait
+  }, [onInspect, onLoadProgress, onVisitorLog])
 
   return (
-    <div
-      className="w-full h-full relative"
-      style={needsRotation ? {
-        transform: 'rotate(-90deg)',
-        transformOrigin: 'center center',
-        width: '100vh',
-        height: '100vw',
-        position: 'fixed',
-        top: '50%',
-        left: '50%',
-        marginTop: '-50vw',
-        marginLeft: '-50vh',
-      } : undefined}
-    >
-      <canvas ref={canvasRef} aria-hidden="true" className="w-full h-full outline-none" />
+    <div className="w-full h-full relative">
+      <canvas ref={canvasRef} tabIndex={0} aria-label="Walk around Balairung. Use W A S D or arrow keys to move, drag to look and E to inspect. Escape releases the mouse; press again to return to the portfolio." className="walk-canvas w-full h-full outline-none" />
+      {pointerLocked && !isInVR && !showMobileControls && <div className={`walk-reticle${nearbyPOI ? ' is-target' : ''}`} aria-hidden="true" />}
+      {!isInVR && !showMobileControls && <div className="walk-guidance">
+        {nearbyPOI && <button onClick={() => onInspect(nearbyPOI)} className="walk-inspect">
+          <span><small>{nearbyPOI.id === 'contact' && community.mode !== 'offline' ? 'Read guestbook' : nearbyPOI.experienceDisplay ? 'Experience' : 'Read notes'}</small><strong>{nearbyPOI.experienceDisplay?.name ?? nearbyPOI.content.title}</strong></span><kbd>E</kbd>
+        </button>}
+        <div className="walk-help">
+        <span>{pointerLocked ? 'WASD / arrows to walk · Shift to run · E to inspect · Esc to release mouse' : pointerError ? 'Drag to look · WASD / arrows to walk · Esc to return' : 'Click to look · WASD / arrows to walk · E to inspect · Esc to return'}</span>
+        {pointerLocked && <button onClick={() => document.exitPointerLock()}>Release mouse</button>}
+        </div>
+      </div>}
 
       {isVRSupported && (
         <button
@@ -420,17 +518,18 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress, initialC
         </button>
       )}
 
-      {!isInVR && (
+      {!isInVR && !showMobileControls && (
         <ProgressStrip
           pois={poisData.pois as POI[]}
           cameraRef={cameraRef}
           onTeleport={handleTeleport}
           onTeleportToPOI={handleTeleportToPOI}
           isPortrait={isPortrait}
+          nearbyId={nearbyPOI?.id}
         />
       )}
 
-      {!isInVR && avatarState.loaded && (
+      {!isInVR && !showMobileControls && visitorZone === 'entrance' && avatarState.loaded && (
         <AvatarToggle
           mode={avatarState.mode}
           splatAvailable={avatarState.splatAvailable}
@@ -441,13 +540,14 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress, initialC
 
       {!isInVR && <SplatLoadIndicator loadingTitle={loadingSplatTitle} />}
 
-      {!isInVR && (
+      {!isInVR && !showMobileControls && (
         <ThreeDSidebar
           pois={poisData.pois as POI[]}
           isOpen={sidebarOpen}
           onToggle={() => setSidebarOpen(prev => !prev)}
           onTeleportToPOI={handleTeleportToPOI}
-          isPortrait={isPortrait}
+          currentZone={visitorZone === 'entrance' ? 'arrival' : visitorZone === 'about' ? 'observatory' : visitorZone === 'contact' ? 'horizon' : 'gallery'}
+          nearbyId={nearbyPOI?.id}
         />
       )}
 
@@ -458,11 +558,10 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress, initialC
           onLook={handleLook}
           onJump={handleJump}
           onInteract={() => nearbyPOI && onInspect(nearbyPOI)}
-          canInteract={nearbyPOI !== null}
+          nearbyTitle={nearbyPOI?.id === 'contact' && community.mode !== 'offline' ? 'guestbook' : nearbyPOI?.experienceDisplay?.name ?? nearbyPOI?.content.title}
+          nearbyAction={nearbyPOI?.id === 'contact' && community.mode !== 'offline' ? 'Read' : undefined}
           pois={poisData.pois as POI[]}
-          cameraRef={cameraRef}
           onTeleportToPOI={handleTeleportToPOI}
-          onTeleport={handleTeleport}
           onSwitchMode={onSwitchMode}
           gyroEnabled={gyroEnabled}
           onGyroRecenter={() => { recenterGyroRef.current = true }}
@@ -486,41 +585,10 @@ export function BabylonScene({ onInspect, onSwitchMode, onLoadProgress, initialC
             setSprintEnabled(prev => !prev)
             sprintRef.current = !sprintRef.current
           }}
-          landscapeMode={landscapeMode}
-          onLandscapeModeToggle={() => {
-            const newVal = !landscapeMode
-            // Disable gyro immediately before orientation change
-            setGyroEnabled(false)
-            gyroRef.current = false
-            setLandscapeMode(newVal)
-            landscapeModeRef.current = newVal
-            if (newVal) {
-              // Show confirmation modal - user must tap Ready after rotating
-              setShowControlsHint('landscape-confirm')
-            }
-          }}
-          showControlsHint={showControlsHint}
-          onDismissHint={() => setShowControlsHint(null)}
-          onLandscapeConfirm={() => {
-            setShowControlsHint(null)
-            setGyroEnabled(true)
-            gyroRef.current = true
-          }}
+          portrait={isPortrait}
         />
       )}
             
-      {!isInVR && nearbyPOI && !(showMobileControls && isPortrait) && (
-        <button
-          onClick={() => onInspect(nearbyPOI)}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 bg-hall-surface/90 px-4 py-2 rounded z-50"
-        >
-          {showMobileControls ? (
-            <span>Tap to inspect <span className="text-hall-accent font-bold">{nearbyPOI.content.title}</span></span>
-          ) : (
-            <span>Press <span className="text-hall-accent font-bold">E</span> to inspect {nearbyPOI.content.title}</span>
-          )}
-        </button>
-      )}
 
       {import.meta.env.DEV && showDebugOverlay && (
         <AssetDebugOverlay

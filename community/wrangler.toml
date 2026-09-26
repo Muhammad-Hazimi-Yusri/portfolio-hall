@@ -1,0 +1,16 @@
+name = "balairung-community"
+main = "worker.mjs"
+compatibility_date = "2026-09-20"
+workers_dev = true
+
+[vars]
+ALLOWED_ORIGINS = "https://muhammadhazimiyusri.uk,https://new.muhammadhazimiyusri.uk"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "balairung-community"
+# Replace after creating the database; no production backend is deployed yet.
+database_id = "00000000-0000-0000-0000-000000000000"
+
+[triggers]
+crons = ["15 3 * * *"]

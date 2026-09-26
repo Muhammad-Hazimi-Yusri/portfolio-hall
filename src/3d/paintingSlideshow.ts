@@ -19,6 +19,7 @@ export interface SlideshowConfig {
 }
 
 export interface SlideshowInstance {
+  needsFrame: () => boolean
   dispose: () => void
 }
 
@@ -42,7 +43,7 @@ export function createSlideshow(config: SlideshowConfig): SlideshowInstance {
   } = config
 
   const mat = canvasMesh.material as StandardMaterial
-  if (!mat) return { dispose: () => {} }
+  if (!mat) return { needsFrame: () => false, dispose: () => {} }
 
   let disposed = false
   let delayTimer: ReturnType<typeof setTimeout> | null = null
@@ -53,7 +54,14 @@ export function createSlideshow(config: SlideshowConfig): SlideshowInstance {
   let currentIndex = 0
   let phase: Phase = 'showing'
   let elapsed = 0
+  let lastUpdate = performance.now()
   const halfFade = crossfadeDurationMs / 2
+  const visible = () => {
+    if (!camera) return true
+    const position = canvasMesh.parent ? (canvasMesh.parent as Mesh).absolutePosition : canvasMesh.absolutePosition
+    return camera.position.subtract(position).lengthSquared() <= pauseDistance * pauseDistance && camera.isInFrustum(canvasMesh)
+  }
+  const invalidate = () => { scene.metadata ??= {}; scene.metadata.needsRender = true }
 
   function startCycle() {
     if (disposed || loadedTextures.length < 2) return
@@ -61,20 +69,15 @@ export function createSlideshow(config: SlideshowConfig): SlideshowInstance {
     // Set initial texture
     mat.diffuseTexture = loadedTextures[0]
     mat.alpha = 1
+    lastUpdate = performance.now()
+    invalidate()
 
     observer = scene.onBeforeRenderObservable.add(() => {
       if (disposed) return
 
-      // Distance-based pausing
-      if (camera) {
-        const meshPos = canvasMesh.parent
-          ? (canvasMesh.parent as Mesh).absolutePosition
-          : canvasMesh.absolutePosition
-        const dist = camera.position.subtract(meshPos).length()
-        if (dist > pauseDistance) return
-      }
-
-      const dt = scene.getEngine().getDeltaTime()
+      const now = performance.now(), dt = now - lastUpdate
+      lastUpdate = now
+      if (!visible()) return
       elapsed += dt
 
       if (phase === 'showing') {
@@ -131,6 +134,7 @@ export function createSlideshow(config: SlideshowConfig): SlideshowInstance {
 
   function onAllSettled() {
     if (disposed) return
+    invalidate()
 
     if (loadedTextures.length === 0) {
       // All failed — apply fallback title card
@@ -156,6 +160,14 @@ export function createSlideshow(config: SlideshowConfig): SlideshowInstance {
   }
 
   return {
+    needsFrame() {
+      if (disposed || !observer) return false
+      const now = performance.now()
+      if (!visible()) { lastUpdate = now; return false }
+      // A static slide can sleep through its display interval. Wake when the
+      // next fade is due, then draw continuously until the new image settles.
+      return phase !== 'showing' || elapsed + now - lastUpdate >= intervalMs
+    },
     dispose() {
       disposed = true
       if (delayTimer !== null) clearTimeout(delayTimer)

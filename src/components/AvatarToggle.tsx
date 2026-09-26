@@ -12,7 +12,7 @@ export function AvatarToggle({ mode, splatAvailable, splatLoading, onToggle }: P
     <button
       onClick={onToggle}
       disabled={splatLoading}
-      className="fixed bottom-16 left-4 z-40 glass-panel px-3 py-1.5 rounded-full
+      className="fixed top-16 left-4 z-40 glass-panel px-3 py-1.5 rounded
         text-sm font-medium text-hall-accent-dark hover:opacity-90
         transition-opacity shadow-lg flex items-center gap-2
         disabled:opacity-60 disabled:cursor-wait"
@@ -27,7 +27,7 @@ export function AvatarToggle({ mode, splatAvailable, splatLoading, onToggle }: P
           <span className="text-xs">
             {mode === 'mesh' ? '◆' : '◇'}
           </span>
-          {mode === 'mesh' ? 'Splat View' : '3D Mesh'}
+          {mode === 'mesh' ? 'Show portrait scan' : 'Show portrait model'}
         </>
       )}
     </button>

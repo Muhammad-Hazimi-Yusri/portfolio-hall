@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+  <title id="title">Reporting workbench — workflow illustration</title>
+  <desc id="desc">Project values, an approved template and study figures feed a draft document. Figure matches are checked before the Word draft goes to engineering review. This is a public workflow illustration, not a screenshot of the internal application.</desc>
+  <rect width="1200" height="720" fill="#203e41"/>
+  <g fill="#e8e3d4" font-family="Arial, Helvetica, sans-serif">
+    <text x="48" y="52" font-size="21" letter-spacing="2">ENGINEERING TOOLS / 01</text>
+    <text x="1152" y="52" font-size="19" text-anchor="end" fill="#c5cdbd">WORKFLOW ILLUSTRATION</text>
+    <text x="48" y="114" font-size="46" font-family="Georgia, serif">Study material → a reviewable draft</text>
+  </g>
+  <path d="M48 150H1152" stroke="#627b78"/>
+  <g font-family="Arial, Helvetica, sans-serif" font-size="24" fill="#e8e3d4">
+    <text x="48" y="201"><tspan fill="#d5b48a">01</tspan><tspan dx="15">Gather inputs</tspan></text>
+    <text x="434" y="201"><tspan fill="#d5b48a">02</tspan><tspan dx="15">Match &amp; assemble</tspan></text>
+    <text x="870" y="201"><tspan fill="#d5b48a">03</tspan><tspan dx="15">Review the draft</tspan></text>
+  </g>
+  <!-- Source material, represented as documents rather than an invented UI. -->
+  <g stroke="#95aaa0" fill="none" stroke-width="2">
+    <path d="M60 249H92L106 263V306H60ZM92 249V263H106M70 274H94M70 286H94"/>
+    <path d="M60 352H92L106 366V409H60ZM92 352V366H106M70 377H94M70 389H87"/>
+    <path d="M60 455H106V510H60ZM70 465V500H98M74 490L80 482L86 485L96 471"/>
+  </g>
+  <g fill="#e8e3d4" font-family="Arial, Helvetica, sans-serif" font-size="26">
+    <text x="128" y="287">Project values</text>
+    <text x="128" y="390">Approved template</text>
+    <text x="128" y="493">Study figures</text>
+  </g>
+  <g fill="none" stroke="#95aaa0" stroke-width="2">
+    <path d="M357 280H387V380H425M357 383H425M357 486H387V386"/>
+    <path d="m416 374 10 9-10 9"/>
+  </g>
+  <!-- A figure and its destination make the matching step explicit. -->
+  <rect x="444" y="247" width="311" height="308" fill="#e8e3d4"/>
+  <g fill="#28483f" font-family="Arial, Helvetica, sans-serif">
+    <text x="468" y="282" font-size="23">Figure matching</text>
+    <path d="M470 295H730" stroke="#bbc1b0"/>
+    <rect x="468" y="320" width="119" height="100" fill="#d4d9c7"/>
+    <rect x="609" y="320" width="119" height="100" fill="#d4d9c7"/>
+    <g fill="none" stroke-width="2.5">
+      <path d="M480 333V406H574M621 333V406H715" stroke="#8c9c89"/>
+      <path d="M482 392H500L511 348L527 367L542 359H574M623 393L639 382L651 356L669 365L683 346L713 340" stroke="#557564"/>
+    </g>
+    <path d="M468 454H728M468 480H662" stroke="#b4bdad" stroke-width="3"/>
+    <text x="468" y="527" font-size="22">Check proposed matches</text>
+  </g>
+  <g fill="none" stroke="#d5b48a" stroke-width="2.5">
+    <path d="M729 370H809V444H859"/>
+    <path d="m849 435 11 9-11 9"/>
+  </g>
+  <circle cx="729" cy="370" r="5" fill="#d5b48a"/>
+  <g font-family="Arial, Helvetica, sans-serif" font-size="20" fill="#d5b48a">
+    <text x="810" y="330" text-anchor="middle">Place</text>
+    <text x="810" y="353" text-anchor="middle">figure</text>
+  </g>
+  <!-- The output remains a draft, with engineering review outside the tool. -->
+  <path d="M881 237H1138V545" fill="none" stroke="#7b948a" stroke-width="2"/>
+  <rect x="870" y="249" width="257" height="308" fill="#f0ebdd"/>
+  <g fill="#28483f" font-family="Arial, Helvetica, sans-serif">
+    <text x="893" y="282" font-size="22">Word draft</text>
+    <path d="M893 299H1103" stroke="#b9bead"/>
+    <path d="M893 326H1055" stroke="#667d69" stroke-width="7"/>
+    <path d="M893 350H1103M893 369H1103M893 388H1052" stroke="#b5bdac" stroke-width="3"/>
+    <rect x="893" y="417" width="126" height="84" fill="#d4d9c7"/>
+    <path d="M903 428V491H1008" fill="none" stroke="#8c9c89" stroke-width="2"/>
+    <path d="M905 478H924L934 445L947 459L965 452H1007" fill="none" stroke="#557564" stroke-width="2.5"/>
+    <path d="M1037 431H1103M1037 450H1103M1037 469H1081M893 526H1090" stroke="#b5bdac" stroke-width="3"/>
+  </g>
+  <path d="M48 601H1152" stroke="#627b78"/>
+  <g fill="#c5cdbd" font-family="Arial, Helvetica, sans-serif" font-size="24">
+    <text x="48" y="646">Internal application · in development</text>
+    <text x="48" y="684" font-size="22">Engineers remain responsible for the studies, report and review.</text>
+  </g>
+</svg>

@@ -1,3 +1,6 @@
+import type { LogoMotion } from '@/3d/logoMotion'
+import type { ProjectImage } from '@/data/portfolio'
+
 export type POIType = 'painting' | 'display-case' | 'pedestal' | 'custom'
 
 export type POISection = 'projects' | 'about' | 'skills' | 'contact' | 'experience' | 'hackathons'
@@ -20,6 +23,13 @@ export type POIContent = {
   outcome?: string
   links?: POILink[]
   tags?: string[]
+  category?: string
+  role?: string
+  status?: string
+  exhibitSteps?: string[]
+  imageCaption?: string
+  image?: ProjectImage
+  gallery?: ProjectImage[]
 }
 
 export type POICustomConfig = {
@@ -40,6 +50,15 @@ export type POI = {
   rotation: number
   content: POIContent
   custom?: POICustomConfig
+  experienceDisplay?: {
+    name: string
+    role: string
+    dates: string
+    src: string
+    ink?: string
+    motion: LogoMotion
+    width: number
+  }
 }
 
 export type AppMode = 'welcome' | '3d' | 'fallback'

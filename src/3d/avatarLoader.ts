@@ -1,17 +1,15 @@
 import { Scene } from '@babylonjs/core/scene'
 import { Vector3 } from '@babylonjs/core/Maths/math.vector'
-import { MeshBuilder } from '@babylonjs/core/Meshes/meshBuilder'
 import { SceneLoader } from '@babylonjs/core/Loading/sceneLoader'
 import { TransformNode } from '@babylonjs/core/Meshes/transformNode'
-import { GaussianSplattingMesh } from '@babylonjs/core/Meshes/GaussianSplatting/gaussianSplattingMesh'
+import type { GaussianSplattingMesh } from '@babylonjs/core/Meshes/GaussianSplatting/gaussianSplattingMesh'
 import { hasWebGL2 } from '@/utils/detection'
 import { AVATAR_CONFIG } from './avatarConfig'
-import type { SceneMaterials } from './materials'
 
 // ── Types ──
 
 export interface AvatarInstance {
-  /** Show low-poly mesh (or procedural fallback), hide splat */
+  /** Show the configured portrait model, hide its optional scan. */
   showMesh: () => void
   /** Show gaussian splat, hide mesh. Lazy-loads on first call. */
   showSplat: () => Promise<void>
@@ -29,49 +27,14 @@ export type AvatarCallbacks = {
   onSplatLoadEnd?: () => void
 }
 
-// ── Procedural Placeholder ──
-
-function createProceduralAvatar(
-  scene: Scene,
-  mats: SceneMaterials,
-): TransformNode {
-  const root = new TransformNode('avatar-procedural', scene)
-
-  // Torso — cylinder
-  const torso = MeshBuilder.CreateCylinder('avatar-torso', {
-    height: 1.2, diameterTop: 0.4, diameterBottom: 0.5, tessellation: 16,
-  }, scene)
-  torso.position.y = 0.9
-  torso.material = mats.stone
-  torso.parent = root
-
-  // Head — sphere
-  const head = MeshBuilder.CreateSphere('avatar-head', {
-    diameter: 0.35, segments: 16,
-  }, scene)
-  head.position.y = 1.7
-  head.material = mats.wall
-  head.parent = root
-
-  // Base — flat cylinder (feet)
-  const base = MeshBuilder.CreateCylinder('avatar-base', {
-    height: 0.05, diameter: 0.6, tessellation: 16,
-  }, scene)
-  base.position.y = 0.025
-  base.material = mats.gold
-  base.parent = root
-
-  return root
-}
-
 // ── Main Loader ──
 
 export async function loadAvatar(
   scene: Scene,
-  mats: SceneMaterials,
   callbacks?: AvatarCallbacks,
 ): Promise<AvatarInstance | null> {
   const cfg = AVATAR_CONFIG
+  if (!cfg.meshPath) return null
 
   // Parent node for positioning
   const root = new TransformNode('avatar-root', scene)
@@ -100,18 +63,16 @@ export async function loadAvatar(
       })
     }
   } catch {
-    console.warn('[Avatar] GLB load failed, using procedural placeholder')
-    meshNode = createProceduralAvatar(scene, mats)
-    meshNode.parent = root
+    console.warn('[Avatar] Configured portrait model could not load')
   }
 
-  // If mesh didn't load and procedural failed somehow, bail out
+  // A missing model leaves the entrance clear; never invent a stand-in person.
   if (!meshNode) {
     root.dispose()
     return null
   }
 
-  const splatSupported = hasWebGL2()
+  const splatSupported = Boolean(cfg.splatPath) && hasWebGL2()
 
   return {
     showMesh: () => {
@@ -122,7 +83,7 @@ export async function loadAvatar(
     },
 
     showSplat: async () => {
-      if (!splatSupported) return
+      if (!splatSupported || !cfg.splatPath) return
 
       // Lazy-load splat on first toggle
       if (!splatLoaded) {
@@ -130,6 +91,7 @@ export async function loadAvatar(
         try {
           // Dynamic import registers the SPLAT loader plugin
           await import('@babylonjs/loaders/SPLAT')
+          const { GaussianSplattingMesh } = await import('@babylonjs/core/Meshes/GaussianSplatting/gaussianSplattingMesh')
 
           splatMesh = new GaussianSplattingMesh('avatar-splat', undefined, scene)
           await splatMesh.loadFileAsync(cfg.splatPath)

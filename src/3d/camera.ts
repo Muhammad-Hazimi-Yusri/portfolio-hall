@@ -2,17 +2,18 @@ import { Scene } from '@babylonjs/core/scene'
 import { Vector3 } from '@babylonjs/core/Maths/math.vector'
 import { UniversalCamera } from '@babylonjs/core/Cameras/universalCamera'
 import type { CameraRef } from './cameraRef'
+import { EYE_HEIGHT, walkingStep, jumpStep } from './locomotion'
 
 // Side-effect imports for camera inputs
 import '@babylonjs/core/Cameras/Inputs/freeCameraKeyboardMoveInput'
 import '@babylonjs/core/Cameras/Inputs/freeCameraMouseInput'
 
-// Touch-look yaw: a full screen-width swipe turns ~1.5 full views.
+// Touch-look yaw: a full screen-width swipe turns 180 degrees.
 // Viewport-relative so dense-DPI phones and tablets feel the same.
 // Gyro-ON and gyro-OFF paths use the same value so drag feels identical
 // regardless of whether gyro is active — touch offset accumulates on top
 // of gyro rotation, the final camera.rotation pitch is clamped separately.
-const TOUCH_LOOK_FULL_SCREEN_YAW = Math.PI * 1.5
+const TOUCH_LOOK_FULL_SCREEN_YAW = Math.PI
 const TOUCH_LOOK_GYRO_OFFSET_YAW = TOUCH_LOOK_FULL_SCREEN_YAW
 
 // Exponential smoothing for noisy device-orientation sensors.
@@ -40,83 +41,63 @@ export function createFirstPersonCamera(
   initialTarget?: { x: number; y: number; z: number },
   recenterGyroRef?: React.MutableRefObject<boolean>,
 ) {
-  // Always start at arrival platform — ensures all geometry and shaders
-  // render at a content-rich position while the transition overlay is visible.
-  const camera = new UniversalCamera('fpCam', new Vector3(0, 1.6, 2), scene)
-  camera.setTarget(new Vector3(0, 1.6, 15))
-
-  // Deferred teleport: after a few render frames, move to the requested
-  // position. The transition overlay hides this camera movement.
-  if (initialPosition || initialTarget) {
-    let frames = 0
-    const obs = scene.onAfterRenderObservable.add(() => {
-      if (++frames >= 3) {
-        if (initialPosition) {
-          camera.position.set(initialPosition.x, initialPosition.y, initialPosition.z)
-        }
-        if (initialTarget) {
-          camera.setTarget(
-            new Vector3(initialTarget.x, initialTarget.y, initialTarget.z),
-          )
-        }
-        scene.onAfterRenderObservable.remove(obs)
-      }
-    })
-  }
+  const start = initialPosition ?? { x: 0, y: EYE_HEIGHT, z: 2 }
+  const target = initialTarget ?? { x: 0, y: EYE_HEIGHT, z: 15 }
+  const camera = new UniversalCamera('fpCam', new Vector3(start.x, start.y, start.z), scene)
+  camera.setTarget(new Vector3(target.x, target.y, target.z))
+  // One movement path for keyboard and touch. Babylon's mouse look remains,
+  // while duplicate touch/keyboard movement inputs are explicitly removed.
+  camera.inputs.removeByType('FreeCameraKeyboardMoveInput')
+  camera.inputs.removeByType('FreeCameraTouchInput')
   camera.attachControl(canvas, true)
 
   // Clipping planes
   camera.minZ = 0.1
-  camera.maxZ = 100
+  camera.maxZ = 1600
 
   // Adjust FOV based on orientation
   const updateFOV = () => {
     const isPortrait = window.innerHeight > window.innerWidth
-    camera.fov = isPortrait ? 2.0 : 0.8  // radians: ~115° portrait, ~46° landscape
+    camera.fov = isPortrait ? 1.15 : 0.95
   }
   updateFOV()
   window.addEventListener('resize', updateFOV)
 
   // Camera sensitivity & inertia
-  camera.angularSensibility = 1000
-  camera.inertia = 0.2
-
-  // Movement speeds
-  const walkSpeed = 0.9
-  const sprintSpeed = 1.8
-  camera.speed = walkSpeed
-
-  // Sprint (Shift key)
-  window.addEventListener('keydown', (e) => {
-    if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') {
-      camera.speed = sprintSpeed
-    }
-  })
-
-  window.addEventListener('keyup', (e) => {
-    if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') {
-      camera.speed = walkSpeed
-    }
-  })
-
-  // WASD keys
-  camera.keysUp = [87, 38]
-  camera.keysDown = [83, 40]
-  camera.keysLeft = [65, 37]
-  camera.keysRight = [68, 39]
+  camera.angularSensibility = 1800
+  camera.inertia = 0
 
   // Collision ellipsoid
-  camera.ellipsoid = new Vector3(0.8, 0.9, 0.8)
-  camera.ellipsoidOffset = new Vector3(0, 0.9, 0)
+  camera.ellipsoid = new Vector3(0.35, 0.75, 0.35)
+  camera.ellipsoidOffset = Vector3.Zero()
   camera.checkCollisions = true
 
   camera.applyGravity = false
   
   let velocityY = 0
-  const gravity = -0.006
-  const jumpForce = 0.18
-  const groundY = 1.6
-  let isGrounded = true
+  const keys = new Set<string>()
+  const movementKeys = new Set(['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ShiftLeft', 'ShiftRight', 'Space'])
+  const active = () => !document.hidden && !cameraRef?.current.isInVR && !cameraRef?.current.isFlyingTo && !scene.metadata?.inputPaused
+  const onKeyDown = (event: KeyboardEvent) => {
+    if (!active() || !movementKeys.has(event.code) || event.ctrlKey || event.altKey || event.metaKey) return
+    if (document.pointerLockElement !== canvas && document.activeElement !== canvas) return
+    event.preventDefault()
+    if (event.code === 'Space' && !event.repeat && jumpRef) jumpRef.current = true
+    keys.add(event.code)
+  }
+  const onKeyUp = (event: KeyboardEvent) => { keys.delete(event.code) }
+  const clearInput = () => {
+    keys.clear(); camera.cameraDirection.setAll(0); camera.cameraRotation.setAll(0)
+    if (joystickRef) joystickRef.current = { x: 0, y: 0 }
+    if (lookRef) lookRef.current = { x: 0, y: 0 }
+    if (jumpRef) jumpRef.current = false
+  }
+  window.addEventListener('keydown', onKeyDown)
+  window.addEventListener('keyup', onKeyUp)
+  window.addEventListener('blur', clearInput)
+  document.addEventListener('visibilitychange', clearInput)
+  document.addEventListener('pointerlockchange', clearInput)
+  canvas.addEventListener('blur', clearInput)
 
   // Gyro state
   let initialAlpha: number | null = null
@@ -140,7 +121,7 @@ export function createFirstPersonCamera(
   }
 
   const handleOrientation = (e: DeviceOrientationEvent) => {
-    if (!gyroRef?.current) return
+    if (!gyroRef?.current || !active()) return
     if (e.alpha === null || e.beta === null || e.gamma === null) return
 
     const isLandscape = landscapeModeRef?.current ?? false
@@ -195,9 +176,10 @@ export function createFirstPersonCamera(
 
   window.addEventListener('deviceorientation', handleOrientation)
 
-  scene.onBeforeRenderObservable.add(() => {
+  const inputObserver = scene.onBeforeAnimationsObservable.add(() => {
     // Skip all input while in VR — XR camera takes over
-    if (cameraRef?.current.isInVR) return
+    if (!active()) { clearInput(); velocityY = 0; initialAlpha = null; return }
+    if (!gyroRef?.current) initialAlpha = null
 
     // User-triggered recenter: re-zero the gyro baseline to the current phone pose
     if (recenterGyroRef?.current) {
@@ -213,21 +195,13 @@ export function createFirstPersonCamera(
       recenterGyroRef.current = false
     }
 
-    // Skip movement during fly-to animation
-    if (!cameraRef?.current.isFlyingTo) {
-      // Joystick movement
-      if (joystickRef?.current) {
-        const { x, y } = joystickRef.current
-        if (x !== 0 || y !== 0) {
-          const moveSpeed = sprintRef?.current ? 0.06 : 0.03
-          camera.cameraDirection.addInPlace(
-            camera.getDirection(Vector3.Forward()).scale(y * moveSpeed)
-          )
-          camera.cameraDirection.addInPlace(
-            camera.getDirection(Vector3.Right()).scale(x * moveSpeed)
-          )
-        }
-      }
+    // Apply the shared movement path before Babylon updates the camera.
+    {
+      const seconds = scene.getEngine().getDeltaTime() / 1000
+      const x = (joystickRef?.current.x ?? 0) + Number(keys.has('KeyD') || keys.has('ArrowRight')) - Number(keys.has('KeyA') || keys.has('ArrowLeft'))
+      const forward = (joystickRef?.current.y ?? 0) + Number(keys.has('KeyW') || keys.has('ArrowUp')) - Number(keys.has('KeyS') || keys.has('ArrowDown'))
+      const step = walkingStep(x, forward, camera.rotation.y, seconds, Boolean(sprintRef?.current || keys.has('ShiftLeft') || keys.has('ShiftRight')))
+      camera.cameraDirection.set(step.x, 0, step.z)
 
       // Touch look — sensitivity scales with viewport width so a full-screen
       // swipe always produces the same angular travel regardless of DPR/size.
@@ -252,28 +226,12 @@ export function createFirstPersonCamera(
         }
       }
 
-      // Mobile jump
-      if (jumpRef?.current && isGrounded) {
-        velocityY = jumpForce
-        isGrounded = false
-        jumpRef.current = false
-      }
-
-      // Gravity
-      velocityY += gravity
-      camera.position.y += velocityY
-
-      if (camera.position.y <= groundY) {
-        camera.position.y = groundY
-        velocityY = 0
-        isGrounded = true
-      }
-    } else {
-      // Reset gravity state during fly-to so there's no jitter on landing
-      velocityY = 0
-      isGrounded = true
+      const jump = jumpStep(camera.position.y, velocityY, seconds, Boolean(jumpRef?.current))
+      camera.position.y = jump.height; velocityY = jump.velocity
+      if (jumpRef) jumpRef.current = false
     }
-
+  })
+  const positionObserver = scene.onBeforeRenderObservable.add(() => {
     // Write camera position to shared ref
     if (cameraRef) {
       cameraRef.current.position.x = camera.position.x
@@ -282,12 +240,27 @@ export function createFirstPersonCamera(
     }
   })
 
-  window.addEventListener('keydown', (e) => {
-    if (e.code === 'Space' && isGrounded) {
-      velocityY = jumpForce
-      isGrounded = false
-    }
+  camera.onDisposeObservable.addOnce(() => {
+    clearInput()
+    scene.onBeforeAnimationsObservable.remove(inputObserver)
+    scene.onBeforeRenderObservable.remove(positionObserver)
+    window.removeEventListener('resize', updateFOV)
+    window.removeEventListener('deviceorientation', handleOrientation)
+    window.removeEventListener('keydown', onKeyDown)
+    window.removeEventListener('keyup', onKeyUp)
+    window.removeEventListener('blur', clearInput)
+    document.removeEventListener('visibilitychange', clearInput)
+    document.removeEventListener('pointerlockchange', clearInput)
+    canvas.removeEventListener('blur', clearInput)
   })
 
-  return camera
+  // Read input before deciding whether to draw. Keeping this separate from
+  // onBeforeAnimations lets the renderer sleep without starving the first
+  // key, touch-look delta or the rest of an airborne jump.
+  const hasPendingInput = () => active() && (
+    keys.size > 0 || Math.hypot(joystickRef?.current.x ?? 0, joystickRef?.current.y ?? 0) >= .08 ||
+    Boolean(lookRef?.current.x || lookRef?.current.y || jumpRef?.current || recenterGyroRef?.current) ||
+    velocityY !== 0 || camera.position.y > EYE_HEIGHT + .001 || camera.cameraRotation.lengthSquared() > 0
+  )
+  return { camera, hasPendingInput }
 }

@@ -48,9 +48,9 @@ export function TourCanvas() {
     }
     loadAssets(scene, loadOpts)
 
-    // Load avatar on arrival platform (mesh-only, no splat toggle in tour)
+    // Only load an explicitly configured portrait, with no placeholder figure.
     let avatarInstance: AvatarInstance | null = null
-    loadAvatar(scene, mats).then(instance => {
+    loadAvatar(scene).then(instance => {
       avatarInstance = instance
     })
 

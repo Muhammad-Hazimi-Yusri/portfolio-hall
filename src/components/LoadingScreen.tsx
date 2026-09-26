@@ -1,40 +1,37 @@
+import { useEffect, useRef } from 'react'
+
 type LoadingScreenProps = {
-  progress?: number
   stage?: string
+  returnHref?: string
 }
 
 const stageLabels: Record<string, string> = {
-  engine: 'Starting engine...',
-  scene: 'Building royal hall...',
-  textures: 'Loading artwork...',
-  ready: 'Welcome!',
+  engine: 'Opening the walk view…',
+  scene: 'Preparing the hall…',
+  textures: 'Loading the exhibits…',
+  ready: 'The hall is ready.',
 }
 
-export function LoadingScreen({ progress = 0, stage = 'engine' }: LoadingScreenProps) {
+export function LoadingScreen({ stage = 'engine', returnHref = '#projects' }: LoadingScreenProps) {
+  const returnRef = useRef<HTMLAnchorElement>(null)
+  useEffect(() => {
+    returnRef.current?.focus({ preventScroll: true })
+    const cancel = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape' || event.defaultPrevented) return
+      event.preventDefault()
+      window.location.hash = returnHref
+    }
+    window.addEventListener('keydown', cancel)
+    return () => window.removeEventListener('keydown', cancel)
+  }, [returnHref])
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center bg-hall-bg">
-      <div className="mb-6">
-        <div className="w-12 h-12 border-4 border-hall-muted/30 border-t-hall-accent rounded-full animate-spin" />
+    <main className="walk-loading" aria-labelledby="walk-loading-title">
+      <div>
+        <p className="walk-loading-kicker">Balairung</p>
+        <h1 id="walk-loading-title">Walk around the hall</h1>
+        <p className="walk-loading-status" role="status">{stageLabels[stage] ?? stageLabels.engine}</p>
+        <a ref={returnRef} href={returnHref}>← Back to portfolio</a>
       </div>
-
-      <div className="w-64 mb-3">
-        <div className="h-2 bg-hall-frame rounded-full overflow-hidden">
-          <div
-            className="h-full bg-hall-accent transition-all duration-300 ease-out rounded-full"
-            style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
-          />
-        </div>
-      </div>
-
-      <p className="text-hall-text text-sm font-semibold">
-        {stageLabels[stage] || stage}
-      </p>
-      <p className="text-hall-muted text-xs mt-1">
-        {Math.round(progress)}%
-      </p>
-      <p className="text-hall-muted/50 text-xs mt-4">
-        First load may take a moment
-      </p>
-    </div>
+    </main>
   )
 }

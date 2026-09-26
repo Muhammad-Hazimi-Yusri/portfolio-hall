@@ -1,5 +1,13 @@
 // Public portfolio content. Update entries here; see docs/PORTFOLIO_CONTENT.md.
 // Keep client names, internal URLs, source code and site-test data out of this file.
+export type ProjectImage = {
+  src: string
+  alt: string
+  caption: string
+  width?: number
+  height?: number
+}
+
 export type Project = {
   id: string
   title: string
@@ -12,14 +20,20 @@ export type Project = {
   contribution: string[]
   currentState: string
   links: { label: string; url: string }[]
-  image?: { src: string; alt: string; caption: string; width?: number; height?: number }
+  liveApp?: { url: string }
+  video?: { youtubeId: string; label: string; title: string; caption: string }
+  image?: ProjectImage
+  gallery?: ProjectImage[]
   featured?: boolean
+  exhibitSteps?: string[]
 }
 
 export const profile = {
   name: 'Muhammad Hazimi Yusri',
   shortName: 'Hazimi Yusri',
   location: 'Liverpool, UK',
+  availability: 'Liverpool · Remote-first',
+  workingPreference: 'I prefer fully remote work and am open to hybrid roles around Liverpool and Manchester. I’m happy to discuss other locations for the right opportunity.',
   email: 'muhammadhazimiyusri@gmail.com',
   linkedin: 'https://www.linkedin.com/in/muhammadhazimiyusri/',
   github: 'https://github.com/Muhammad-Hazimi-Yusri',
@@ -30,6 +44,7 @@ export const profile = {
 export const professionalWork: Project[] = [
   {
     id: 'reporting-workbench',
+    exhibitSteps: ['Project inputs', 'Figures & templates', 'Word draft'],
     title: 'Reporting workbench',
     category: 'TNEI · Engineering tools',
     status: 'Internal · In development',
@@ -43,10 +58,12 @@ export const professionalWork: Project[] = [
       'Connecting the React interface, FastAPI application and PostgreSQL database. The application runs on a company Ubuntu VM with Docker and Microsoft SSO.',
     ],
     currentState: 'Deployed on the internal network and still under development. The workflow needs further work before I would describe it as a finished tool. Engineers remain responsible for the studies, the report and its review.',
+    image: { src: 'thumbnails/reporting-workbench-workflow.svg', alt: 'Workflow illustration: project values, an approved template and study figures are assembled into a Word draft for engineering review.', caption: 'Public workflow illustration, not an application screenshot. The internal workbench is still in development.', width: 1200, height: 720 },
     links: [],
   },
   {
     id: 'site-test-analysis',
+    exhibitSteps: ['Measured data', 'Targets & plots', 'Reviewable results'],
     title: 'Site-test analysis tools',
     category: 'TNEI · Data analysis',
     status: 'Internal · In development',
@@ -60,6 +77,7 @@ export const professionalWork: Project[] = [
       'Working on traceable calculation workbooks and report figures so the results can be checked during engineering review.',
     ],
     currentState: 'Ongoing internal tooling work using site-test data. This is analysis of measurements; it does not replace engineering judgement or independently establish compliance.',
+    image: { src: 'thumbnails/site-test-analysis-sketch.svg', alt: 'Illustrative response trace with a step target, a shaded band and a chosen test window. All values are synthetic.', caption: 'Illustrative trace with synthetic values and an arbitrary band. No site data, compliance limits or test results are shown.', width: 1200, height: 720 },
     links: [],
   },
 ]
@@ -67,6 +85,7 @@ export const professionalWork: Project[] = [
 export const projects: Project[] = [
   {
     id: 'food-wars',
+    liveApp: { url: 'https://food-wars.muhammadhazimiyusri.uk' },
     title: 'Food Wars',
     category: 'Personal · Web application',
     status: 'In development',
@@ -107,10 +126,13 @@ export const projects: Project[] = [
     links: [
       { label: 'Project & download', url: 'https://chronohaxx.itch.io/avvr' },
       { label: 'Project resources', url: 'https://linktr.ee/gdp4' },
+      { label: 'Research & scene data', url: 'https://cvssp.org/data/s3a/public/AV-Analysis2/' },
     ],
   },
   {
     id: 'wattwhere',
+    liveApp: { url: 'https://muhammad-hazimi-yusri.github.io/wattwhere/' },
+    exhibitSteps: ['Generation', 'Grid & markets', 'Electricity bills'],
     title: 'WattWhere',
     category: 'Personal · Energy & data',
     status: 'Early version',
@@ -123,7 +145,9 @@ export const projects: Project[] = [
       'Combining infrastructure overlays with electricity-market and carbon-intensity data.',
       'Using a static Astro site with interactive React components and a data-refresh workflow.',
     ],
-    currentState: 'An early public version. Data comes from external providers and needs to be understood in that context; this is an explanatory project, not an operational grid tool.',
+    currentState: 'An early public version. These dated captures show the dashboard’s chart panels. The hosted map currently displays a basemap-provider error, which still needs fixing.',
+    image: { src: 'thumbnails/wattwhere-fuel-mix.jpg', alt: 'WattWhere’s fuel-mix chart showing stacked generation by fuel across a day, with BMRS attribution.', caption: 'Fuel-mix panel from the hosted dashboard, 23 September 2026. BMRS data © Elexon Limited (2026).', width: 420, height: 272 },
+    gallery: [{ src: 'thumbnails/wattwhere-carbon.jpg', alt: 'WattWhere’s national carbon-intensity chart with solid actual and dashed forecast lines.', caption: 'Actual and forecast carbon-intensity panel, 23 September 2026. Data: National Grid ESO, CC BY 4.0.', width: 360, height: 252 }],
     links: [
       { label: 'Source code', url: 'https://github.com/Muhammad-Hazimi-Yusri/wattwhere' },
       { label: 'Open site', url: 'https://muhammad-hazimi-yusri.github.io/wattwhere/' },
@@ -131,6 +155,7 @@ export const projects: Project[] = [
   },
   {
     id: 'rubyvr-studio',
+    exhibitSteps: ['Tile artwork', 'Voxel editing', 'Game integration'],
     title: 'RubyVR Studio',
     category: 'Personal · Graphics tools',
     status: 'Early development',
@@ -144,10 +169,14 @@ export const projects: Project[] = [
       'Documenting setup, contribution tasks and the limits of the current playable demo.',
     ],
     currentState: 'The editor and local desktop demo are in development. Public installation, world coverage, performance and VR work remain open. It is not a finished VR game. Original game assets and the underlying recompilation are the work of their respective authors.',
+    image: { src: 'thumbnails/rubyvr-studio-scene.png', alt: 'RubyVR Studio showing the original tile map above an editable 3D scene, with a model library and scene controls.', caption: 'The development editor: source artwork above the voxel scene. Original game artwork belongs to its respective owners.', width: 1600, height: 950 },
+    gallery: [{ src: 'thumbnails/rubyvr-studio-model.png', alt: 'A house roof selected in RubyVR Studio, with its source pixels, 3D transform handles and part dimensions visible.', caption: 'Editing a model part while keeping its source artwork in view. Development capture from the editor repository.', width: 1600, height: 950 }],
     links: [{ label: 'Source & progress', url: 'https://github.com/ChronoHaxx/rubyvr-studio' }],
   },
   {
     id: 'the-finals-outfit',
+    liveApp: { url: 'https://chronohaxx.github.io/the-finals-outfit/' },
+    exhibitSteps: ['Cosmetic items', 'Materials & preview', 'Shared outfits'],
     title: 'THE FINALS Outfit Studio',
     category: 'Personal · 3D web application',
     status: 'In development',
@@ -161,10 +190,15 @@ export const projects: Project[] = [
       'Keeping application code separate from game artwork and recording community-tooling attribution.',
     ],
     currentState: 'An unofficial fan project in development. Material fidelity and item coverage are ongoing work. THE FINALS and its artwork belong to Embark Studios; extraction and reconstruction also build on community discoveries.',
-    links: [{ label: 'Source & credits', url: 'https://github.com/ChronoHaxx/the-finals-outfit' }],
+    image: { src: 'thumbnails/the-finals-outfit-builder.png', alt: 'THE FINALS Outfit Studio with a 3D character preview, equipped items and a searchable cosmetic catalogue.', caption: 'Development capture, 12 September 2026. Interface and material work are ongoing. Game artwork © Embark Studios.', width: 1390, height: 1000 },
+    links: [
+      { label: 'Open app', url: 'https://chronohaxx.github.io/the-finals-outfit/' },
+      { label: 'Source & credits', url: 'https://github.com/ChronoHaxx/the-finals-outfit' },
+    ],
   },
   {
     id: 'petbot',
+    video: { youtubeId: '3umn0yt_FcE', label: 'Watch demo', title: 'PetBot team demonstration', caption: 'The university team prototype in action. My contribution was the server and AI integration.' },
     title: 'PetBot',
     category: 'University · Team project',
     status: 'University prototype',
@@ -185,7 +219,30 @@ export const projects: Project[] = [
     ],
   },
   {
+    id: 'fpv-drone',
+    video: { youtubeId: 'KLsvO-GVh0s', label: 'Watch flight', title: 'Southampton Common flight', caption: 'Flight footage from the 2023 AOS 5 build diary, recorded with the DJI O3 air unit.' },
+    title: 'FPV drone',
+    category: 'Personal · Hardware & flight',
+    status: 'Build & flight diary · 2023',
+    summary: 'An AOS 5 build with DJI O3 video, followed by flights, repairs and better component mounting.',
+    role: 'Assembled, modified and flew a personal drone using off-the-shelf components.',
+    tools: ['AOS 5 V3', 'DJI O3', 'ELRS', '3D printing / TPU', 'Soldering'],
+    problem: 'Putting the parts together was only the beginning. Early flights exposed problems with camera mounting, antenna placement and protecting the electronics.',
+    contribution: [
+      'Assembled the drone, then rerouted wiring and printed a side cover after the first flight.',
+      'Printed camera and GPS mounts in TPU using Tim O’Brien’s design.',
+      'Added spare LED strips to help see the drone at dusk, and documented flights and repairs.',
+    ],
+    currentState: 'The linked diary records the build and early flights in 2023. The Southampton Common film shows the drone flying; the diary also records damage and repairs. This exhibit presents that chapter of the project.',
+    image: { src: 'thumbnails/fpv-drone.jpg', alt: 'My FPV drone with an orange battery, blue-green propellers, a front camera and LED strips.', caption: 'The actual build, from my earlier portfolio.', width: 1440, height: 1920 },
+    links: [
+      { label: 'Watch flight', url: 'https://youtu.be/KLsvO-GVh0s' },
+      { label: 'Original build diary', url: 'https://muhammad-hazimi-yusri.github.io/quartz-jimi/projects/fpv-drone/' },
+    ],
+  },
+  {
     id: 'eee-roadmap',
+    liveApp: { url: 'https://eee-roadmap.muhammadhazimiyusri.uk' },
     title: 'EEE Roadmap',
     category: 'Personal · Learning tools',
     status: 'In development',
@@ -206,6 +263,7 @@ export const projects: Project[] = [
   },
   {
     id: 'balairung',
+    exhibitSteps: ['Project content', 'Gallery displays', 'Browse or explore'],
     title: 'Balairung',
     category: 'Personal · Browser 3D',
     status: 'Interactive experiment',
@@ -219,6 +277,8 @@ export const projects: Project[] = [
       'Connected the hall to direct project navigation, with readable notes, a CV and a map when 3D is unavailable.',
     ],
     currentState: 'An ongoing browser experiment. The gallery has direct navigation and a free-roam mode, with the same content available without 3D. Headset support still needs further testing.',
+    image: { src: 'thumbnails/balairung-hall.jpg', alt: 'Balairung’s timber hall over water, with project frames, planted entrance platform and browsing controls.', caption: 'Development preview of the hall, September 2026.', width: 723, height: 580 },
+    gallery: [{ src: 'thumbnails/balairung-map.jpg', alt: 'Balairung’s 2D floor plan, with links to professional work, projects and experience.', caption: 'The same project catalogue in the 2D floor-plan view. Development preview, September 2026.', width: 723, height: 580 }],
     links: [
       { label: 'Enter the 3D hall', url: '#explore' },
       { label: 'Source code', url: 'https://github.com/Muhammad-Hazimi-Yusri/portfolio-hall' },
@@ -228,13 +288,17 @@ export const projects: Project[] = [
 
 export const experience = [
   {
+    id: 'tnei',
+    logo: { src: 'brands/tnei.png', background: '#f4f8fb', width: 2.05, motion: 'left-right' as const },
     organisation: 'TNEI',
-    title: 'Graduate Consultant · Connections',
+    title: 'Power Systems Consultant · Connections',
     dates: 'Apr 2026 – present',
     description: 'Grid-code compliance and load-flow studies, post-energisation site-test analysis, and engineering reports. Developing internal Python and web tools alongside those studies.',
     tools: 'PowerFactory, IPSA, Python, engineering analysis',
   },
   {
+    id: 'audioscenic',
+    logo: { src: 'brands/audioscenic.svg', background: '#14233f', width: 2.6, ink: '#14233f', motion: 'right-left' as const },
     organisation: 'Audioscenic',
     title: 'Software Audio Analysis Intern',
     dates: 'Jul – Sep 2025',
@@ -242,6 +306,8 @@ export const experience = [
     tools: 'Python, WebSockets, multiprocessing, pytest, GitLab',
   },
   {
+    id: 'southampton-research',
+    logo: { src: 'brands/southampton.svg', background: '#00536b', width: 2.65, ink: '#00536b', motion: 'bob' as const },
     organisation: 'University of Southampton',
     title: 'Research Assistant',
     dates: 'Jun – Aug 2024',

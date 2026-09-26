@@ -7,24 +7,22 @@ import { Mesh } from '@babylonjs/core/Meshes/mesh'
 import { Texture } from '@babylonjs/core/Materials/Textures/texture'
 import { DynamicTexture } from '@babylonjs/core/Materials/Textures/dynamicTexture'
 import type { POI } from '@/types/poi'
+import { createProjectArtwork } from './projectArtwork'
+import { createExperienceDisplay } from './experienceDisplay'
+import { roundedBox } from './exhibitGeometry'
 
 // Shared materials (created once per scene)
 function createSharedMaterials(scene: Scene) {
-  // Frame for paintings (light gray)
+  // A slim, dark metal edge leaves the artwork dominant against the plaster.
   const frame = new StandardMaterial('frameMat', scene)
-  frame.diffuseColor = new Color3(0.92, 0.93, 0.95)
-  frame.specularColor = new Color3(0.3, 0.3, 0.3)
+  frame.diffuseColor = Color3.FromHexString('#393b34')
+  frame.specularColor = new Color3(0.18, 0.18, 0.18)
   frame.specularPower = 96
 
-  // Structural gray for bases/platforms
+  // Backing panels and signs share the architectural palette.
   const teak = new StandardMaterial('teakMat', scene)
-  teak.diffuseColor = new Color3(0.85, 0.87, 0.90)
-  teak.specularColor = new Color3(0.2, 0.2, 0.2)
-
-  // Panel white for pedestal bodies
-  const teakLight = new StandardMaterial('teakLightMat', scene)
-  teakLight.diffuseColor = new Color3(0.95, 0.96, 0.97)
-  teakLight.specularColor = new Color3(0.15, 0.15, 0.15)
+  teak.diffuseColor = Color3.FromHexString('#344b3f')
+  teak.specularColor = new Color3(0.1, 0.1, 0.1)
 
   // Glass for display cases (frosted, cool tint)
   const glass = new StandardMaterial('glassMat', scene)
@@ -34,7 +32,7 @@ function createSharedMaterials(scene: Scene) {
   glass.alpha = 0.2
   glass.backFaceCulling = false
 
-  return { frame, teak, teakLight, glass }
+  return { frame, teak, glass }
 }
 
 type PaintingResult = {
@@ -45,11 +43,13 @@ type PaintingResult = {
 function createPaintingMesh(poi: POI, scene: Scene, mats: ReturnType<typeof createSharedMaterials>): PaintingResult {
   const rad = (poi.rotation * Math.PI) / 180
   const group = new Mesh(`${poi.id}-group`, scene)
-  group.position = new Vector3(poi.position.x, 1.65, poi.position.z)
+  group.position = new Vector3(poi.position.x, 1.92, poi.position.z)
   group.rotation.y = rad
 
   // Canvas plane
-  const canvas = MeshBuilder.CreatePlane(poi.id, { width: 1.5, height: 1, sideOrientation: Mesh.DOUBLESIDE }, scene)
+  const fw = 2.9
+  const fh = 1.94
+  const canvas = MeshBuilder.CreatePlane(poi.id, { width: fw, height: fh, sideOrientation: Mesh.DOUBLESIDE }, scene)
   canvas.position.z = -0.05
   canvas.parent = group
 
@@ -58,7 +58,11 @@ function createPaintingMesh(poi: POI, scene: Scene, mats: ReturnType<typeof crea
   canvasMat.specularColor = new Color3(0.02, 0.02, 0.02)
   canvasMat.emissiveColor = new Color3(0.03, 0.03, 0.03)
 
-  if (poi.content.thumbnail) {
+  if (poi.content.category) {
+    canvasMat.emissiveTexture = createProjectArtwork(poi.id, poi.content, scene)
+    canvasMat.emissiveColor = Color3.Black()
+    canvasMat.disableLighting = true
+  } else if (poi.content.thumbnail) {
     const tex = new Texture(poi.content.thumbnail, scene, false, true)
     tex.uScale = -1
     canvasMat.diffuseTexture = tex
@@ -77,10 +81,8 @@ function createPaintingMesh(poi: POI, scene: Scene, mats: ReturnType<typeof crea
   canvas.material = canvasMat
 
   // Frame bars (4 pieces)
-  const fw = 1.5 // canvas width
-  const fh = 1 // canvas height
-  const t = 0.08 // frame thickness
-  const d = 0.1 // frame depth
+  const t = 0.045 // frame thickness
+  const d = 0.075 // frame depth
 
   const frameParts = [
     // Top
@@ -93,19 +95,44 @@ function createPaintingMesh(poi: POI, scene: Scene, mats: ReturnType<typeof crea
     { w: t, h: fh, dp: d, x: fw / 2 + t / 2, y: 0 },
   ]
 
-  frameParts.forEach((fp, i) => {
+  const bars = frameParts.map((fp, i) => {
     const bar = MeshBuilder.CreateBox(`${poi.id}-frame-${i}`, { width: fp.w, height: fp.h, depth: fp.dp }, scene)
     bar.position = new Vector3(fp.x, fp.y, -0.05)
-    bar.parent = group
     bar.material = mats.frame
+    return bar
   })
+  // The border remains one independently highlightable frame, rather than
+  // four draw calls. Merge in local coordinates before attaching its parent.
+  const border = Mesh.MergeMeshes(bars, true, true)!
+  border.name = `${poi.id}-frame-border`; border.parent = group
+
+  // A shallow shadow gap and a small physical catalogue label ground each exhibit.
+  const backing = MeshBuilder.CreateBox(`${poi.id}-backing`, { width: fw + 0.12, height: fh + 0.12, depth: 0.08 }, scene)
+  backing.position.z = -0.13; backing.material = mats.teak
+  const labelMount = MeshBuilder.CreateBox(`${poi.id}-label-mount`, { width: 2.34, height: .4, depth: .035 }, scene)
+  labelMount.position.set(0, -1.31, -.13); labelMount.material = mats.teak
+  const mounting = Mesh.MergeMeshes([backing, labelMount], true, true)!
+  mounting.name = `${poi.id}-backing`; mounting.parent = group
+  const plaqueTexture = new DynamicTexture(`${poi.id}-plaque`, { width: 1024, height: 160 }, scene, true)
+  plaqueTexture.anisotropicFilteringLevel = 4
+  const ctx = plaqueTexture.getContext() as unknown as CanvasRenderingContext2D
+  ctx.fillStyle = '#f2eee4'; ctx.fillRect(0, 0, 1024, 160)
+  ctx.fillStyle = '#254b53'; ctx.font = '500 44px sans-serif'
+  ctx.fillText(poi.content.title, 36, 64, 920)
+  ctx.fillStyle = '#5e726f'; ctx.font = '25px sans-serif'
+  ctx.fillText(poi.content.category ?? 'Project', 36, 119, 900)
+  plaqueTexture.update(); plaqueTexture.uScale = -1; plaqueTexture.uOffset = 1
+  const plaqueMaterial = new StandardMaterial(`${poi.id}-plaque-material`, scene)
+  plaqueMaterial.emissiveTexture = plaqueTexture; plaqueMaterial.disableLighting = true
+  const plaque = MeshBuilder.CreatePlane(`${poi.id}-plaque`, { width: 2.3, height: 0.36, sideOrientation: Mesh.DOUBLESIDE }, scene)
+  plaque.parent = group; plaque.position.set(0, -1.31, -0.1); plaque.material = plaqueMaterial
 
   // Collision box for the whole painting
   group.checkCollisions = true
 
   // Return slideshow target if multiple thumbnails are available
   const thumbnails = poi.content.thumbnails
-  const slideshowTarget = thumbnails && thumbnails.length >= 2
+  const slideshowTarget = !poi.content.category && thumbnails && thumbnails.length >= 2
     ? { mesh: canvas, images: thumbnails }
     : undefined
 
@@ -178,30 +205,80 @@ function createPedestalMesh(poi: POI, scene: Scene, mats: ReturnType<typeof crea
   group.position = new Vector3(poi.position.x, 0, poi.position.z)
   group.rotation.y = rad
 
-  // Base (wider)
-  const base = MeshBuilder.CreateCylinder(`${poi.id}-base`, {
-    diameterTop: 0.7, diameterBottom: 0.8, height: 0.2, tessellation: 12,
-  }, scene)
-  base.position.y = 0.1
+  if (!poi.experienceDisplay) {
+    const contact = poi.id === 'contact'
+    // At 2.23 m wide, the complete sign also fits a narrow phone view from
+    // a safe point on the circular arrival platform.
+    group.scaling.setAll(.85); group.position.y = .02
+    const housing = roundedBox(`${poi.id}-housing`, 2.62, 1.72, .18, .04, scene)
+    housing.position.y = 1.36
+    const foot = roundedBox(`${poi.id}-foot`, 2.72, .12, .64, .035, scene)
+    foot.position.y = .22
+    const supports = [housing, foot]
+    for (const x of [-.82, .82]) {
+      const leg = MeshBuilder.CreateCylinder(`${poi.id}-leg-${x}`, { diameter: .075, height: .55, tessellation: 16 }, scene)
+      leg.position.set(x, .5, 0); supports.push(leg)
+    }
+    // Merge in local space so the sign has one solid, collidable housing.
+    supports.forEach(part => { part.material = mats.frame })
+    const stand = Mesh.MergeMeshes(supports, true, true)!
+    stand.name = `${poi.id}-stand`; stand.parent = group; stand.checkCollisions = true
+
+    const texture = new DynamicTexture(`${poi.id}-welcome`, { width: 1024, height: 640 }, scene, true)
+    texture.anisotropicFilteringLevel = 4
+    const ctx = texture.getContext() as unknown as CanvasRenderingContext2D
+    ctx.fillStyle = '#eee7d7'; ctx.fillRect(0, 0, 1024, 640)
+    ctx.fillStyle = '#846342'; ctx.font = '24px sans-serif'; ctx.fillText(contact ? 'BALAIRUNG / 05' : 'BALAIRUNG / 01', 64, 83)
+    // The same pavilion mark as the website header, drawn as vector strokes.
+    ctx.save(); ctx.translate(892, 37); ctx.scale(2, 2)
+    ctx.strokeStyle = '#846342'; ctx.lineWidth = 1.5; ctx.beginPath()
+    ctx.moveTo(4, 29); ctx.lineTo(4, 9); ctx.lineTo(17, 3); ctx.lineTo(30, 9); ctx.lineTo(30, 29)
+    ctx.moveTo(4, 9); ctx.lineTo(17, 15); ctx.lineTo(30, 9)
+    ctx.moveTo(17, 15); ctx.lineTo(17, 31); ctx.moveTo(9, 12); ctx.lineTo(9, 26); ctx.moveTo(25, 12); ctx.lineTo(25, 26)
+    ctx.stroke(); ctx.restore()
+    ctx.fillStyle = '#292c28'; ctx.font = '100px Georgia, serif'; ctx.fillText(contact ? 'Say hello.' : 'Balairung', 58, 244)
+    ctx.fillStyle = '#626457'; ctx.font = '29px sans-serif'
+    ctx.fillText(contact ? 'Muhammad Hazimi Yusri' : 'Work & ideas by Hazimi Yusri', 64, 302)
+    ctx.fillStyle = '#b8ac94'; ctx.fillRect(64, 388, 896, 2)
+    ctx.fillStyle = '#263e40'; ctx.font = '500 44px sans-serif'
+    ctx.fillText(contact ? 'Contact details' : 'Enter the gallery', 64, 478)
+    ctx.strokeStyle = '#846342'; ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.lineJoin = 'round'
+    ctx.beginPath(); ctx.moveTo(827, 463); ctx.lineTo(943, 463); ctx.lineTo(921, 441); ctx.moveTo(943, 463); ctx.lineTo(921, 485); ctx.stroke()
+    ctx.fillStyle = '#626457'; ctx.font = '24px sans-serif'
+    ctx.fillText(contact ? 'Email  ·  LinkedIn  ·  GitHub' : 'Professional work  /  Projects  /  Experience', 64, 568)
+    texture.update()
+    const material = new StandardMaterial(`${poi.id}-sign-material`, scene)
+    material.emissiveTexture = texture; material.disableLighting = true
+    const sign = MeshBuilder.CreatePlane(`${poi.id}-front`, { width: 2.48, height: 1.55 }, scene)
+    sign.position.set(0, 1.36, -.091); sign.material = material
+    const reverse = sign.clone(`${poi.id}-reverse`)
+    reverse.position.z = .091; reverse.rotation.y = Math.PI
+    const faces = Mesh.MergeMeshes([sign, reverse], true, true)!
+    faces.name = `${poi.id}-sign`; faces.parent = group
+    return group
+  }
+
+  // A quiet exhibition plinth: a recessed foot, solid cabinet and thin cap.
+  // Its front carries the printed role plaque; only the brand mark floats.
+  const base = roundedBox(`${poi.id}-base`, 1.94, .07, .72, .02, scene)
+  base.position.y = .185
   base.parent = group
-  base.material = mats.teakLight
-  base.checkCollisions = true
+  base.material = mats.frame
 
-  // Column
-  const column = MeshBuilder.CreateCylinder(`${poi.id}-col`, {
-    diameter: 0.5, height: 0.6, tessellation: 12,
-  }, scene)
-  column.position.y = 0.5
+  const column = roundedBox(`${poi.id}-col`, 2.08, .97, .82, .035, scene)
+  column.position.y = .705
   column.parent = group
-  column.material = mats.teakLight
+  column.material = mats.teak
+  column.checkCollisions = true
+  column.receiveShadows = true
 
-  // Top platform (gold)
-  const top = MeshBuilder.CreateCylinder(`${poi.id}-top`, {
-    diameterTop: 0.65, diameterBottom: 0.6, height: 0.15, tessellation: 12,
-  }, scene)
-  top.position.y = 0.875
+  const top = roundedBox(`${poi.id}-top`, 2.14, .06, .88, .014, scene)
+  top.position.y = 1.22
   top.parent = group
   top.material = mats.frame
+  top.receiveShadows = true
+
+  createExperienceDisplay(poi, group, scene)
 
   return group
 }
