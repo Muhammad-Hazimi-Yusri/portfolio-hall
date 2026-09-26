@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { POI } from '@/types/poi'
 import type { CameraRef } from '@/3d/cameraRef'
 import { isMobile } from '@/utils/detection'
@@ -9,34 +9,39 @@ type ProgressStripProps = {
   onTeleport: (x: number, z: number) => void
   onTeleportToPOI: (poi: POI) => void
   isPortrait: boolean
+  nearbyId?: string
 }
 
 function getZoneForPosition(wz: number): string {
-  if (wz < 4) return 'Arrival'
+  if (wz < 4) return 'Entrance'
   if (wz < 61) return 'Gallery'
-  if (wz < 75) return 'Observatory'
-  if (wz <= 92) return 'Horizon'
+  if (wz < 75) return 'Experience'
+  if (wz <= 92) return 'Contact'
   return ''
 }
 
 // Zone boundaries as percentages of the 0–90 range
 const toPercent = (z: number) => `${(z / 90) * 100}%`
 
-export function ProgressStrip({ pois, cameraRef, onTeleport, onTeleportToPOI, isPortrait }: ProgressStripProps) {
+export function ProgressStrip({ pois, cameraRef, onTeleport, onTeleportToPOI, isPortrait, nearbyId }: ProgressStripProps) {
   const [playerZ, setPlayerZ] = useState(2)
   const [currentZone, setCurrentZone] = useState('')
   const trackRef = useRef<HTMLDivElement>(null)
+  const [hovered, setHovered] = useState<string | null>(null)
+  const [focused, setFocused] = useState<string | null>(null)
+  const orderedPois = useMemo(() => [...pois].sort((a, b) => a.position.z - b.position.z || a.position.x - b.position.x), [pois])
+  const preview = orderedPois.find(poi => poi.id === (hovered ?? focused))
 
   // RAF loop: track player position at ~10fps
   useEffect(() => {
-    let frame = 0
+    let lastUpdate = 0
     let rafId: number
 
-    const update = () => {
-      frame++
-      if (frame % 6 === 0) {
+    const update = (now: number) => {
+      if (!document.hidden && now - lastUpdate >= 100) {
+        lastUpdate = now
         const { position } = cameraRef.current
-        setPlayerZ(position.z)
+        setPlayerZ(Math.round(position.z * 20) / 20)
         setCurrentZone(getZoneForPosition(position.z))
       }
       rafId = requestAnimationFrame(update)
@@ -68,69 +73,71 @@ export function ProgressStrip({ pois, cameraRef, onTeleport, onTeleportToPOI, is
   const showMobile = isMobile()
   if (showMobile && isPortrait) return null
 
-  const playerPercent = toPercent(playerZ)
+  // The round end platforms extend beyond the strip's 0–90 m axis. Keep the
+  // visitor marker visible there instead of letting it fall outside the rail.
+  const playerPercent = toPercent(Math.max(0, Math.min(90, playerZ)))
 
   return (
     <div
-      className="absolute bottom-0 left-0 w-full h-12 z-40 glass-panel flex flex-col"
-      aria-hidden="true"
+      className="walk-route"
+      role="navigation"
+      aria-label="Destinations in the hall"
     >
-      {/* Zone label */}
-      {currentZone && (
-        <span className="absolute top-0.5 left-3 text-[10px] text-hall-muted pointer-events-none select-none z-10">
-          {currentZone}
-        </span>
-      )}
+      <div className="walk-route-heading"><span><i aria-hidden="true" />You · {currentZone || 'Entrance'}</span><span className={preview ? 'is-preview' : undefined}>{preview ? `Go to ${preview.experienceDisplay?.name ?? preview.content.title}` : 'Choose a destination'}</span></div>
 
       {/* Track area */}
       <div
         ref={trackRef}
-        className="flex-1 relative mx-4 cursor-crosshair"
+        className="walk-route-track"
         onClick={handleClick}
         onTouchEnd={handleTouch}
       >
         {/* Track background line */}
-        <div className="absolute top-1/2 left-0 right-0 h-[3px] -translate-y-1/2 bg-hall-frame rounded-full" />
+        <div className="walk-route-line" />
 
         {/* Zone segments */}
-        <div className="absolute top-1/2 -translate-y-1/2 h-[3px] rounded-full bg-hall-frame"
-          style={{ left: toPercent(0), width: toPercent(6) }} />
-        <div className="absolute top-1/2 -translate-y-1/2 h-[5px] rounded-full bg-hall-frame"
+        <div className="walk-route-gallery"
           style={{ left: toPercent(8), width: toPercent(50) }} />
-        <div className="absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-hall-frame/50 -translate-x-1/2"
+        <div className="walk-route-platform"
           style={{ left: toPercent(68) }} />
-        <div className="absolute top-1/2 -translate-y-1/2 h-[2px] rounded-full bg-hall-frame/30"
-          style={{ left: toPercent(76), width: toPercent(14) }} />
 
         {/* POI dots */}
-        {pois.map(poi => (
-          <div
+        {orderedPois.map((poi, index) => (
+          <button
             key={poi.id}
-            className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-hall-accent/50 hover:bg-hall-accent cursor-pointer z-10"
-            style={{ left: toPercent(poi.position.z) }}
+            aria-label={`Go to ${poi.experienceDisplay?.name ?? poi.content.title}`}
+            aria-current={nearbyId === poi.id ? 'location' : undefined}
+            className="walk-route-stop"
+            onMouseEnter={() => setHovered(poi.id)} onMouseLeave={() => setHovered(null)}
+            onFocus={() => setFocused(poi.id)} onBlur={() => setFocused(null)}
+            onKeyDown={event => {
+              if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return
+              const next = event.key === 'ArrowLeft' ? Math.max(0, index - 1) : event.key === 'ArrowRight' ? Math.min(orderedPois.length - 1, index + 1) : event.key === 'Home' ? 0 : event.key === 'End' ? orderedPois.length - 1 : null
+              if (next === null) return
+              event.preventDefault()
+              trackRef.current?.querySelectorAll<HTMLButtonElement>('button')[next]?.focus({ preventScroll: true })
+            }}
+            style={{ left: toPercent(poi.position.z), top: poi.experienceDisplay ? `calc(50% + ${Math.sign(poi.position.x) * 14}px)` : '50%' }}
             onClick={(e) => { e.stopPropagation(); onTeleportToPOI(poi) }}
             onTouchEnd={(e) => { e.preventDefault(); e.stopPropagation(); onTeleportToPOI(poi) }}
-          />
+          ><span aria-hidden="true" /></button>
         ))}
 
-        {/* Player glow ring */}
+        {/* A bordered diamond distinguishes the visitor from exhibit dots. */}
         <div
-          className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-5 h-5 rounded-full bg-hall-accent/30 pointer-events-none"
-          style={{ left: playerPercent }}
-        />
-        {/* Player position dot */}
-        <div
-          className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3.5 h-3.5 rounded-full bg-hall-accent pointer-events-none z-10"
+          role="img"
+          aria-label={`Your position: ${currentZone || 'Entrance'}`}
+          className="walk-route-player"
           style={{ left: playerPercent }}
         />
       </div>
 
       {/* Zone labels */}
-      <div className="h-4 flex items-start px-4 pointer-events-none select-none">
-        <span className="text-[10px] text-hall-muted absolute" style={{ left: `calc(${toPercent(3)} + 1rem)`, transform: 'translateX(-50%)' }}>Arrival</span>
-        <span className="text-[10px] text-hall-muted absolute" style={{ left: `calc(${toPercent(33)} + 1rem)`, transform: 'translateX(-50%)' }}>Gallery</span>
-        <span className="text-[10px] text-hall-muted absolute" style={{ left: `calc(${toPercent(68)} + 1rem)`, transform: 'translateX(-50%)' }}>Observatory</span>
-        <span className="text-[10px] text-hall-muted absolute" style={{ left: `calc(${toPercent(83)} + 1rem)`, transform: 'translateX(-50%)' }}>Horizon</span>
+      <div className="walk-route-labels">
+        <span style={{ left: toPercent(3) }}>Entrance</span>
+        <span style={{ left: toPercent(33) }}>Gallery</span>
+        <span style={{ left: toPercent(68) }}>Experience</span>
+        <span style={{ left: toPercent(83) }}>Contact</span>
       </div>
     </div>
   )

@@ -1,35 +1,38 @@
 import { Scene } from '@babylonjs/core/scene'
 import { Vector3 } from '@babylonjs/core/Maths/math.vector'
 import { Mesh } from '@babylonjs/core/Meshes/mesh'
+import type { Camera } from '@babylonjs/core/Cameras/camera'
 import type { POI } from '@/types/poi'
+import { inspectionTarget } from './exhibitViewing'
 
 type POIMeshMap = Map<string, { mesh: Mesh; poi: POI }>
 
 export function setupInteraction(
   scene: Scene,
-  camera: { position: Vector3 },
+  camera: Camera,
   poiMeshes: POIMeshMap,
   onInteract: (poi: POI) => void,
   onNearbyChange: (poi: POI | null) => void
 ) {
-  const interactDistance = 2.5
   let nearbyPOI: POI | null = null
+  const forwardAxis = new Vector3(0, 0, 1), forward = Vector3.Zero()
+  const targets = [...poiMeshes.values()].map(({ mesh, poi }) => {
+    const position = mesh.getAbsolutePosition().clone()
+    // Pedestal roots are at floor level; use their display, not their base.
+    if (poi.type !== 'painting') position.y = poi.experienceDisplay ? 1.9 : 1.37
+    return { value: poi, position, reach: poi.type === 'painting' || poi.experienceDisplay ? 7.4 : poi.type === 'pedestal' ? 4.5 : 3.5 }
+  })
+  const contact = targets.find(target => target.value.id === 'contact')
 
-  // Check proximity each frame
-  scene.onBeforeRenderObservable.add(() => {
-    let closest: POI | null = null
-    let closestDist = Infinity
-
-    poiMeshes.forEach(({ mesh, poi }) => {
-      const dist = Vector3.Distance(
-        camera.position,
-        mesh.position
-      )
-      if (dist < interactDistance && dist < closestDist) {
-        closest = poi
-        closestDist = dist
-      }
-    })
+  // A few vector comparisons, with no scene-wide ray cast or frame allocations.
+  const observer = scene.onBeforeRenderObservable.add(() => {
+    if (contact) {
+      contact.position.y = scene.metadata?.guestbookActive ? 2.045 : 1.37
+      contact.reach = scene.metadata?.guestbookActive ? 9.4 : 4.5
+    }
+    camera.getDirectionToRef(forwardAxis, forward)
+    const closest = scene.metadata?.travelActive || scene.metadata?.inputPaused ? null
+      : inspectionTarget(camera.position, forward, targets, { fov: camera.fov, aspect: scene.getEngine().getAspectRatio(camera) })
 
     if (closest !== nearbyPOI) {
       nearbyPOI = closest
@@ -39,7 +42,8 @@ export function setupInteraction(
 
   // E key to interact
   const onKeyDown = (e: KeyboardEvent) => {
-    if (e.code === 'KeyE' && nearbyPOI) {
+    if (e.code === 'KeyE' && !e.repeat && !e.ctrlKey && !e.altKey && !e.metaKey && nearbyPOI && !scene.metadata?.inputPaused &&
+        (document.pointerLockElement === scene.getEngine().getRenderingCanvas() || document.activeElement === scene.getEngine().getRenderingCanvas())) {
       onInteract(nearbyPOI)
     }
   }
@@ -48,5 +52,6 @@ export function setupInteraction(
 
   return () => {
     window.removeEventListener('keydown', onKeyDown)
+    scene.onBeforeRenderObservable.remove(observer)
   }
 }

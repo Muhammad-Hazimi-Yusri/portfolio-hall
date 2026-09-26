@@ -3,6 +3,13 @@ node_modules/
 
 # Build output
 dist/
+_local/
+community/.wrangler/
+
+# S3A source data is for local research; redistribution is not permitted.
+public/models/avvr/listening-reconstruction.bin
+public/models/avvr/listening-reconstruction.json
+public/models/avvr/listening-reference.png
 
 # Local env files
 .env

@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+  <head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>Embedded counter fixture</title>
+    <style>body{font:18px system-ui;color:#25332e;background:#f1f4ed;padding:24px}button{font:inherit;padding:14px 20px}output{display:block;margin:20px 0}section{margin-top:700px}</style>
+  </head>
+  <body>
+    <h1>Embedded counter</h1><p>This local document is a test fixture, not a portfolio project.</p>
+    <button id="increment">Add one</button><output id="count" aria-live="polite">Count: 0</output>
+    <a href="#lower">Go to lower section</a><section id="lower"><h2>Lower section</h2><a href="#">Back to counter</a></section>
+    <script>
+      if (new URLSearchParams(location.search).has('blank')) document.body.replaceChildren();
+      else {
+        let count = 0;
+        document.getElementById('increment').addEventListener('click', () => { document.getElementById('count').textContent = `Count: ${++count}`; });
+      }
+    </script>
+  </body>
+</html>

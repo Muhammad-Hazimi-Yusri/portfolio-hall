@@ -1,88 +1,108 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { POI, Zone } from '@/types/poi'
-import { isMobile } from '@/utils/detection'
 
 type ThreeDSidebarProps = {
   pois: POI[]
   isOpen: boolean
   onToggle: () => void
   onTeleportToPOI: (poi: POI) => void
-  isPortrait: boolean
+  currentZone: Zone
+  nearbyId?: string
 }
 
 const ZONES: { key: Zone; label: string }[] = [
-  { key: 'arrival', label: 'Arrival' },
+  { key: 'arrival', label: 'Entrance' },
   { key: 'gallery', label: 'Gallery' },
-  { key: 'observatory', label: 'Observatory' },
-  { key: 'horizon', label: 'Horizon' },
+  { key: 'observatory', label: 'Experience' },
+  { key: 'horizon', label: 'Contact' },
 ]
 
-export function ThreeDSidebar({ pois, isOpen, onToggle, onTeleportToPOI, isPortrait }: ThreeDSidebarProps) {
+export function ThreeDSidebar({ pois, isOpen, onToggle, onTeleportToPOI, currentZone, nearbyId }: ThreeDSidebarProps) {
   const [expandedZone, setExpandedZone] = useState<string | null>(null)
-  const showMobile = isMobile()
-
-  // Hide in portrait on mobile
-  if (showMobile && isPortrait) return null
+  const toggleRef = useRef<HTMLButtonElement>(null)
+  const closeRef = useRef<HTMLButtonElement>(null)
+  const listRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (!isOpen) return
+    setExpandedZone(currentZone)
+    closeRef.current?.focus({ preventScroll: true })
+  }, [isOpen, currentZone])
+  useEffect(() => {
+    const list = listRef.current
+    const current = list?.querySelector<HTMLButtonElement>('button[aria-current]')
+    if (!isOpen || !list || !current?.getClientRects().length) return
+    const bounds = list.getBoundingClientRect(), item = current.getBoundingClientRect()
+    if (item.top < bounds.top) list.scrollTop += item.top - bounds.top
+    else if (item.bottom > bounds.bottom) list.scrollTop += item.bottom - bounds.bottom
+  }, [isOpen, expandedZone, nearbyId])
+  const close = () => {
+    onToggle()
+    toggleRef.current?.focus({ preventScroll: true })
+  }
 
   return (
     <>
-      {/* Toggle tab — right side */}
       <button
+        ref={toggleRef}
         onClick={onToggle}
-        className={`absolute top-1/2 -translate-y-1/2 z-30 bg-hall-frame/80 backdrop-blur-sm py-3 px-1.5 rounded-l border border-r-0 border-hall-accent/30 text-hall-muted hover:text-hall-text transition-all duration-200 ${
-          isOpen ? 'right-56' : 'right-0'
-        }`}
+        aria-label={isOpen ? 'Close hall directory' : 'Open hall directory'}
+        aria-expanded={isOpen}
+        aria-controls="hall-directory"
+        className="walk-directory-toggle"
       >
-        {isOpen ? '\u25B6' : '\u25C0'}
+        <svg viewBox="0 0 20 20" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="1.2" aria-hidden="true"><path d="m2 4 5-2 6 2 5-2v14l-5 2-6-2-5 2V4Z" /><path d="M7 2v14M13 4v14" /></svg>
+        Hall directory
       </button>
 
-      {/* Sidebar panel — right side */}
-      <div
-        className={`absolute top-0 right-0 h-full w-56 z-30 glass-panel backdrop-blur-sm border-l border-hall-accent/30 transition-transform duration-200 overflow-y-auto ${
-          isOpen ? 'translate-x-0' : 'translate-x-full'
-        }`}
+      <nav
+        id="hall-directory"
+        aria-label="Hall directory"
+        hidden={!isOpen}
+        className="walk-directory-panel"
+        onKeyDown={event => {
+          if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); close() }
+        }}
       >
-        <div className="p-4">
-          <h3 className="text-sm font-bold text-hall-muted mb-3 uppercase tracking-wider">
-            Navigate
-          </h3>
-
+        <div className="walk-directory-heading"><h2>Places in the hall</h2><button ref={closeRef} onClick={close} aria-label="Close hall directory">×</button></div>
+        <div ref={listRef} className="walk-directory-groups">
           {ZONES.map(({ key, label }) => {
             const zonePois = pois.filter((p) => p.zone === key)
             if (zonePois.length === 0) return null
             const isExpanded = expandedZone === key
 
             return (
-              <div key={key} className="mb-2">
+              <section key={key} className="walk-directory-group">
                 <button
                   onClick={() => setExpandedZone(isExpanded ? null : key)}
-                  className="w-full text-left px-2 py-1.5 rounded text-sm font-semibold text-hall-muted hover:text-hall-text hover:bg-hall-muted/10 transition-colors flex items-center justify-between"
+                  aria-expanded={isExpanded}
+                  aria-controls={`walk-zone-${key}`}
+                  className="walk-directory-zone"
                 >
                   <span>{label}</span>
-                  <span className="text-xs">{isExpanded ? '\u25B2' : '\u25BC'}</span>
+                  <span aria-hidden="true">{isExpanded ? '−' : '+'}</span>
                 </button>
-
-                {isExpanded && (
-                  <div className="ml-2 mt-1 space-y-0.5">
-                    {zonePois.map((poi) => (
+                  <div id={`walk-zone-${key}`} hidden={!isExpanded} className="walk-directory-items">
+                    {zonePois.map((poi, index) => (
                       <button
                         key={poi.id}
+                        aria-current={nearbyId === poi.id ? 'location' : undefined}
                         onClick={() => {
-                          onToggle()
                           onTeleportToPOI(poi)
+                          onToggle()
                         }}
-                        className="w-full text-left px-2 py-1 rounded text-sm text-hall-muted hover:text-hall-accent hover:bg-hall-muted/10 transition-colors"
                       >
-                        {poi.content.title}
+                        <span className="walk-directory-number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+                        <span>{poi.experienceDisplay?.name ?? poi.content.title}</span>
+                        <span aria-hidden="true">{nearbyId === poi.id ? '◆' : '→'}</span>
                       </button>
                     ))}
                   </div>
-                )}
-              </div>
+              </section>
             )
           })}
         </div>
-      </div>
+        <p className="walk-directory-footnote">Choose a destination to move there. <kbd>Esc</kbd> closes this list.</p>
+      </nav>
     </>
   )
 }
